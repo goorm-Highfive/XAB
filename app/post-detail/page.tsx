@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 // 게시글 뷰페이지
 function PostDetailPage() {
   return (
-    <div className="bg-gray-100">
+    <div className="h-screen bg-gray-100">
       <SiteHeader></SiteHeader>
       <div className="mx-auto max-w-[1248px] pt-[24px]">
         <section>

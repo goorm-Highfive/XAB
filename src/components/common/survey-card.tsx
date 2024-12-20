@@ -1,6 +1,11 @@
+'use client'
+
 import { Card } from '~/components/ui/card'
 import { Progress } from '~/components/ui/progress'
 import { Heart, MessageSquare, Share2 } from 'lucide-react'
+
+import { useState } from 'react'
+import { CustomAlertDialog } from '~/components/common/custom-alert-dialog'
 
 type SurveyCardProps = {
   date: string
@@ -9,7 +14,7 @@ type SurveyCardProps = {
   optionB: string
   votesA: number
   votesB: number
-  totalVotes: number
+  showVoteBtn?: boolean //true일 경우 투표 버튼 표시
 }
 
 function SurveyCard({
@@ -19,8 +24,18 @@ function SurveyCard({
   optionB,
   votesA,
   votesB,
-  totalVotes,
+  showVoteBtn = false,
 }: SurveyCardProps) {
+  //투표 완료 여부
+  const [voteComplete, setVoteComplete] = useState(false)
+
+  const handleVoteSubmit = () => {
+    setVoteComplete(true)
+  }
+
+  // A와 B의 투표 수 합
+  const totalVotes = votesA + votesB
+
   return (
     <Card className="mb-4 p-6 shadow-sm">
       <div className="mb-4 flex items-center gap-2">
@@ -41,6 +56,16 @@ function SurveyCard({
           <span className="text-xs">
             {Math.round((votesA / totalVotes) * 100)}%
           </span>
+
+          {/* 투표 버튼은 상세페이지 && 투표하지 않았을 경우에만 보입니다 */}
+          {showVoteBtn && !voteComplete && (
+            <CustomAlertDialog
+              triggerBtnText={'Vote'}
+              alertTitle={`Your vote for ${optionA} has been submitted.`}
+              actionBtnText="Confirm"
+              onActionClick={() => handleVoteSubmit()}
+            />
+          )}
         </div>
         <div className="flex flex-col items-center rounded-lg bg-gray-200 p-4">
           <span className="text-gray-600">{optionB}</span>
@@ -51,6 +76,16 @@ function SurveyCard({
           <span className="text-xs">
             {Math.round((votesB / totalVotes) * 100)}%
           </span>
+
+          {/* 투표 버튼은 상세페이지 && 투표하지 않았을 경우에만 보입니다 */}
+          {showVoteBtn && !voteComplete && (
+            <CustomAlertDialog
+              triggerBtnText={'Vote'}
+              alertTitle={`Your vote for ${optionB} has been submitted.`}
+              actionBtnText="Confirm"
+              onActionClick={() => handleVoteSubmit()}
+            />
+          )}
         </div>
       </div>
       <div className="mt-4 flex items-center gap-6 text-gray-500">
@@ -58,7 +93,7 @@ function SurveyCard({
         <MessageSquare size={18} /> 128
         <Share2 size={18} /> Share
         <span className="ml-auto">
-          <strong>789</strong> Votes
+          <strong>{totalVotes}</strong> Votes
         </span>
       </div>
     </Card>
