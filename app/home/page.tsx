@@ -19,7 +19,6 @@ export default function Home() {
             optionB="Design B"
             votesA={790}
             votesB={444}
-            totalVotes={1234}
           />
           <SurveyCard
             date="March 14, 2025"
@@ -28,7 +27,6 @@ export default function Home() {
             optionB="Palette B"
             votesA={360}
             votesB={496}
-            totalVotes={856}
           />
           <SurveyCard
             date="March 15, 2025"
@@ -37,7 +35,6 @@ export default function Home() {
             optionB="Design B"
             votesA={790}
             votesB={444}
-            totalVotes={1234}
           />
           <SurveyCard
             date="March 14, 2025"
@@ -46,7 +43,6 @@ export default function Home() {
             optionB="Palette B"
             votesA={360}
             votesB={496}
-            totalVotes={856}
           />
           <SurveyCard
             date="March 15, 2025"
@@ -55,7 +51,6 @@ export default function Home() {
             optionB="Design B"
             votesA={790}
             votesB={444}
-            totalVotes={1234}
           />
           <SurveyCard
             date="March 14, 2025"
@@ -64,7 +59,6 @@ export default function Home() {
             optionB="Palette B"
             votesA={360}
             votesB={496}
-            totalVotes={856}
           />
           <SurveyCard
             date="March 15, 2025"
@@ -73,7 +67,6 @@ export default function Home() {
             optionB="Design B"
             votesA={790}
             votesB={444}
-            totalVotes={1234}
           />
           <SurveyCard
             date="March 14, 2025"
@@ -82,7 +75,6 @@ export default function Home() {
             optionB="Palette B"
             votesA={360}
             votesB={496}
-            totalVotes={856}
           />
         </div>
         <SuggestSection />

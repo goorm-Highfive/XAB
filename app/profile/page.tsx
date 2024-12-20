@@ -17,7 +17,6 @@ function ProfilePage() {
             optionB="Design B"
             votesA={790}
             votesB={444}
-            totalVotes={1234}
           />
           <SurveyCard
             date="March 14, 2025"
@@ -26,7 +25,6 @@ function ProfilePage() {
             optionB="Palette B"
             votesA={360}
             votesB={496}
-            totalVotes={856}
           />
         </div>
       </div>
