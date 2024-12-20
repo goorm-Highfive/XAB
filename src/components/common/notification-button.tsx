@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { Bell } from 'lucide-react'
 
-import { NotifyItem } from '~/components/notify/notify-item'
 import { Button } from '~/components/ui/button'
 import {
   Sheet,
@@ -31,11 +30,7 @@ function NotificationButton() {
             Notifications
           </SheetTitle>
         </SheetHeader>
-        <div className="my-6">
-          <NotifyItem />
-          <NotifyItem />
-          <NotifyItem />
-        </div>
+        <div className="my-6" />
         <SheetFooter>
           <SheetClose asChild>
             <Button className="h-12 w-full py-3 text-center" asChild>
