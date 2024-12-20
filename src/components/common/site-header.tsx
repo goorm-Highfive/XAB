@@ -9,9 +9,9 @@ function SiteHeader() {
     <nav className="sticky top-0 z-50 bg-white shadow-sm">
       <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-6 py-4">
         {/* Logo */}
-        <div className="flex items-center gap-2">
+        <h1 className="flex items-center gap-2">
           <Image src={Logo} alt="Website Logo" className="size-8" />
-        </div>
+        </h1>
 
         {/* Navbar 메뉴 */}
         <div className="flex items-center gap-4">
