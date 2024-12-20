@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import { SiteHeader } from '~/components/common/site-header'
 import { NotifyGroup } from '~/components/notify/notify-group'
 
@@ -37,8 +39,17 @@ const mockData: MockDataType[] = [
 ]
 
 function NotifyPage() {
+  const [data, setData] = useState(mockData)
+
+  const updateIsRead = (id: number) => {
+    const newData = data.map((item) =>
+      item.id === id ? { ...item, isRead: true } : item,
+    )
+    setData(newData)
+  }
+
   // 날짜별로 그룹화한 데이터
-  const groupedData = mockData.reduce<GroupedMockData>((acc, curr) => {
+  const groupedData = data.reduce<GroupedMockData>((acc, curr) => {
     const { createdAt } = curr
 
     if (!acc[createdAt]) {
@@ -53,7 +64,12 @@ function NotifyPage() {
       <SiteHeader />
       <div className="mb-28 mt-4">
         {Object.entries(groupedData).map(([createdAt, items]) => (
-          <NotifyGroup key={createdAt} date={createdAt} items={items} />
+          <NotifyGroup
+            key={createdAt}
+            date={createdAt}
+            items={items}
+            updateIsRead={updateIsRead}
+          />
         ))}
       </div>
     </div>
