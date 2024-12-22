@@ -8,7 +8,6 @@ type NotifyGroupProps = {
 }
 
 function NotifyGroup({ date, items, updateIsRead }: NotifyGroupProps) {
-  console.log(items)
   // 알림 발생 날짜에 맞게 묶어서 출력하기 위한 컴포넌트
   return (
     <div className="mx-auto max-w-xl px-4 pt-5">
