@@ -18,7 +18,7 @@ function NotifyItem({ data, updateIsRead }: NotifyItemsProp) {
         <div>
           <div className="h-12 w-12 rounded-full bg-gray-300" />
         </div>
-        <div className="px-4">
+        <div className="px-6">
           <AlertTitle className="text-base font-semibold">
             {data.userId}
             <span className="font-normal"> {data.action}</span>
@@ -28,7 +28,9 @@ function NotifyItem({ data, updateIsRead }: NotifyItemsProp) {
           </AlertDescription>
         </div>
       </div>
-      {data.isRead ? null : <div className="h-3 w-3 rounded-full bg-chart-1" />}
+      {data.isRead ? null : (
+        <div className="absolute right-4 h-3 w-3 rounded-full bg-chart-1" />
+      )}
     </Alert>
   )
 }
