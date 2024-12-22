@@ -1,11 +1,5 @@
 import { NotifyItem } from '~/components/notify/notify-item'
-import type { MockDataType } from '~/types/mockdata'
-
-type NotifyGroupProps = {
-  date: string
-  items: MockDataType[]
-  updateIsRead: (id: number) => void
-}
+import type { NotifyGroupProps } from '~/types/mockdata'
 
 function NotifyGroup({ date, items, updateIsRead }: NotifyGroupProps) {
   // 알림 발생 날짜에 맞게 묶어서 출력하기 위한 컴포넌트

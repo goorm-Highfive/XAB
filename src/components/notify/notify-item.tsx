@@ -1,14 +1,9 @@
 'use client'
 
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
-import type { MockDataType } from '~/types/mockdata'
+import type { NotifyItemProp } from '~/types/mockdata'
 
-type NotifyItemsProp = {
-  data: MockDataType
-  updateIsRead: (id: number) => void
-}
-
-function NotifyItem({ data, updateIsRead }: NotifyItemsProp) {
+function NotifyItem({ data, updateIsRead }: NotifyItemProp) {
   return (
     <Alert
       onClick={() => updateIsRead(data.id)}
