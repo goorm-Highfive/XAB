@@ -4,10 +4,12 @@ import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 import type { NotifyItemProp } from '~/types/mockdata'
 
 function NotifyItem({ data, updateIsRead }: NotifyItemProp) {
+  const { id, isRead, userId, action, createdAt } = data
+
   return (
     <Alert
-      onClick={() => updateIsRead(data.id)}
-      className={`relative my-4 flex cursor-pointer justify-between p-4 ${data.isRead ? 'opacity-50' : 'opacity-100'}`}
+      onClick={() => updateIsRead(id)}
+      className={`relative my-4 flex cursor-pointer justify-between p-4 ${isRead ? 'opacity-50' : 'opacity-100'}`}
     >
       <div className="items-top flex gap-3">
         <div>
@@ -15,15 +17,15 @@ function NotifyItem({ data, updateIsRead }: NotifyItemProp) {
         </div>
         <div className="px-6">
           <AlertTitle className="text-base font-semibold">
-            {data.userId}
-            <span className="font-normal"> {data.action}</span>
+            {userId}
+            <span className="font-normal"> {action}</span>
           </AlertTitle>
           <AlertDescription className="text-sm text-muted-foreground">
-            {data.createdAt}
+            {createdAt}
           </AlertDescription>
         </div>
       </div>
-      {data.isRead ? null : (
+      {isRead ? null : (
         <div className="absolute right-4 h-3 w-3 rounded-full bg-chart-1" />
       )}
     </Alert>
