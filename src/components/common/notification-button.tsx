@@ -2,7 +2,9 @@
 
 import Link from 'next/link'
 import { Bell } from 'lucide-react'
+import { useState } from 'react'
 
+import type { MockDataType } from '~/types/mockdata'
 import { NotifyItem } from '~/components/notify/notify-item'
 import { Button } from '~/components/ui/button'
 import {
@@ -11,11 +13,8 @@ import {
   SheetContent,
   SheetTitle,
   SheetTrigger,
+  SheetDescription,
 } from '~/components/ui/custom-sheet'
-
-import type { MockDataType } from '~/types/mockdata'
-import { useState } from 'react'
-import { SheetDescription } from '../ui/sheet'
 
 const mockData: MockDataType[] = [
   {
