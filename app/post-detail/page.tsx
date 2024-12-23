@@ -1,8 +1,6 @@
 import { SiteHeader } from '~/components/common/site-header'
 import { SurveyCard } from '~/components/common/survey-card'
-import { PostComment } from '~/components/post-comment'
-import { PostCommentInput } from '~/components/post-comment-input'
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
+import { CommentsCard } from '~/components/comments-card'
 
 // 게시글 뷰페이지
 function PostDetailPage() {
@@ -22,16 +20,7 @@ function PostDetailPage() {
           />
         </section>
         <section className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Comments (89)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <PostComment />
-              <PostComment />
-              <PostCommentInput />
-            </CardContent>
-          </Card>
+          <CommentsCard></CommentsCard>
         </section>
       </div>
     </div>
