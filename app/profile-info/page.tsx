@@ -1,6 +1,6 @@
 'use client'
 
-import { HeaderPrevType } from '~/components/header-prev-type'
+import { HeaderPrevType } from '~/components/common/header-prev-type'
 import { ProfileEditLayout } from '~/components/profile-edit-layout'
 import { ProfileInfo } from '~/components/profile-info'
 import { Toaster } from '~/components/ui/sonner'
