@@ -1,5 +1,5 @@
 import { SiteHeader } from '~/components/common/site-header'
-import { PostArticle } from '~/components/post-article'
+import { SurveyCard } from '~/components/common/survey-card'
 import { PostComment } from '~/components/post-comment'
 import { PostCommentInput } from '~/components/post-comment-input'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
@@ -11,7 +11,15 @@ function PostDetailPage() {
       <SiteHeader></SiteHeader>
       <div className="mx-auto max-w-[1248px] pt-[24px]">
         <section>
-          <PostArticle />
+          <SurveyCard
+            date="March 15, 2025"
+            question="Which landing page design do you prefer for our new product?"
+            optionA="Design A"
+            optionB="Design B"
+            votesA={50}
+            votesB={50}
+            showVoteBtn={true} //투표 버튼은 상세페이지에서만 보입니다.
+          />
         </section>
         <section className="mt-6">
           <Card>
