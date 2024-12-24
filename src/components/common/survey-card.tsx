@@ -85,7 +85,7 @@ function SurveyCard({
               triggerBtnText="Vote"
               alertTitle={`Your vote for ${optionA} has been submitted.`}
               actionBtnText="Confirm"
-              onActionClick={() => handleVoteSubmit('A')}
+              onActionClick={() => handleVoteSubmit()}
             />
           )}
         </div>
@@ -105,7 +105,7 @@ function SurveyCard({
               triggerBtnText={'Vote'}
               alertTitle={`Your vote for ${optionB} has been submitted.`}
               actionBtnText="Confirm"
-              onActionClick={() => handleVoteSubmit('B')}
+              onActionClick={() => handleVoteSubmit()}
             />
           )}
         </div>
