@@ -5,13 +5,16 @@ import { Button } from '~/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 
-type HeaderPrevProps = {
+type SiteHeaderPrevTypeProps = {
   pageTitle: string
   handleSaveBtnClick: () => void
 }
 
 // 이전 페이지로 가는 버튼이 포함된 헤더 컴포넌트
-function HeaderPrevType({ pageTitle, handleSaveBtnClick }: HeaderPrevProps) {
+function SiteHeaderPrevType({
+  pageTitle,
+  handleSaveBtnClick,
+}: SiteHeaderPrevTypeProps) {
   // Save Changes 버튼 클릭 시 알림 표시
   const handleSaveForm = () => {
     toast.success('Changes saved successfully!')
@@ -37,4 +40,4 @@ function HeaderPrevType({ pageTitle, handleSaveBtnClick }: HeaderPrevProps) {
   )
 }
 
-export { HeaderPrevType }
+export { SiteHeaderPrevType }

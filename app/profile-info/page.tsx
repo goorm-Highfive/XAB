@@ -1,6 +1,6 @@
 'use client'
 
-import { HeaderPrevType } from '~/components/common/header-prev-type'
+import { SiteHeaderPrevType } from '~/components/common/site-header-prev-type'
 import { ProfileEditLayout } from '~/components/profile-edit-layout'
 import { ProfileInfo } from '~/components/profile-info'
 import { Toaster } from '~/components/ui/sonner'
@@ -34,7 +34,7 @@ function ProfileInfoPage() {
 
   return (
     <>
-      <HeaderPrevType
+      <SiteHeaderPrevType
         pageTitle="Setting"
         handleSaveBtnClick={handleSaveBtnClick}
       />
