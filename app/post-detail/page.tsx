@@ -16,7 +16,9 @@ function PostDetailPage() {
             optionB="Design B"
             votesA={50}
             votesB={50}
-            showVoteBtn={true} //투표 버튼은 상세페이지에서만 보입니다.
+            voteComplete={false}
+            initLikeCount={12100}
+            userLiked={false}
           />
         </section>
         <section className="mt-6">

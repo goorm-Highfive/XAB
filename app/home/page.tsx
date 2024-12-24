@@ -19,6 +19,9 @@ export default function Home() {
             optionB="Design B"
             votesA={790}
             votesB={444}
+            voteComplete={true}
+            initLikeCount={1209}
+            userLiked={true}
           />
           <SurveyCard
             date="March 14, 2025"
@@ -27,6 +30,9 @@ export default function Home() {
             optionB="Palette B"
             votesA={360}
             votesB={496}
+            voteComplete={true}
+            initLikeCount={11}
+            userLiked={false}
           />
           <SurveyCard
             date="March 15, 2025"
@@ -35,6 +41,9 @@ export default function Home() {
             optionB="Design B"
             votesA={790}
             votesB={444}
+            voteComplete={true}
+            initLikeCount={1100}
+            userLiked={false}
           />
           <SurveyCard
             date="March 14, 2025"
@@ -43,6 +52,9 @@ export default function Home() {
             optionB="Palette B"
             votesA={360}
             votesB={496}
+            voteComplete={true}
+            initLikeCount={500}
+            userLiked={true}
           />
           <SurveyCard
             date="March 15, 2025"
@@ -51,6 +63,9 @@ export default function Home() {
             optionB="Design B"
             votesA={790}
             votesB={444}
+            voteComplete={true}
+            initLikeCount={1100}
+            userLiked={false}
           />
           <SurveyCard
             date="March 14, 2025"
@@ -59,6 +74,9 @@ export default function Home() {
             optionB="Palette B"
             votesA={360}
             votesB={496}
+            voteComplete={true}
+            initLikeCount={99}
+            userLiked={true}
           />
           <SurveyCard
             date="March 15, 2025"
@@ -67,6 +85,9 @@ export default function Home() {
             optionB="Design B"
             votesA={790}
             votesB={444}
+            voteComplete={true}
+            initLikeCount={1100}
+            userLiked={false}
           />
           <SurveyCard
             date="March 14, 2025"
@@ -75,6 +96,9 @@ export default function Home() {
             optionB="Palette B"
             votesA={360}
             votesB={496}
+            voteComplete={true}
+            initLikeCount={1100}
+            userLiked={false}
           />
         </div>
         <SuggestSection />
