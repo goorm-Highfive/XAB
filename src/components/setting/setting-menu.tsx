@@ -58,14 +58,13 @@ const MenuItem = ({
   icon: React.ComponentType<{ className?: string }>
   label: string
   isLogout?: boolean
-  href?: string // Link의 목적지
+  href?: string
 }) => {
-  // 버튼인지 링크인지 결정
   const Wrapper = href ? Link : 'button'
 
   return (
     <Wrapper
-      href={href}
+      href={href || ''} // undefined일 경우 빈 문자열로 대체
       className={`flex w-full items-center justify-between rounded-lg px-4 py-2 ${
         isLogout ? 'text-red-500 hover:bg-red-50' : 'hover:bg-gray-100'
       }`}
