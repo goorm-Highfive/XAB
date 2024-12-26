@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { SiteHeader } from '~/components/common/site-header'
 import { SurveyCard } from '~/components/common/survey-card'
-import { CommentsCard } from '~/components/comments-card'
+import { CommentsCard } from '~/components/post-comments-card'
 
 // 임시 데이터 타입 정의
 type SurveyData = {
@@ -31,6 +31,55 @@ const mokData: SurveyData[] = [
     voteComplete: false,
     initLikeCount: 999,
     userLiked: false,
+  },
+]
+
+// 임시 댓글 데이터 타입 정의
+type commentMokData = {
+  id: string
+  writer: string
+  content: string
+  likeCount: number //해당 댓글의 좋아요 수
+  date: string
+  userLiked: boolean //현재 사용자가 해당 댓글에 좋아요를 눌렀는지 여부
+  replies?: commentMokData[]
+}
+
+// 임시 댓글 데이터
+const commentMokData: commentMokData[] = [
+  {
+    id: '1',
+    writer: 'John Doe',
+    content: 'This is a comment on the post. Great article!',
+    likeCount: 10,
+    date: '2 hours ago',
+    userLiked: false,
+  },
+  {
+    id: '2',
+    writer: 'John Doe',
+    content: 'This is a comment on the post. Great article!',
+    likeCount: 10,
+    date: '3 hours ago',
+    userLiked: false,
+  },
+  {
+    id: '3',
+    writer: 'Jane Smith',
+    content: 'I totally agree with this perspective. Very insightful!',
+    likeCount: 5,
+    date: '1 hour ago',
+    userLiked: true,
+    replies: [
+      {
+        id: '3-1',
+        writer: 'John Doe',
+        content: 'Thanks! Glad you liked it.',
+        likeCount: 2,
+        date: '30 minutes ago',
+        userLiked: false,
+      },
+    ],
   },
 ]
 
@@ -73,7 +122,7 @@ function PostDetailPage() {
   }
 
   return (
-    <div className="h-screen bg-gray-100">
+    <div className="bg-gray-100">
       <SiteHeader></SiteHeader>
       <div className="mx-auto max-w-[1248px] pt-[24px]">
         <section>
@@ -84,7 +133,7 @@ function PostDetailPage() {
           />
         </section>
         <section className="mt-6">
-          <CommentsCard></CommentsCard>
+          <CommentsCard comments={commentMokData}></CommentsCard>
         </section>
       </div>
     </div>
