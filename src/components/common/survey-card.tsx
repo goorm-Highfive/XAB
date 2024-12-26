@@ -1,9 +1,7 @@
-'use client'
-
-import { useState } from 'react'
 import { CustomAlertDialog } from '~/components/common/custom-alert-dialog'
 import { Card } from '~/components/ui/card'
 import { Progress } from '~/components/ui/progress'
+import { formatLikeCount } from '~/utils/like-formatters'
 import { Heart, MessageSquare, Share2 } from 'lucide-react'
 
 type SurveyCardProps = {
@@ -16,6 +14,8 @@ type SurveyCardProps = {
   voteComplete: boolean // 투표 여부
   initLikeCount: number
   userLiked: boolean // 현재 사용자 좋아요 상태
+  onLikeToggle?: () => void
+  onVoteSubmit?: (option: 'A' | 'B') => void
 }
 
 function SurveyCard({
@@ -27,35 +27,11 @@ function SurveyCard({
   votesB,
   voteComplete,
   initLikeCount,
+  onLikeToggle,
+  onVoteSubmit,
   userLiked,
 }: SurveyCardProps) {
-  // 투표 완료 상태 관리
-  const [isVoteComplete, setIsVoteComplete] = useState(voteComplete)
-
-  // 좋아요 상태 및 좋아요 카운트 관리
-  const [liked, setLiked] = useState(userLiked)
-  const [likeCount, setLikeCount] = useState(initLikeCount)
-
-  // 좋아요 토글 함수
-  const toggleLike = () => {
-    setLikeCount((prevCount) =>
-      liked ? Math.max(prevCount - 1, 0) : prevCount + 1,
-    )
-    setLiked((prev) => !prev)
-  }
-
-  // 좋아요 카운트 포맷
-  const formatLikeCount = (count: number) => {
-    if (count >= 1000) return `${Math.round(count / 100) / 10}k`
-    return count.toString()
-  }
-
-  // 투표 처리 함수
-  const handleVoteSubmit = () => {
-    if (!isVoteComplete) setIsVoteComplete(true)
-  }
-
-  // A와 B의 투표 수 합
+  // 전체 투표 수
   const totalVotes = votesA + votesB
 
   return (
@@ -80,12 +56,12 @@ function SurveyCard({
           </span>
 
           {/* 투표 버튼은 isVoteComplete가 false일 때만 보입니다 */}
-          {!isVoteComplete && (
+          {!voteComplete && (
             <CustomAlertDialog
               triggerBtnText="Vote"
               alertTitle={`Your vote for ${optionA} has been submitted.`}
               actionBtnText="Confirm"
-              onActionClick={() => handleVoteSubmit()}
+              onActionClick={() => onVoteSubmit && onVoteSubmit('A')}
             />
           )}
         </div>
@@ -100,24 +76,24 @@ function SurveyCard({
           </span>
 
           {/* 투표 버튼은 isVoteComplete가 false일 때만 보입니다 */}
-          {!isVoteComplete && (
+          {!voteComplete && (
             <CustomAlertDialog
               triggerBtnText={'Vote'}
               alertTitle={`Your vote for ${optionB} has been submitted.`}
               actionBtnText="Confirm"
-              onActionClick={() => handleVoteSubmit()}
+              onActionClick={() => onVoteSubmit && onVoteSubmit('B')}
             />
           )}
         </div>
       </div>
       <div className="mt-4 flex items-center gap-4 text-gray-500">
-        <button onClick={toggleLike} className="flex items-center">
-          {liked ? (
+        <button onClick={onLikeToggle} className="flex items-center">
+          {userLiked ? (
             <Heart size={18} color="red" className="mr-4" strokeWidth={2} />
           ) : (
             <Heart size={18} color="gray" className="mr-4" />
           )}
-          {formatLikeCount(likeCount)}
+          {formatLikeCount(initLikeCount)}
         </button>
         <MessageSquare size={18} /> 128
         <Share2 size={18} /> Share
