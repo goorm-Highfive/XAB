@@ -19,10 +19,13 @@ function SiteHeader() {
 
         {/* Navbar 메뉴 */}
         <div className="flex items-center gap-4">
-          <Button variant="ghost" className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Profile
-          </Button>
+          <Link href="/profile">
+            <Button variant="ghost" className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Profile
+            </Button>
+          </Link>
+
           <NotificationButton />
         </div>
       </div>
