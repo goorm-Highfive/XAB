@@ -8,6 +8,7 @@ import {
 } from '~/components/ui/card'
 import { Avatar, AvatarImage, AvatarFallback } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
+import Link from 'next/link'
 
 function ProfileSection() {
   return (
@@ -37,7 +38,15 @@ function ProfileSection() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button className="w-full">Edit Profile</Button>
+        <Link
+          href="/settings/personal-information"
+          passHref
+          className="block w-full" // block 추가
+        >
+          <Button variant="default" className="w-full">
+            Edit Profile
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   )
