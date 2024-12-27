@@ -49,7 +49,7 @@ type commentMokData = {
 const commentMokData: commentMokData[] = [
   {
     id: '1',
-    writer: 'John Doe',
+    writer: 'wontory',
     content: 'This is a comment on the post. Great article!',
     likeCount: 10,
     date: '2 hours ago',
@@ -57,7 +57,7 @@ const commentMokData: commentMokData[] = [
   },
   {
     id: '2',
-    writer: 'John Doe',
+    writer: 'E0min',
     content: 'This is a comment on the post. Great article!',
     likeCount: 10,
     date: '3 hours ago',
@@ -65,7 +65,7 @@ const commentMokData: commentMokData[] = [
   },
   {
     id: '3',
-    writer: 'Jane Smith',
+    writer: 'jyooni99',
     content: 'I totally agree with this perspective. Very insightful!',
     likeCount: 5,
     date: '1 hour ago',
@@ -73,7 +73,7 @@ const commentMokData: commentMokData[] = [
     replies: [
       {
         id: '3-1',
-        writer: 'John Doe',
+        writer: 'yujsoo',
         content: 'Thanks! Glad you liked it.',
         likeCount: 2,
         date: '30 minutes ago',
