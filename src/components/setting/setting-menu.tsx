@@ -42,7 +42,7 @@ function SettingsMenu() {
             label="Terms of Service"
             href="/settings/terms"
           />
-          <MenuItem icon={LogOut} label="Log Out" isLogout />
+          <MenuItem icon={LogOut} label="Log Out" href="api/logout" isLogout />
         </div>
       </div>
     </div>
