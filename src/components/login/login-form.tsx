@@ -24,7 +24,10 @@ function LoginForm() {
             <h1 className="text-3xl font-bold">Welcome to xAB</h1>
             <div className="text-md text-center">
               Don&apos;t have an account?
-              <Link href="#" className="ml-1 underline underline-offset-4">
+              <Link
+                href="sign-up"
+                className="ml-1 underline underline-offset-4"
+              >
                 Sign up
               </Link>
             </div>

@@ -13,7 +13,7 @@ function SignUpForm() {
             <h1 className="text-3xl font-bold">Sign Up for xAB</h1>
             <div className="text-md text-center">
               Already have an account?
-              <Link href="#" className="ml-1 underline underline-offset-4">
+              <Link href="/login" className="ml-1 underline underline-offset-4">
                 Login
               </Link>
             </div>
