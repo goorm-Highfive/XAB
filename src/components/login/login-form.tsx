@@ -1,7 +1,19 @@
 import Link from 'next/link'
+import Image from 'next/image'
+import { Roboto } from 'next/font/google'
+
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
+
+import googleIcon from '~/assets/svgs/google-icon.svg'
+import kakaoIcon from '~/assets/svgs/kakao-icon.svg'
+import naverIcon from '~/assets/svgs/naver-icon.svg'
+
+const roboto = Roboto({
+  subsets: ['latin'],
+  weight: '500',
+})
 
 function LoginForm() {
   return (
@@ -34,6 +46,48 @@ function LoginForm() {
             <Button type="submit" className="w-full">
               Login
             </Button>
+          </div>
+          <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:border-t">
+            <span className="relative z-10 bg-background px-2 text-muted-foreground">
+              OR
+            </span>
+          </div>
+          <div className={`grid gap-4 ${roboto.className}`}>
+            <div className="flex flex-col gap-3">
+              <button className="flex w-full items-center gap-2 rounded border bg-white py-3 pl-4 text-sm font-medium">
+                <Image
+                  src={googleIcon}
+                  alt="googleIcon"
+                  width={18}
+                  className="shrink-0"
+                />
+                <span className="flex-grow text-center">
+                  Continue with Google
+                </span>
+              </button>
+              <button className="flex w-full items-center gap-2 rounded bg-social-kakao py-3 pl-4 text-sm font-medium">
+                <Image
+                  src={kakaoIcon}
+                  alt="kakaoIcon"
+                  width={18}
+                  className="shrink-0"
+                />
+                <span className="flex-grow text-center">
+                  Continue with Kakao
+                </span>
+              </button>
+              <button className="flex w-full items-center gap-2 rounded bg-social-naver py-3 pl-4 text-sm font-medium text-white">
+                <Image
+                  src={naverIcon}
+                  alt="naverIcon"
+                  width={14}
+                  className="shrink-0"
+                />
+                <span className="flex-grow text-center">
+                  Continue with Naver
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </form>
