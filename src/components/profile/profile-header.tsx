@@ -1,7 +1,9 @@
 'use client'
-import { Button } from '~/components/ui/button'
+
 import Link from 'next/link'
 import { useState } from 'react'
+import { SettingButton } from '~/components/profile/profile-setting-button' // 설정 버튼 추가
+import { Button } from '~/components/ui/button'
 
 function ProfileHeader() {
   // 상태 관리: Following 여부
@@ -16,45 +18,45 @@ function ProfileHeader() {
     <div className="flex flex-col rounded-lg bg-white p-6 shadow">
       {/* Avatar */}
       <div className="mb-4 h-24 w-24 rounded-full bg-gray-300" />
-      <div className="flex w-full justify-between">
+
+      {/* Header 상단 */}
+      <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Alex Thompson</h2>
           <p className="text-gray-500">@alexthompson</p>
         </div>
-        <div className="flex gap-4">
-          <Button className="bg-black text-white hover:bg-gray-800">
-            Edit Profile
-          </Button>
+
+        {/* 버튼 그룹 */}
+        <div className="flex gap-2">
+          <Link href="/settings/personal-information" passHref>
+            <Button variant="default">Edit Profile</Button>
+          </Link>
           <Button
             onClick={toggleFollow}
-            className={`${
-              isFollowing
-                ? 'bg-black text-white hover:bg-gray-800'
-                : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
-            }`}
+            variant={isFollowing ? 'default' : 'outline'}
           >
             {isFollowing ? 'Following' : 'Follow'}
           </Button>
+          <SettingButton />
         </div>
       </div>
 
-      <p className="text-gray-600">
-        {/* 설명하는 부분 */}
+      {/* Description */}
+      <p className="mt-4 text-gray-600">
         UX Researcher | A/B Testing Enthusiast | Data Driven Designer
       </p>
-      <div className="mt-2 flex gap-6 text-gray-800">
-        <Link href="/profile/followings">
+
+      {/* Stats */}
+      <div className="mt-4 flex gap-6 text-sm text-gray-700">
+        <Link href="/profile/followings" className="hover:underline">
           <strong>1,234</strong> Following
         </Link>
-
-        <Link href="/profile/followers">
+        <Link href="/profile/followers" className="hover:underline">
           <strong>5,678</strong> Followers
         </Link>
-
         <span>
           <strong>789</strong> Surveys
         </span>
-        {/* 유저 상태에 따라 다르게 접근 되어야 함 */}
       </div>
     </div>
   )

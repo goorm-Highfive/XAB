@@ -10,6 +10,7 @@ function ProfilePage() {
       <div className="p-6">
         <div className="mx-auto mt-6 max-w-3xl space-y-6">
           <ProfileHeader />
+
           <SurveyCard
             date="March 15, 2025"
             question="Which landing page design do you prefer for our new product?"
