@@ -6,12 +6,12 @@ import { useFormContext } from 'react-hook-form'
 import {
   FormField,
   FormItem,
-  FormLabel,
   FormControl,
   FormDescription,
   FormMessage,
 } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
+import { Label } from '~/components/ui/label'
 
 type FormProps = {
   name: string
@@ -36,7 +36,7 @@ function CustomFormField({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <Label>{label}</Label>
           <FormControl>
             <Input type={type} placeholder={placeholder} {...field} />
           </FormControl>
