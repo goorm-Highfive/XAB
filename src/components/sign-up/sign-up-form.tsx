@@ -1,52 +1,55 @@
-import Link from 'next/link'
+'use client'
+
+import { useForm } from 'react-hook-form'
 
 import { Button } from '~/components/ui/button'
-import { Input } from '~/components/ui/input'
-import { Label } from '~/components/ui/label'
+import { Form } from '~/components/ui/form'
+import { CustomFormField } from '~/components/common/custom-form-field'
+
+export type FormDataType = {
+  userName: string
+  email: string
+  password: string
+  passwordConfirm: string
+}
 
 function SignUpForm() {
+  const form = useForm<FormDataType>({
+    defaultValues: {
+      userName: '',
+      email: '',
+      password: '',
+      passwordConfirm: '',
+    },
+  })
   return (
-    <div className="flex flex-col gap-6">
+    <Form {...form}>
       <form>
         <div className="flex flex-col gap-6">
-          <div className="flex flex-col items-center gap-2">
-            <h1 className="text-3xl font-bold">Sign Up for xAB</h1>
-            <div className="text-md text-center">
-              Already have an account?
-              <Link href="/login" className="ml-1 underline underline-offset-4">
-                Login
-              </Link>
-            </div>
-          </div>
-          <div className="flex flex-col gap-6">
-            <div className="grid gap-2">
-              <Label htmlFor="userName">Name</Label>
-              <Input id="userName" type="text" required />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input id="password" type="confirmPassword" required />
-            </div>
-            <Button type="submit" className="w-full">
-              Sign Up
-            </Button>
-          </div>
+          <CustomFormField
+            name="userName"
+            label="Name"
+            placeholder="John Doe"
+            type="text"
+          />
+
+          <CustomFormField
+            name="email"
+            label="Email"
+            placeholder="xAB@example.com"
+          />
+          <CustomFormField name="password" label="Password" type="password" />
+          <CustomFormField
+            name="passwordConfirm"
+            label="Password Confirm"
+            type="password"
+          />
+          <Button type="submit" className="w-full">
+            Sign Up
+          </Button>
         </div>
       </form>
-    </div>
+    </Form>
   )
 }
 
