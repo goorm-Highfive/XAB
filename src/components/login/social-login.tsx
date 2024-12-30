@@ -14,7 +14,7 @@ const roboto = Roboto({
 
 function SocialLogin() {
   return (
-    <div className={`grid gap-4 ${roboto.className}`}>
+    <div className={`my-2 grid gap-4 ${roboto.className}`}>
       <div className="flex flex-col gap-3">
         <SocialLoginButton
           icon={googleIcon}

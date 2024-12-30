@@ -56,7 +56,7 @@ function SignUpForm() {
             placeholder="password confirm"
           />
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="my-4 w-full py-6">
             Sign Up
           </Button>
         </div>

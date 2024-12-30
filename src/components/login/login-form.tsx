@@ -28,7 +28,7 @@ function LoginForm() {
         <div className="flex flex-col gap-6">
           <CustomFormField name="email" label="Email" type="text" />
           <CustomFormField name="password" label="Password" type="password" />
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="my-4 w-full py-6">
             Login
           </Button>
         </div>

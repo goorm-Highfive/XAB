@@ -36,9 +36,14 @@ function CustomFormField({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <Label>{label}</Label>
+          <Label className="font-semibold">{label}</Label>
           <FormControl>
-            <Input type={type} placeholder={placeholder} {...field} />
+            <Input
+              type={type}
+              placeholder={placeholder}
+              className="py-5"
+              {...field}
+            />
           </FormControl>
           {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
