@@ -5,7 +5,7 @@ import { Roboto } from 'next/font/google'
 import googleIcon from '~/assets/svgs/google-icon.svg'
 import kakaoIcon from '~/assets/svgs/kakao-icon.svg'
 import naverIcon from '~/assets/svgs/naver-icon.svg'
-import { SocialLoginButton } from '../common/social-login-button'
+import { SocialLoginButton } from '~/components/common/social-login-button'
 
 const roboto = Roboto({
   subsets: ['latin'],
