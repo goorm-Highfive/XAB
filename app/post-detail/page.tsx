@@ -1,28 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-
 import { SiteHeader } from '~/components/common/site-header'
 import { SurveyCard } from '~/components/common/survey-card'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
-import { PostComment } from '~/components/post-comment'
-import { PostCommentInput } from '~/components/post-comment-input'
-
-// 임시 데이터 타입 정의
-type SurveyData = {
-  date: string
-  question: string
-  optionA: string
-  optionB: string
-  votesA: number
-  votesB: number
-  voteComplete: boolean
-  initLikeCount: number
-  userLiked: boolean
-}
+import { PostComment } from '~/components/survey-detail/survey-comment'
+import { PostCommentInput } from '~/components/survey-detail/survey-comment-input'
+import { SurveyData } from '~/types/survey'
+import { CommentData } from '~/types/comment'
 
 // 임시 데이터
-const mokData: SurveyData[] = [
+const initialSurveyData: SurveyData[] = [
   {
     date: 'March 15, 2025',
     question: 'Which landing page design do you prefer for our new product?',
@@ -36,19 +24,7 @@ const mokData: SurveyData[] = [
   },
 ]
 
-// 임시 댓글 데이터 타입 정의
-type commentMokData = {
-  id: string
-  writer: string
-  content: string
-  likeCount: number //해당 댓글의 좋아요 수
-  date: string
-  userLiked: boolean //현재 사용자가 해당 댓글에 좋아요를 눌렀는지 여부
-  replies?: commentMokData[]
-}
-
-// 임시 댓글 데이터
-const commentMokData: commentMokData[] = [
+const initialCommentData: CommentData[] = [
   {
     id: '1',
     writer: 'wontory',
@@ -85,16 +61,13 @@ const commentMokData: commentMokData[] = [
   },
 ]
 
-// 게시글 뷰페이지
-function PostDetailPage() {
-  const [surveyData, setSurveyData] = useState(mokData)
-  const [comments, setComments] = useState(commentMokData)
-  //console.log(surveyData)
+// 좋아요 및 투표 로직 관리
+const useSurveyData = (initialData: SurveyData[]) => {
+  const [survey, setSurvey] = useState(initialData)
 
-  // 좋아요 상태를 업데이트하는 함수
   const updateLike = (index: number, newLikeStatus: boolean) => {
-    setSurveyData((prevData) =>
-      prevData.map((item, i) =>
+    setSurvey((prev) =>
+      prev.map((item, i) =>
         i === index
           ? {
               ...item,
@@ -108,10 +81,9 @@ function PostDetailPage() {
     )
   }
 
-  // 투표 데이터 업데이트 함수
   const handleVoteSubmit = (index: number, option: 'A' | 'B') => {
-    setSurveyData((prevData) =>
-      prevData.map((item, i) =>
+    setSurvey((prev) =>
+      prev.map((item, i) =>
         i === index
           ? {
               ...item,
@@ -124,66 +96,65 @@ function PostDetailPage() {
     )
   }
 
-  const toggleCommentLike = (id: string) => {
-    setComments((prevComments) =>
-      prevComments.map((comment) =>
+  return { survey, updateLike, handleVoteSubmit }
+}
+
+const useCommentData = (initialData: CommentData[]) => {
+  const [comments, setComments] = useState(initialData)
+
+  const toggleLike = (id: string, isReply = false, replyId?: string) => {
+    setComments((prev) =>
+      prev.map((comment) =>
         comment.id === id
           ? {
               ...comment,
-              userLiked: !comment.userLiked,
-              likeCount: !comment.userLiked
-                ? comment.likeCount + 1
-                : Math.max(comment.likeCount - 1, 0),
+              ...(isReply
+                ? {
+                    replies: comment.replies?.map((reply) =>
+                      reply.id === replyId
+                        ? {
+                            ...reply,
+                            userLiked: !reply.userLiked,
+                            likeCount: reply.userLiked
+                              ? Math.max(reply.likeCount - 1, 0)
+                              : reply.likeCount + 1,
+                          }
+                        : reply,
+                    ),
+                  }
+                : {
+                    userLiked: !comment.userLiked,
+                    likeCount: comment.userLiked
+                      ? Math.max(comment.likeCount - 1, 0)
+                      : comment.likeCount + 1,
+                  }),
             }
           : comment,
       ),
     )
   }
 
-  const toggleReplyLike = (commentId: string, replyId: string) => {
-    setComments((prevComments) =>
-      prevComments.map((comment) =>
-        comment.id === commentId
-          ? {
-              ...comment,
-              replies: comment.replies?.map((reply) =>
-                reply.id === replyId
-                  ? {
-                      ...reply,
-                      userLiked: !reply.userLiked,
-                      likeCount: reply.userLiked
-                        ? Math.max(reply.likeCount - 1, 0)
-                        : reply.likeCount + 1,
-                    }
-                  : reply,
-              ),
-            }
-          : comment,
-      ),
-    )
+  const addComment = (content: string) => {
+    setComments((prev) => [
+      {
+        id: String(prev.length + 1),
+        writer: 'current_user',
+        content,
+        likeCount: 0,
+        date: 'Just now',
+        userLiked: false,
+      },
+      ...prev,
+    ])
   }
 
-  // 새로운 댓글 추가 함수
-  const addComment = (commentContent: string) => {
-    const newComment = {
-      id: String(comments.length + 1), // 고유 id 생성
-      writer: 'current_user', // 실제 사용자 정보로 대체 가능
-      content: commentContent,
-      likeCount: 0,
-      date: 'Just now',
-      userLiked: false,
-    }
-    setComments((prevComments) => [newComment, ...prevComments]) // 새 댓글을 기존 댓글 앞에 추가
-  }
-
-  // 새로운 댓글 추가 함수
   const addReply = (
     commentId: string,
-    replyContent: string,
+    content: string,
     mentionedUser: string,
   ) => {
-    setComments((prevComments) =>
-      prevComments.map((comment) =>
+    setComments((prev) =>
+      prev.map((comment) =>
         comment.id === commentId
           ? {
               ...comment,
@@ -191,8 +162,8 @@ function PostDetailPage() {
                 ...(comment.replies || []),
                 {
                   id: `${comment.id}-${(comment.replies?.length || 0) + 1}`,
-                  writer: 'current_user', // 실제 사용자 정보로 변경
-                  content: `@${mentionedUser} ${replyContent}`, // '@' 표시와 함께 대댓글 내용 추가
+                  writer: 'current_user',
+                  content: `@${mentionedUser} ${content}`,
                   likeCount: 0,
                   date: 'Just now',
                   userLiked: false,
@@ -204,39 +175,45 @@ function PostDetailPage() {
     )
   }
 
+  return { comments, toggleLike, addComment, addReply }
+}
+
+function PostDetailPage() {
+  const { survey, updateLike, handleVoteSubmit } =
+    useSurveyData(initialSurveyData)
+  const { comments, toggleLike, addComment, addReply } =
+    useCommentData(initialCommentData)
+
   return (
     <div className="bg-gray-100">
-      <SiteHeader></SiteHeader>
-      <div className="mx-auto max-w-[1248px] pt-[24px]">
-        <section>
-          <SurveyCard
-            {...surveyData[0]}
-            onVoteSubmit={(option) => handleVoteSubmit(0, option)}
-            onLikeToggle={() => updateLike(0, !surveyData[0].userLiked)}
-          />
-        </section>
-        <section className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Comments (89)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {comments.map((comment) => (
-                <PostComment
-                  comment={comment}
-                  key={comment.id}
-                  onToggleLike={() => toggleCommentLike(comment.id)}
-                  onToggleReplyLike={(replyId) =>
-                    toggleReplyLike(comment.id, replyId)
-                  }
-                  onAddReply={addReply}
-                />
-              ))}
-              <PostCommentInput onCommentSubmit={addComment} />{' '}
-              {/* 댓글 추가 기능 */}
-            </CardContent>
-          </Card>
-        </section>
+      <SiteHeader />
+      <div className="mx-auto max-w-[1248px] pt-6">
+        <SurveyCard
+          {...survey[0]}
+          onVoteSubmit={(option) => handleVoteSubmit(0, option)}
+          onLikeToggle={() => updateLike(0, !survey[0].userLiked)}
+        />
+
+        {/* 댓글 영역 */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Comments ({comments.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {comments.map((comment) => (
+              <PostComment
+                key={comment.id}
+                comment={comment}
+                onToggleLike={() => toggleLike(comment.id)}
+                onToggleReplyLike={(replyId) =>
+                  toggleLike(comment.id, true, replyId)
+                }
+                onAddReply={addReply}
+              />
+            ))}
+            <PostCommentInput onCommentSubmit={addComment} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
