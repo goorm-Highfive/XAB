@@ -4,7 +4,9 @@ import { useState } from 'react'
 
 import { SiteHeader } from '~/components/common/site-header'
 import { SurveyCard } from '~/components/common/survey-card'
-import { CommentsCard } from '~/components/post-comments-card'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
+import { PostComment } from '~/components/post-comment'
+import { PostCommentInput } from '~/components/post-comment-input'
 
 // 임시 데이터 타입 정의
 type SurveyData = {
@@ -86,7 +88,8 @@ const commentMokData: commentMokData[] = [
 // 게시글 뷰페이지
 function PostDetailPage() {
   const [surveyData, setSurveyData] = useState(mokData)
-  console.log(surveyData)
+  const [comments, setComments] = useState(commentMokData)
+  //console.log(surveyData)
 
   // 좋아요 상태를 업데이트하는 함수
   const updateLike = (index: number, newLikeStatus: boolean) => {
@@ -121,6 +124,86 @@ function PostDetailPage() {
     )
   }
 
+  const toggleCommentLike = (id: string) => {
+    setComments((prevComments) =>
+      prevComments.map((comment) =>
+        comment.id === id
+          ? {
+              ...comment,
+              userLiked: !comment.userLiked,
+              likeCount: !comment.userLiked
+                ? comment.likeCount + 1
+                : Math.max(comment.likeCount - 1, 0),
+            }
+          : comment,
+      ),
+    )
+  }
+
+  const toggleReplyLike = (commentId: string, replyId: string) => {
+    setComments((prevComments) =>
+      prevComments.map((comment) =>
+        comment.id === commentId
+          ? {
+              ...comment,
+              replies: comment.replies?.map((reply) =>
+                reply.id === replyId
+                  ? {
+                      ...reply,
+                      userLiked: !reply.userLiked,
+                      likeCount: reply.userLiked
+                        ? Math.max(reply.likeCount - 1, 0)
+                        : reply.likeCount + 1,
+                    }
+                  : reply,
+              ),
+            }
+          : comment,
+      ),
+    )
+  }
+
+  // 새로운 댓글 추가 함수
+  const addComment = (commentContent: string) => {
+    const newComment = {
+      id: String(comments.length + 1), // 고유 id 생성
+      writer: 'current_user', // 실제 사용자 정보로 대체 가능
+      content: commentContent,
+      likeCount: 0,
+      date: 'Just now',
+      userLiked: false,
+    }
+    setComments((prevComments) => [newComment, ...prevComments]) // 새 댓글을 기존 댓글 앞에 추가
+  }
+
+  // 새로운 댓글 추가 함수
+  const addReply = (
+    commentId: string,
+    replyContent: string,
+    mentionedUser: string,
+  ) => {
+    setComments((prevComments) =>
+      prevComments.map((comment) =>
+        comment.id === commentId
+          ? {
+              ...comment,
+              replies: [
+                ...(comment.replies || []),
+                {
+                  id: `${comment.id}-${(comment.replies?.length || 0) + 1}`,
+                  writer: 'current_user', // 실제 사용자 정보로 변경
+                  content: `@${mentionedUser} ${replyContent}`, // '@' 표시와 함께 대댓글 내용 추가
+                  likeCount: 0,
+                  date: 'Just now',
+                  userLiked: false,
+                },
+              ],
+            }
+          : comment,
+      ),
+    )
+  }
+
   return (
     <div className="bg-gray-100">
       <SiteHeader></SiteHeader>
@@ -133,7 +216,26 @@ function PostDetailPage() {
           />
         </section>
         <section className="mt-6">
-          <CommentsCard comments={commentMokData}></CommentsCard>
+          <Card>
+            <CardHeader>
+              <CardTitle>Comments (89)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {comments.map((comment) => (
+                <PostComment
+                  comment={comment}
+                  key={comment.id}
+                  onToggleLike={() => toggleCommentLike(comment.id)}
+                  onToggleReplyLike={(replyId) =>
+                    toggleReplyLike(comment.id, replyId)
+                  }
+                  onAddReply={addReply}
+                />
+              ))}
+              <PostCommentInput onCommentSubmit={addComment} />{' '}
+              {/* 댓글 추가 기능 */}
+            </CardContent>
+          </Card>
         </section>
       </div>
     </div>
