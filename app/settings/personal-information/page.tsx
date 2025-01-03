@@ -1,6 +1,5 @@
 'use client'
 
-import { SiteHeaderPrevType } from '~/components/common/site-header-prev-type'
 import { ProfileEditLayout } from '~/components/profile-edit-layout'
 import { ProfileInfo } from '~/components/profile-info'
 import { Toaster } from '~/components/ui/sonner'
@@ -12,6 +11,7 @@ import {
   CardTitle,
 } from '~/components/ui/card'
 import { CustomAlertDialog } from '~/components/common/custom-alert-dialog'
+import { SiteHeader } from '~/components/common/site-header'
 
 // 타입 정의
 type ProfileData = {
@@ -26,21 +26,12 @@ function ProfileInfoPage() {
     console.log(data)
   }
 
-  // [Save Changes] 버튼 클릭 시 폼 데이터 출력
-  const handleSaveBtnClick = () => {
-    const form = document.querySelector('form')
-    if (form) form.requestSubmit()
-  }
-
   return (
     <>
-      <SiteHeaderPrevType
-        pageTitle="Setting"
-        handleSaveBtnClick={handleSaveBtnClick}
-      />
+      <SiteHeader />
       <div className="mx-auto h-screen max-w-[736px]">
         <ProfileEditLayout contentTitle={'Profile Settings'}>
-          <ProfileInfo onSave={handleSave}></ProfileInfo>
+          <ProfileInfo onSave={handleSave} />
         </ProfileEditLayout>
         <ProfileEditLayout contentTitle={'Danger Zone'}>
           <Card>
