@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { SiteHeader } from '~/components/common/site-header'
 import { SurveyCard } from '~/components/common/survey-card'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
-import { PostComment } from '~/components/survey-detail/survey-comment'
-import { PostCommentInput } from '~/components/survey-detail/survey-comment-input'
+import { SurveyComment } from '~/components/survey-detail/survey-comment'
+import { SurveyCommentInput } from '~/components/survey-detail/survey-comment-input'
 import { SurveyData } from '~/types/survey'
 import { CommentData } from '~/types/comment'
 
@@ -178,7 +178,7 @@ const useCommentData = (initialData: CommentData[]) => {
   return { comments, toggleLike, addComment, addReply }
 }
 
-function PostDetailPage() {
+function SurveyDetailPage() {
   const { survey, updateLike, handleVoteSubmit } =
     useSurveyData(initialSurveyData)
   const { comments, toggleLike, addComment, addReply } =
@@ -201,7 +201,7 @@ function PostDetailPage() {
           </CardHeader>
           <CardContent>
             {comments.map((comment) => (
-              <PostComment
+              <SurveyComment
                 key={comment.id}
                 comment={comment}
                 onToggleLike={() => toggleLike(comment.id)}
@@ -211,7 +211,7 @@ function PostDetailPage() {
                 onAddReply={addReply}
               />
             ))}
-            <PostCommentInput onCommentSubmit={addComment} />
+            <SurveyCommentInput onCommentSubmit={addComment} />
           </CardContent>
         </Card>
       </div>
@@ -219,4 +219,4 @@ function PostDetailPage() {
   )
 }
 
-export default PostDetailPage
+export default SurveyDetailPage

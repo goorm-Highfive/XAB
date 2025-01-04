@@ -8,7 +8,7 @@ import { Input } from '~/components/ui/input'
 import { Send } from 'lucide-react'
 
 // 게시글 뷰페이지 : 댓글 입력
-function PostCommentInput({
+function SurveyCommentInput({
   onCommentSubmit,
 }: {
   onCommentSubmit: (comment: string) => void
@@ -67,4 +67,4 @@ function PostCommentInput({
   )
 }
 
-export { PostCommentInput }
+export { SurveyCommentInput }

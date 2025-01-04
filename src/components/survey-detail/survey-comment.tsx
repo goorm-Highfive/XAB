@@ -8,7 +8,7 @@ import { Input } from '~/components/ui/input'
 import { CommentData } from '~/types/comment'
 import { Heart, Send } from 'lucide-react'
 
-type PostCommentProps = {
+type SurveyCommentProps = {
   comment: CommentData
   onToggleLike: () => void
   onToggleReplyLike: (replyId: string) => void
@@ -61,12 +61,12 @@ function ReplyInput({
   )
 }
 
-function PostComment({
+function SurveyComment({
   comment,
   onToggleLike,
   onToggleReplyLike,
   onAddReply,
-}: PostCommentProps) {
+}: SurveyCommentProps) {
   const [replyData, setReplyData] = useState({
     replyWriter: '',
     replyContent: '',
@@ -186,4 +186,4 @@ function PostComment({
   )
 }
 
-export { PostComment }
+export { SurveyComment }
