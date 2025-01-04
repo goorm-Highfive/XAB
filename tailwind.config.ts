@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss'
+import animatePlugin from 'tailwindcss-animate'
 
-export default {
+const config: Config = {
   darkMode: ['class'],
   content: [
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -49,6 +50,11 @@ export default {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+        social: {
+          google: '#4285f4',
+          kakao: '#fee500',
+          naver: '#03c75a',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -57,5 +63,7 @@ export default {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
-} satisfies Config
+  plugins: [animatePlugin],
+}
+
+export default config
