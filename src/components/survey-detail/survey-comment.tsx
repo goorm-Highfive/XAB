@@ -19,42 +19,47 @@ type PostCommentProps = {
   ) => void
 }
 
-const ReplyInput = ({
-  replyWriter,
-  replyContent,
-  onChange,
-  onSubmit,
-  onKeyDown,
-}: {
+type ReplyInputProps = {
   replyWriter: string
   replyContent: string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onSubmit: () => void
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void
-}) => (
-  <div className="mt-[25px] flex items-center">
-    <div className="mr-3 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
-      <Image src={defaultProfile} alt="" />
+}
+
+// 특정 사용자를 대상으로 댓글을 작성할 수 있는 입력창
+function ReplyInput({
+  replyWriter,
+  replyContent,
+  onChange,
+  onSubmit,
+  onKeyDown,
+}: ReplyInputProps) {
+  return (
+    <div className="mt-[25px] flex items-center">
+      <div className="mr-3 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
+        <Image src={defaultProfile} alt="" />
+      </div>
+      <div className="relative flex-auto">
+        <Input
+          type="text"
+          className="h-[40px] rounded-[30px] border-0 bg-primary-foreground pr-[40px]"
+          placeholder={`@${replyWriter}에게 답글 달기`}
+          value={replyContent}
+          onChange={onChange}
+          onKeyDown={onKeyDown}
+        />
+        <Button
+          variant="ghost"
+          className="absolute right-2 top-1 w-[30px] hover:bg-transparent"
+          onClick={onSubmit}
+        >
+          <Send />
+        </Button>
+      </div>
     </div>
-    <div className="relative flex-auto">
-      <Input
-        type="text"
-        className="h-[40px] rounded-[30px] border-0 bg-primary-foreground pr-[40px]"
-        placeholder={`@${replyWriter}에게 답글 달기`}
-        value={replyContent}
-        onChange={onChange}
-        onKeyDown={onKeyDown}
-      />
-      <Button
-        variant="ghost"
-        className="absolute right-2 top-1 w-[30px] hover:bg-transparent"
-        onClick={onSubmit}
-      >
-        <Send />
-      </Button>
-    </div>
-  </div>
-)
+  )
+}
 
 function PostComment({
   comment,
@@ -64,7 +69,6 @@ function PostComment({
 }: PostCommentProps) {
   const [replyData, setReplyData] = useState({
     replyWriter: '',
-    showReplyInput: false,
     replyContent: '',
   })
 
@@ -72,10 +76,8 @@ function PostComment({
     setReplyData((prev) => {
       const newWriter = prev.replyWriter === writer ? '' : writer
       return {
-        ...prev,
         replyWriter: newWriter,
-        showReplyInput: newWriter !== '',
-        replyContent: '', // 내용은 항상 초기화
+        replyContent: '', // 내용 초기화
       }
     })
   }
@@ -92,7 +94,6 @@ function PostComment({
       onAddReply(comment.id, replyData.replyContent, replyData.replyWriter)
       setReplyData({
         replyWriter: '',
-        showReplyInput: false,
         replyContent: '',
       })
     }
@@ -129,7 +130,7 @@ function PostComment({
           <button
             type="button"
             onClick={() => toggleReplyInput(comment.writer)}
-            className={`mr-4 hover:text-black ${comment.replies && comment.replies.length > 0 ? 'mr-1' : ''}`}
+            className={`hover:text-black ${comment.replies?.length ? 'mr-1' : 'mr-4'}`}
           >
             답글 달기
           </button>
@@ -171,7 +172,7 @@ function PostComment({
         ))}
 
         {/* 답글 입력창 */}
-        {replyData.showReplyInput && (
+        {replyData.replyWriter && (
           <ReplyInput
             replyWriter={replyData.replyWriter}
             replyContent={replyData.replyContent}
