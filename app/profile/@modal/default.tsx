@@ -1,4 +1,3 @@
-function Default() {
-  return <div></div>
+export default function Default() {
+  return null
 }
-export default Default
