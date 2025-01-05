@@ -4,7 +4,6 @@ import { Roboto } from 'next/font/google'
 
 import googleIcon from '~/assets/svgs/google-icon.svg'
 import kakaoIcon from '~/assets/svgs/kakao-icon.svg'
-import naverIcon from '~/assets/svgs/naver-icon.svg'
 import { SocialLoginButton } from '~/components/common/social-login-button'
 
 const roboto = Roboto({
@@ -31,15 +30,6 @@ function SocialLogin() {
           iconSize={18}
           bgColor="bg-social-kakao"
           label="Continue with Kakao"
-        />
-
-        <SocialLoginButton
-          icon={naverIcon}
-          iconAlt="naver social login"
-          iconSize={16}
-          bgColor="bg-social-naver"
-          textColor="text-white"
-          label="Continue with Naver"
         />
       </div>
     </div>
