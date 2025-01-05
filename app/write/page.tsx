@@ -101,7 +101,7 @@ export default function Write() {
               <CardHeader>
                 <CardTitle>Option A</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex flex-col gap-4">
                 {previewA && (
                   <AspectRatio ratio={16 / 9}>
                     <Image
@@ -144,7 +144,7 @@ export default function Write() {
               <CardHeader>
                 <CardTitle>Option B</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex flex-col gap-4">
                 {previewB && (
                   <AspectRatio ratio={16 / 9}>
                     <Image
