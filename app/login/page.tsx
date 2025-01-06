@@ -1,6 +1,5 @@
 import Link from 'next/link'
 
-import { SiteHeader } from '~/components/common/site-header'
 import { LoginForm } from '~/components/login/login-form'
 import { SocialLogin } from '~/components/login/social-login'
 import {
@@ -14,7 +13,6 @@ import {
 export default function LoginPage() {
   return (
     <>
-      <SiteHeader />
       <div className="flex min-h-svh w-full items-center justify-center bg-gray-100 p-10 md:p-10">
         <div className="w-full max-w-md">
           <Card className="py-2">

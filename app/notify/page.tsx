@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 
-import { SiteHeader } from '~/components/common/site-header'
 import { NotifyGroup } from '~/components/notify/notify-group'
 
 import type { MockDataType, GroupedMockData } from '~/types/mockdata'
@@ -61,7 +60,6 @@ function NotifyPage() {
 
   return (
     <div className="h-screen bg-gray-100">
-      <SiteHeader />
       <div className="mb-28 mt-4">
         {Object.entries(groupedData).map(([createdAt, items]) => (
           <NotifyGroup

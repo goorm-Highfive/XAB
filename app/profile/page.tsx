@@ -1,12 +1,10 @@
 import { ProfileHeader } from '~/components/profile/profile-header'
 
 import { SurveyCard } from '~/components/common/survey-card'
-import { SiteHeader } from '~/components/common/site-header'
 
 function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-100">
-      <SiteHeader />
       <div className="p-6">
         <div className="mx-auto mt-6 max-w-3xl space-y-6">
           <ProfileHeader />

@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from '~/components/ui/card'
 import { CustomAlertDialog } from '~/components/common/custom-alert-dialog'
-import { SiteHeader } from '~/components/common/site-header'
 
 // 타입 정의
 type ProfileData = {
@@ -28,7 +27,6 @@ function ProfileInfoPage() {
 
   return (
     <>
-      <SiteHeader />
       <div className="mx-auto h-screen max-w-[736px]">
         <ProfileEditLayout contentTitle={'Profile Settings'}>
           <ProfileInfo onSave={handleSave} />

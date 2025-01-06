@@ -1,6 +1,5 @@
 import Link from 'next/link'
 
-import { SiteHeader } from '~/components/common/site-header'
 import { SignUpForm } from '~/components/sign-up/sign-up-form'
 import {
   Card,
@@ -13,7 +12,6 @@ import {
 export default function SignUpPage() {
   return (
     <>
-      <SiteHeader />
       <div className="flex min-h-svh w-full items-center justify-center bg-gray-100 p-6 md:p-10">
         <div className="w-full max-w-md">
           <Card className="py-2">
