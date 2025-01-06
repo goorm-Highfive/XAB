@@ -16,6 +16,7 @@ function SocialLogin() {
     <div className={`my-2 grid gap-4 ${roboto.className}`}>
       <div className="flex flex-col gap-3">
         <SocialLoginButton
+          social="google"
           icon={googleIcon}
           iconAlt="google social login"
           iconSize={18}
@@ -25,6 +26,7 @@ function SocialLogin() {
         />
 
         <SocialLoginButton
+          social="kakao"
           icon={kakaoIcon}
           iconAlt="kakao social login"
           iconSize={18}

@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card'
+import { SocialLogin } from '~/components/login/social-login'
 
 export default function SignUpPage() {
   return (
@@ -31,6 +32,12 @@ export default function SignUpPage() {
             </CardHeader>
             <CardContent>
               <SignUpForm />
+              <div className="relative py-6 text-center text-sm after:absolute after:inset-0 after:top-1/2 after:border-t">
+                <span className="relative z-10 bg-background px-2 text-muted-foreground">
+                  OR
+                </span>
+              </div>
+              <SocialLogin />
             </CardContent>
           </Card>
         </div>
