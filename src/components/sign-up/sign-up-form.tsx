@@ -2,12 +2,14 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { redirect } from 'next/navigation'
 
 import { Button } from '~/components/ui/button'
 import { Form } from '~/components/ui/form'
 import { CustomFormField } from '~/components/common/custom-form-field'
 
 import { SignUpPayload, signUpSchema } from '~/schema/user'
+import { createClient } from '~/utils/supabase/client'
 
 function SignUpForm() {
   const form = useForm<SignUpPayload>({
@@ -21,8 +23,21 @@ function SignUpForm() {
     },
   })
 
-  const onSubmit = (values: SignUpPayload) => {
-    console.log(values)
+  const onSubmit = async (values: SignUpPayload) => {
+    const supabase = createClient()
+
+    const { data, error } = await supabase.auth.signUp({
+      email: values.email,
+      password: values.password,
+    })
+
+    if (error) {
+      alert(error.message)
+    }
+
+    console.log('회원가입 성공:', data)
+    alert('회원가입이 성공적으로 완료되었습니다!')
+    redirect('/login')
   }
 
   return (
