@@ -59,18 +59,16 @@ function NotifyPage() {
   }, {} as GroupedMockData)
 
   return (
-    <div className="h-screen bg-gray-100">
-      <div className="mb-28 mt-4">
-        {Object.entries(groupedData).map(([createdAt, items]) => (
-          <NotifyGroup
-            key={createdAt}
-            date={createdAt}
-            items={items}
-            updateIsRead={updateIsRead}
-          />
-        ))}
-      </div>
-    </div>
+    <>
+      {Object.entries(groupedData).map(([createdAt, items]) => (
+        <NotifyGroup
+          key={createdAt}
+          date={createdAt}
+          items={items}
+          updateIsRead={updateIsRead}
+        />
+      ))}
+    </>
   )
 }
 

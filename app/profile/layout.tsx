@@ -6,10 +6,10 @@ function ProfileLayout({
   modal: React.ReactNode
 }) {
   return (
-    <div>
+    <>
       {children}
       {modal}
-    </div>
+    </>
   )
 }
 

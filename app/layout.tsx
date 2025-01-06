@@ -15,9 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="antialiased">
+      <body className="bg-gray-100 antialiased">
         <SiteHeader />
-        {children}
+        <main className="min-h-screen px-5 pb-20 pt-10" role="main">
+          <div className="mx-auto max-w-screen-2xl">{children}</div>
+        </main>
       </body>
     </html>
   )

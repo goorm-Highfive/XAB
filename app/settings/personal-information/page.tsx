@@ -26,39 +26,37 @@ function ProfileInfoPage() {
   }
 
   return (
-    <>
-      <div className="mx-auto h-screen max-w-[736px]">
-        <ProfileEditLayout contentTitle={'Profile Settings'}>
-          <ProfileInfo onSave={handleSave} />
-        </ProfileEditLayout>
-        <ProfileEditLayout contentTitle={'Danger Zone'}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Delete Account</CardTitle>
-              <CardDescription>
-                Once you delete your account, there is no going back. Please be
-                certain.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CustomAlertDialog
-                alertTitle="Are you sure you want to delete your account?"
-                description="This action is permanent and cannot be undone."
-                triggerBtnText="Delete Account"
-                cancelBtnText="Cancel"
-                actionBtnText="Continue"
-              />
-            </CardContent>
-          </Card>
-        </ProfileEditLayout>
-      </div>
+    <div className="mx-auto max-w-xl">
+      <ProfileEditLayout contentTitle={'Profile Settings'}>
+        <ProfileInfo onSave={handleSave} />
+      </ProfileEditLayout>
+      <ProfileEditLayout contentTitle={'Danger Zone'}>
+        <Card>
+          <CardHeader>
+            <CardTitle>Delete Account</CardTitle>
+            <CardDescription>
+              Once you delete your account, there is no going back. Please be
+              certain.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CustomAlertDialog
+              alertTitle="Are you sure you want to delete your account?"
+              description="This action is permanent and cannot be undone."
+              triggerBtnText="Delete Account"
+              cancelBtnText="Cancel"
+              actionBtnText="Continue"
+            />
+          </CardContent>
+        </Card>
+      </ProfileEditLayout>
       <Toaster
         toastOptions={{
           duration: 1000, // 알림이 1초 후에 사라짐
           className: 'z-10', // z-index 수정
         }}
       />
-    </>
+    </div>
   )
 }
 
