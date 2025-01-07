@@ -72,7 +72,7 @@ const MenuItem = ({
 
   return (
     <Wrapper
-      href={href || ''} // undefined일 경우 빈 문자열로 대체
+      href={href || '/'} // undefined일 경우 빈 문자열로 대체
       onClick={onClick}
       className={`flex w-full items-center justify-between rounded-lg px-4 py-2 ${
         isLogout ? 'text-red-500 hover:bg-red-50' : 'hover:bg-gray-100'
