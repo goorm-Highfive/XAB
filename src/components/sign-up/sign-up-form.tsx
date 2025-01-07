@@ -2,7 +2,6 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { redirect } from 'next/navigation'
 
 import { Button } from '~/components/ui/button'
 import { Form } from '~/components/ui/form'
@@ -25,19 +24,24 @@ function SignUpForm() {
 
   const onSubmit = async (values: SignUpPayload) => {
     const supabase = createClient()
+    const { email, password, userName: username } = values
 
     const { data, error } = await supabase.auth.signUp({
-      email: values.email,
-      password: values.password,
+      email,
+      password,
+      options: {
+        data: {
+          username,
+        },
+      },
     })
 
     if (error) {
-      alert(error.message)
+      toast('회원가입에 실패하였습니다.')
+      return
     }
 
     console.log('회원가입 성공:', data)
-    alert('회원가입이 성공적으로 완료되었습니다!')
-    redirect('/login')
   }
 
   return (
