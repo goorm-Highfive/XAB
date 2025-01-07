@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import defaultProfile from '~/assets/svg/default-profile.svg'
+import defaultProfile from '~/assets/svgs/default-profile.svg'
 import { Heart } from 'lucide-react'
 
 // 게시글 뷰페이지 : 댓글 개별 요소

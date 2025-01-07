@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import defaultProfile from '~/assets/svg/default-profile.svg'
+import defaultProfile from '~/assets/svgs/default-profile.svg'
 import { PostActionBar } from '~/components/post-action-bar'
 import { CustomAlertDialog } from '~/components/common/custom-alert-dialog'
 import { Card } from '~/components/ui/card'
