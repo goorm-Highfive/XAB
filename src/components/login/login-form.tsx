@@ -31,9 +31,8 @@ function LoginForm() {
 
     if (error) {
       console.log(error)
-      toast.error('로그인 실패', {
-        description:
-          '등록되지 않은 아이디거나 아이디 또는 비밀번호를 잘못 입력하였습니다.',
+      toast.error('Login Failed', {
+        description: `${error}`,
       })
     } else {
       console.log('로그인 성공:', data)

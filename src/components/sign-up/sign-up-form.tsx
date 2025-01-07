@@ -1,5 +1,6 @@
 'use client'
 
+import { redirect } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -9,6 +10,8 @@ import { CustomFormField } from '~/components/common/custom-form-field'
 
 import { SignUpPayload, signUpSchema } from '~/schema/user'
 import { createClient } from '~/utils/supabase/client'
+import { toast } from 'sonner'
+import { Toaster } from '~/components/ui/sonner'
 
 function SignUpForm() {
   const form = useForm<SignUpPayload>({
@@ -37,11 +40,14 @@ function SignUpForm() {
     })
 
     if (error) {
-      console.error('회원가입에 실패하였습니다.', error)
+      toast.error('Sign up failed', {
+        description: `${error}`,
+      })
       return
     }
 
     console.log('회원가입 성공:', data)
+    redirect('/login')
   }
 
   return (
@@ -80,6 +86,7 @@ function SignUpForm() {
           </Button>
         </div>
       </form>
+      <Toaster richColors />
     </Form>
   )
 }
