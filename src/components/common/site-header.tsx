@@ -8,7 +8,7 @@ import { NotificationButton } from '~/components/common/notification-button'
 
 function SiteHeader() {
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-sm">
+    <header className="sticky top-0 z-50 bg-white shadow-sm">
       <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-6 py-4">
         {/* Logo */}
         <h1 className="flex items-center gap-2">
@@ -29,7 +29,7 @@ function SiteHeader() {
           <NotificationButton />
         </div>
       </div>
-    </nav>
+    </header>
   )
 }
 
