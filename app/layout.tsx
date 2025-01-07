@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { SiteHeader } from '~/components/common/site-header'
 
 import '~/styles/globals.css'
 
@@ -16,8 +17,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="antialiased">
-        {children}
+      <body className="bg-gray-100 antialiased">
+        <SiteHeader />
+        <main className="min-h-screen px-5 pb-20 pt-10" role="main">
+          <div className="mx-auto max-w-screen-2xl">{children}</div>
+        </main>
         {modal}
       </body>
     </html>
