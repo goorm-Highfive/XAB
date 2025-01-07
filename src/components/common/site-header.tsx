@@ -18,7 +18,7 @@ function SiteHeader() {
         </h1>
 
         {/* Navbar 메뉴 */}
-        <div className="flex items-center gap-4">
+        <nav className="flex items-center gap-4">
           <Link href="/profile">
             <Button variant="ghost" className="flex items-center gap-2">
               <User className="h-5 w-5" />
@@ -27,7 +27,7 @@ function SiteHeader() {
           </Link>
 
           <NotificationButton />
-        </div>
+        </nav>
       </div>
     </header>
   )
