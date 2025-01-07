@@ -37,7 +37,7 @@ function SignUpForm() {
     })
 
     if (error) {
-      toast('회원가입에 실패하였습니다.')
+      console.error('회원가입에 실패하였습니다.', error)
       return
     }
 
