@@ -1,5 +1,6 @@
 'use client'
 
+import { redirect } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -8,6 +9,9 @@ import { Form } from '~/components/ui/form'
 import { CustomFormField } from '~/components/common/custom-form-field'
 
 import { SignUpPayload, signUpSchema } from '~/schema/user'
+import { createClient } from '~/utils/supabase/client'
+import { toast } from 'sonner'
+import { Toaster } from '~/components/ui/sonner'
 
 function SignUpForm() {
   const form = useForm<SignUpPayload>({
@@ -21,8 +25,29 @@ function SignUpForm() {
     },
   })
 
-  const onSubmit = (values: SignUpPayload) => {
-    console.log(values)
+  const onSubmit = async (values: SignUpPayload) => {
+    const supabase = createClient()
+    const { email, password, userName: username } = values
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username,
+        },
+      },
+    })
+
+    if (error) {
+      toast.error('Sign up failed', {
+        description: `${error}`,
+      })
+      return
+    }
+
+    console.log('회원가입 성공:', data)
+    redirect('/login')
   }
 
   return (
@@ -61,6 +86,7 @@ function SignUpForm() {
           </Button>
         </div>
       </form>
+      <Toaster richColors />
     </Form>
   )
 }

@@ -1,13 +1,16 @@
 'use client'
-
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { redirect } from 'next/navigation'
+import { toast } from 'sonner'
 
+import { Toaster } from '~/components/ui/sonner'
 import { Button } from '~/components/ui/button'
 import { Form } from '~/components/ui/form'
 import { CustomFormField } from '~/components/common/custom-form-field'
 
 import { LoginPayload, loginSchema } from '~/schema/user'
+import { createClient } from '~/utils/supabase/client'
 
 function LoginForm() {
   const form = useForm<LoginPayload>({
@@ -18,8 +21,23 @@ function LoginForm() {
     },
   })
 
-  const onSubmit = (values: LoginPayload) => {
-    console.log(values)
+  const supabase = createClient()
+
+  const onSubmit = async (values: LoginPayload) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: values.email,
+      password: values.password,
+    })
+
+    if (error) {
+      console.log(error)
+      toast.error('Login Failed', {
+        description: `${error}`,
+      })
+    } else {
+      console.log('로그인 성공:', data)
+      redirect('/home')
+    }
   }
 
   return (
@@ -33,6 +51,7 @@ function LoginForm() {
           </Button>
         </div>
       </form>
+      <Toaster richColors />
     </Form>
   )
 }

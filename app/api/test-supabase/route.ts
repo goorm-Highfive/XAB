@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '~/utils/supabase'
+import { createClient } from '~/utils/supabase/server'
 
 export async function GET() {
+  const supabase = await createClient()
+
   try {
     const { data, error } = await supabase.from('users').select('*') // 'table_name'을 실제 테이블 이름으로 변경
 

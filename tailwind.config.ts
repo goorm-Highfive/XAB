@@ -53,7 +53,6 @@ const config: Config = {
         social: {
           google: '#4285f4',
           kakao: '#fee500',
-          naver: '#03c75a',
         },
       },
       borderRadius: {

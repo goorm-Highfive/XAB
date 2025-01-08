@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import defaultProfile from '~/assets/svg/default-profile.svg'
+import defaultProfile from '~/assets/svgs/default-profile.svg'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { CommentData } from '~/types/comment'
