@@ -10,6 +10,7 @@ import {
   LogOut,
 } from 'lucide-react'
 import Link from 'next/link'
+import { logout } from '~/utils/logout'
 
 function SettingsMenu() {
   return (
@@ -42,7 +43,12 @@ function SettingsMenu() {
             label="Terms of Service"
             href="/settings/terms"
           />
-          <MenuItem icon={LogOut} label="Log Out" href="api/logout" isLogout />
+          <MenuItem
+            icon={LogOut}
+            label="Log Out"
+            onClick={() => logout()}
+            isLogout
+          />
         </div>
       </div>
     </div>
@@ -54,17 +60,20 @@ const MenuItem = ({
   label,
   isLogout,
   href,
+  onClick,
 }: {
   icon: React.ComponentType<{ className?: string }>
   label: string
   isLogout?: boolean
   href?: string
+  onClick?: () => Promise<{ success: boolean } | undefined>
 }) => {
   const Wrapper = href ? Link : 'button'
 
   return (
     <Wrapper
-      href={href || ''} // undefined일 경우 빈 문자열로 대체
+      href={href || '/'} // undefined일 경우 빈 문자열로 대체
+      onClick={onClick}
       className={`flex w-full items-center justify-between rounded-lg px-4 py-2 ${
         isLogout ? 'text-red-500 hover:bg-red-50' : 'hover:bg-gray-100'
       }`}

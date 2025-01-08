@@ -7,7 +7,7 @@ function ProfileCard() {
       {/* Avatar */}
       <div className="relative">
         <Avatar className="h-10 w-10">
-          <AvatarImage src="/images/avatar-placeholder.png" alt="John Doe" />
+          <AvatarImage alt="John Doe" />
           <AvatarFallback>JD</AvatarFallback>
         </Avatar>
         {/* Lock Icon */}

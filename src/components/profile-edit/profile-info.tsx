@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import defaultProfileImg from '~/assets/svg/default-profile.svg'
+import defaultProfileImg from '~/assets/svgs/default-profile.svg'
 import { Card, CardContent, CardHeader } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
