@@ -101,7 +101,6 @@ export default function Home() {
         </div>
         <SuggestSection />
       </div>
-      <SuggestSection />
     </div>
   )
 }
