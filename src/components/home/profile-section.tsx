@@ -12,7 +12,7 @@ import Link from 'next/link'
 
 function ProfileSection() {
   return (
-    <Card className="sticky top-[92px] hidden w-72 lg:block">
+    <Card className="static top-[92px] mb-6 w-full lg:sticky lg:w-72">
       <CardHeader className="items-center gap-5">
         <Avatar className="size-20 items-center justify-center">
           <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />

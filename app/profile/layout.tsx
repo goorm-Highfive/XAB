@@ -1,4 +1,4 @@
-function ProfileLayout({
+export default function ProfileLayout({
   children,
   modal,
 }: {
@@ -6,11 +6,9 @@ function ProfileLayout({
   modal: React.ReactNode
 }) {
   return (
-    <div>
+    <>
       {children}
       {modal}
-    </div>
+    </>
   )
 }
-
-export default ProfileLayout
