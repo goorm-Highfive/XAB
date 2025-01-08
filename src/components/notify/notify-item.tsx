@@ -9,13 +9,13 @@ function NotifyItem({ data, updateIsRead }: NotifyItemProp) {
   return (
     <Alert
       onClick={() => updateIsRead(id)}
-      className={`relative my-4 flex cursor-pointer justify-between p-4 ${isRead ? 'opacity-50' : 'opacity-100'}`}
+      className={`relative my-4 flex cursor-pointer justify-between p-4 pr-10 ${isRead ? 'opacity-50' : 'opacity-100'}`}
     >
-      <div className="items-top flex gap-3">
-        <div>
+      <div className="items-top flex">
+        <div className="mr-4">
           <div className="h-12 w-12 rounded-full bg-gray-300" />
         </div>
-        <div className="px-6">
+        <div>
           <AlertTitle className="text-base font-semibold">
             {userId}
             <span className="font-normal"> {action}</span>
