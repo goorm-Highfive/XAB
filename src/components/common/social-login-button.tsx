@@ -1,8 +1,11 @@
 'use client'
 
+import { Provider } from '@supabase/supabase-js'
 import Image from 'next/image'
+import { createClient } from '~/utils/supabase/client'
 
 type SocialLoginButtonProps = {
+  provider: Provider
   icon: string
   iconAlt: string
   iconSize: number
@@ -12,7 +15,19 @@ type SocialLoginButtonProps = {
   label: string
 }
 
+const supabase = createClient()
+
+const handleSocialLogin = async (provider: Provider) => {
+  await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    },
+  })
+}
+
 function SocialLoginButton({
+  provider,
   icon,
   iconSize,
   iconAlt,
@@ -24,6 +39,7 @@ function SocialLoginButton({
   return (
     <button
       className={`flex w-full items-center gap-2 rounded py-3 pl-4 text-sm font-medium ${bgColor} ${textColor} ${border}`}
+      onClick={() => handleSocialLogin(provider)}
     >
       <Image src={icon} alt={iconAlt} width={iconSize} className="shrink-0" />
       <span className="flex-grow text-center">{label}</span>
