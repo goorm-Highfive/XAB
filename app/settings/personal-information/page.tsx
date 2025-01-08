@@ -1,7 +1,7 @@
 'use client'
 
-import { ProfileEditLayout } from '~/components/profile-edit-layout'
-import { ProfileInfo } from '~/components/profile-info'
+import { ProfileEditLayout } from '~/components/profile-edit/profile-edit-layout'
+import { ProfileInfo } from '~/components/profile-edit/profile-info'
 import { Toaster } from '~/components/ui/sonner'
 import {
   Card,
