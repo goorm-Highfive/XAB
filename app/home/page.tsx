@@ -5,9 +5,7 @@ import { NewSurveyButton } from '~/components/home/new-survey-button'
 
 export default function Home() {
   return (
-
     <div className="min-h-screen bg-gray-100">
-      <SiteHeader />
       <div className="mx-auto max-w-screen-2xl items-start gap-6 p-6 lg:flex">
         <ProfileSection />
         <div className="flex-1 space-y-6">
@@ -102,7 +100,6 @@ export default function Home() {
           />
         </div>
         <SuggestSection />
-   
       </div>
       <SuggestSection />
     </div>
