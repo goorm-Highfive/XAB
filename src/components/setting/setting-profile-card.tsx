@@ -11,7 +11,7 @@ function ProfileCard({ username }: ProfileCardProps) {
       {/* Avatar */}
       <div className="relative">
         <Avatar className="h-10 w-10">
-          <AvatarImage alt="John Doe" />
+          <AvatarImage alt={username || 'User'} />
           <AvatarFallback>
             {username ? username[0].toUpperCase() : 'G'}
           </AvatarFallback>

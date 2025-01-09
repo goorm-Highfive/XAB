@@ -1,8 +1,6 @@
-'use client'
-
+import { redirect } from 'next/navigation'
 import { ProfileEditLayout } from '~/components/profile-edit/profile-edit-layout'
 import { ProfileInfo } from '~/components/profile-edit/profile-info'
-import { Toaster } from '~/components/ui/sonner'
 import {
   Card,
   CardContent,
@@ -11,26 +9,27 @@ import {
   CardTitle,
 } from '~/components/ui/card'
 import { CustomAlertDialog } from '~/components/common/custom-alert-dialog'
+import { fetchUserProfile } from '~/utils/supabase/fetch-user'
 
-// 타입 정의
-type ProfileData = {
-  displayname: string
-  username: string
-  bio: string
-}
+async function ProfileInfoPage() {
+  const fields = ['username', 'bio']
+  const userData = await fetchUserProfile(fields)
 
-// 개인정보 페이지
-function ProfileInfoPage() {
-  const handleSave = (data: ProfileData) => {
-    console.log(data)
+  if (!userData) {
+    redirect('/login')
   }
 
   return (
     <div className="mx-auto max-w-xl">
-      <ProfileEditLayout contentTitle={'Profile Settings'}>
-        <ProfileInfo onSave={handleSave} />
+      <ProfileEditLayout contentTitle="Profile Settings">
+        <ProfileInfo
+          defaultValues={{
+            username: userData.username ?? '',
+            bio: userData.bio ?? '',
+          }}
+        />
       </ProfileEditLayout>
-      <ProfileEditLayout contentTitle={'Danger Zone'}>
+      <ProfileEditLayout contentTitle="Danger Zone">
         <Card>
           <CardHeader>
             <CardTitle>Delete Account</CardTitle>
@@ -50,12 +49,6 @@ function ProfileInfoPage() {
           </CardContent>
         </Card>
       </ProfileEditLayout>
-      <Toaster
-        toastOptions={{
-          duration: 1000, // 알림이 1초 후에 사라짐
-          className: 'z-10', // z-index 수정
-        }}
-      />
     </div>
   )
 }

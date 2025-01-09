@@ -1,75 +1,116 @@
 'use client'
 
-import Image from 'next/image'
-import defaultProfileImg from '~/assets/svgs/default-profile.svg'
-import { Card, CardContent, CardHeader } from '~/components/ui/card'
-import { Button } from '~/components/ui/button'
-import { Input } from '~/components/ui/input'
+import { toast, Toaster } from 'sonner'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Label } from '~/components/ui/label'
+import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent, CardHeader } from '~/components/ui/card'
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 
-// 타입 정의
 type ProfileData = {
-  displayname: string
   username: string
   bio: string
 }
 
-// 개인정보 페이지 : 사용자 정보 변경 부분
-function ProfileInfo({ onSave }: { onSave: (data: ProfileData) => void }) {
-  const { register, handleSubmit } = useForm<ProfileData>()
+function ProfileInfo({ defaultValues }: { defaultValues: ProfileData }) {
+  const router = useRouter()
+  const [formData, setFormData] = useState<ProfileData>(
+    defaultValues || { username: '', bio: '' },
+  )
+  const [isLoading, setIsLoading] = useState(false)
 
-  const onSubmit = (data: ProfileData) => {
-    onSave(data)
-    // Sonner toast 팝업 띄우기
-    toast.success('Profile updated successfully!')
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSaveBtnClick = () => {
-    const form = document.querySelector('form')
-    if (form) form.requestSubmit() // form 제출
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      const response = await fetch('/api/profile/profile-update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: formData.username,
+          bio: formData.bio || '',
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || '알 수 없는 오류가 발생했습니다.')
+      }
+
+      const result = await response.json()
+      toast.success(result.message || '프로필이 성공적으로 업데이트되었습니다!')
+      router.refresh()
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message || '예기치 못한 오류가 발생했습니다.')
+      } else {
+        toast.error('알 수 없는 오류가 발생했습니다.')
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center">
-        <div className="mr-4 h-20 w-20 overflow-hidden rounded-full">
-          <Image src={defaultProfileImg} alt="Profile Image" />
-        </div>
-        <Button variant="outline">Change Photo</Button>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <ul className="grid gap-4">
-            <li className="space-y-1.5">
-              <Label htmlFor="displayname">Display Name</Label>
-              <Input {...register('displayname')} id="displayname" />
-            </li>
-            <li className="space-y-1.5">
-              <Label htmlFor="username">Username</Label>
-              <Input {...register('username')} id="username" />
-            </li>
-            <li className="space-y-1.5">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea {...register('bio')} id="bio" className="min-h-24" />
-            </li>
-          </ul>
-          {/* Save Changes 버튼 */}
-          <div className="mt-4 flex justify-end">
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center">
+          <Avatar className="mr-4 h-16 w-16">
+            <AvatarImage alt={formData.username || 'User'} />
+            <AvatarFallback>
+              {formData.username ? formData.username[0].toUpperCase() : 'G'}
+            </AvatarFallback>
+          </Avatar>
+          <Button variant="outline">Change Photo</Button>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="username" className="mb-2 block">
+                Username
+              </Label>
+              <Input
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <Label htmlFor="bio" className="mb-2 block">
+                Bio
+              </Label>
+              <Textarea
+                id="bio"
+                name="bio"
+                value={formData.bio}
+                className="h-[120px] max-h-[200px]"
+                onChange={handleChange}
+              />
+            </div>
             <Button
-              type="button"
-              variant="default"
+              type="submit"
               className="bg-black text-white hover:bg-gray-800"
-              onClick={handleSaveBtnClick}
+              disabled={isLoading}
             >
-              Save Changes
+              {isLoading ? 'Saving...' : 'Save Changes'}
             </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+          </form>
+        </CardContent>
+      </Card>
+      <Toaster />
+    </>
   )
 }
 
