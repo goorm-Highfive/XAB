@@ -32,7 +32,7 @@ function LoginForm() {
     if (error) {
       console.log(error)
       toast.error('Login Failed', {
-        description: `${error}`,
+        description: `${error.message}`,
       })
     } else {
       console.log('로그인 성공:', data)
@@ -45,7 +45,13 @@ function LoginForm() {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-6">
           <CustomFormField name="email" label="Email" type="text" />
-          <CustomFormField name="password" label="Password" type="password" />
+          <CustomFormField
+            name="password"
+            label="Password"
+            type="password"
+            addLinkTitle="Forget Your Password?"
+            addLinkHref="/reset-password"
+          />
           <Button type="submit" className="my-4 w-full py-6">
             Login
           </Button>

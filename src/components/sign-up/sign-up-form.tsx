@@ -41,7 +41,7 @@ function SignUpForm() {
 
     if (error) {
       toast.error('Sign up failed', {
-        description: `${error}`,
+        description: `${error.message}`,
       })
       return
     }
