@@ -50,7 +50,7 @@ function LoginForm() {
             label="Password"
             type="password"
             addLinkTitle="Forget Your Password?"
-            addLinkHref="/reset-password"
+            addLinkHref="/account/reset-password"
           />
           <Button type="submit" className="my-4 w-full py-6">
             Login

@@ -41,13 +41,13 @@ function SignUpForm() {
 
     if (error) {
       toast.error('Sign up failed', {
-        description: `${error.message}`,
+        description: 'Authentication failed. Please try again',
       })
-      return
     }
 
-    console.log('회원가입 성공:', data)
-    redirect('/login')
+    console.log(data)
+
+    redirect('/check-email')
   }
 
   return (
@@ -86,7 +86,7 @@ function SignUpForm() {
           </Button>
         </div>
       </form>
-      <Toaster richColors />
+      <Toaster duration={2000} />
     </Form>
   )
 }
