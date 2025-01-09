@@ -12,10 +12,8 @@ import Logo from '~/assets/svgs/logo.svg'
 
 function SiteHeader() {
   const pathname = usePathname()
-  const hiddenNav = ['/login', '/sign-up']
-  const showNavPath = !hiddenNav.includes(pathname)
 
-  if (!showNavPath) {
+  if (!!pathname.startsWith('/account')) {
     return null
   }
 
