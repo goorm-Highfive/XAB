@@ -16,7 +16,7 @@ type AccountLayoutProps = {
   children: React.ReactNode
 }
 
-export default function AccountLayout({
+function AccountLayout({
   title,
   description,
   linkHref = '/',
@@ -45,3 +45,5 @@ export default function AccountLayout({
     </div>
   )
 }
+
+export { AccountLayout }

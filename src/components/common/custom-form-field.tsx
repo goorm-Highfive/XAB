@@ -20,16 +20,10 @@ type FormProps = {
   placeholder?: string
   description?: string
   type?: HTMLInputTypeAttribute
-} & (
-  | {
-      addLinkTitle?: undefined
-      addLinkHref?: undefined
-    }
-  | {
-      addLinkTitle: string
-      addLinkHref: string
-    }
-)
+} & {
+  addLinkTitle?: string
+  addLinkHref?: string
+}
 
 function CustomFormField({
   name,
@@ -38,7 +32,7 @@ function CustomFormField({
   description,
   type,
   addLinkTitle,
-  addLinkHref,
+  addLinkHref = '/',
 }: FormProps) {
   const { control } = useFormContext()
 
@@ -50,14 +44,14 @@ function CustomFormField({
         <FormItem>
           <div className="flex items-center">
             <Label className="font-semibold">{label}</Label>
-            {addLinkTitle ? (
+            {addLinkTitle && (
               <Link
                 href={addLinkHref}
                 className="ml-auto inline-block cursor-pointer text-xs text-gray-500 underline-offset-4 hover:underline"
               >
                 {addLinkTitle}
               </Link>
-            ) : null}
+            )}
           </div>
           <FormControl>
             <Input
