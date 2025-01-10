@@ -20,7 +20,7 @@ function ClientSessionManager() {
     return () => {
       data.subscription?.unsubscribe()
     }
-  }, [router])
+  }, [router, supabase.auth])
 
   return null
 }
