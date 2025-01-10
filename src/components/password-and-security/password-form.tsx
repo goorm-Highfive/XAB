@@ -23,7 +23,7 @@ function PasswordForm() {
   })
 
   const updatePassword = (data: FormDataType): void => {
-    toast.success('비밀번호가 변경되었습니다.')
+    toast.success('The password has been changed')
     console.log(data)
     form.reset()
   }
