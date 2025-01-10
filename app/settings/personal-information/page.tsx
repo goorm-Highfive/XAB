@@ -9,14 +9,14 @@ import {
   CardTitle,
 } from '~/components/ui/card'
 import { CustomAlertDialog } from '~/components/common/custom-alert-dialog'
-import { fetchUserProfile } from '~/utils/supabase/fetch-user'
+import { fetchUserProfile } from '~/utils/fetch-user'
 
 async function ProfileInfoPage() {
-  const fields = ['username', 'bio']
-  const userData = await fetchUserProfile(fields)
+  const profileData = await fetchUserProfile()
 
-  if (!userData) {
+  if (!profileData) {
     redirect('/login')
+    return null // 리디렉션 후 렌더링 방지
   }
 
   return (
@@ -24,8 +24,8 @@ async function ProfileInfoPage() {
       <ProfileEditLayout contentTitle="Profile Settings">
         <ProfileInfo
           defaultValues={{
-            username: userData.username ?? '',
-            bio: userData.bio ?? '',
+            username: profileData.username ?? '',
+            bio: profileData.bio ?? '',
           }}
         />
       </ProfileEditLayout>

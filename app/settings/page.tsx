@@ -1,15 +1,14 @@
 import { redirect } from 'next/navigation'
 import SettingsMenu from '~/components/setting/setting-menu'
 import { ProfileCard } from '~/components/setting/setting-profile-card'
-import { fetchUserProfile } from '~/utils/supabase/fetch-user'
+import { fetchUserProfile } from '~/utils/fetch-user'
 
 async function SettingsPage() {
-  const fields = ['username']
-  const profileData = await fetchUserProfile(fields)
+  const profileData = await fetchUserProfile()
 
-  // 로그인되지 않았으면 로그인 페이지로 리디렉션
   if (!profileData) {
     redirect('/login')
+    return null // 리디렉션 후 렌더링 방지
   }
 
   return (

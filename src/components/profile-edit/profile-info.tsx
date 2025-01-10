@@ -34,7 +34,7 @@ function ProfileInfo({ defaultValues }: { defaultValues: ProfileData }) {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/profile/profile-update', {
+      const response = await fetch('/api/user-edit/edit-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -49,7 +49,7 @@ function ProfileInfo({ defaultValues }: { defaultValues: ProfileData }) {
       }
 
       const result = await response.json()
-      toast.success(result.message || '프로필이 성공적으로 업데이트되었습니다!')
+      toast.success(result.message || '변경 사항이 저장되었습니다.')
       router.refresh()
     } catch (error) {
       if (error instanceof Error) {
