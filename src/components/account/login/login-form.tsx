@@ -1,10 +1,9 @@
 'use client'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { redirect } from 'next/navigation'
-import { toast } from 'sonner'
 
-import { Toaster } from '~/components/ui/sonner'
 import { Button } from '~/components/ui/button'
 import { Form } from '~/components/ui/form'
 import { CustomFormField } from '~/components/common/custom-form-field'
@@ -13,6 +12,8 @@ import { LoginPayload, loginSchema } from '~/schema/user'
 import { createClient } from '~/utils/supabase/client'
 
 function LoginForm() {
+  const [error, setError] = useState<boolean>(false)
+
   const form = useForm<LoginPayload>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -24,20 +25,16 @@ function LoginForm() {
   const supabase = createClient()
 
   const onSubmit = async (values: LoginPayload) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email: values.email,
       password: values.password,
     })
 
     if (error) {
-      console.log(error)
-      toast.error('Login Failed', {
-        description: `${error.message}`,
-      })
-    } else {
-      console.log('로그인 성공:', data)
-      redirect('/home')
+      setError(true)
+      return
     }
+    redirect('/home')
   }
 
   return (
@@ -50,14 +47,19 @@ function LoginForm() {
             label="Password"
             type="password"
             addLinkTitle="Forget Your Password?"
-            addLinkHref="/account/reset-password"
+            addLinkHref="/account/forgot-password"
           />
+          {error && (
+            <p className="text-sm text-red-500">
+              The email or password you entered is incorrect. Please check and
+              try again
+            </p>
+          )}
           <Button type="submit" className="my-4 w-full py-6">
             Login
           </Button>
         </div>
       </form>
-      <Toaster richColors />
     </Form>
   )
 }
