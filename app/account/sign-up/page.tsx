@@ -1,5 +1,5 @@
 import { SignUpForm } from '~/components/account/sign-up/sign-up-form'
-import AccountLayout from '~/components/account/account-layout'
+import { AccountLayout } from '~/components/account/account-layout'
 import { SocialLogin } from '~/components/account/social-login'
 
 export default function SignUpPage() {

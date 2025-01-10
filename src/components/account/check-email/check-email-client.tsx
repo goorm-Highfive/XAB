@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-import AccountLayout from '~/components/account/account-layout'
+import { AccountLayout } from '~/components/account/account-layout'
 import { Button } from '~/components/ui/button'
 import { createClient } from '~/utils/supabase/client'
 

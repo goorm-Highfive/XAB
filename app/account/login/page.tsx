@@ -1,6 +1,6 @@
 import { LoginForm } from '~/components/account/login/login-form'
 import { SocialLogin } from '~/components/account/social-login'
-import AccountLayout from '~/components/account/account-layout'
+import { AccountLayout } from '~/components/account/account-layout'
 
 export default function LoginPage() {
   return (

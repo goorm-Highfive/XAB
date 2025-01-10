@@ -1,4 +1,4 @@
-import AccountLayout from '~/components/account/account-layout'
+import { AccountLayout } from '~/components/account/account-layout'
 import { ResetPasswordForm } from '~/components/account/reset-password/reset-password-form'
 
 export default function ForgotPassword() {
