@@ -24,6 +24,8 @@ function SignUpForm() {
       passwordConfirm: '',
       createdAt: new Date(),
     },
+
+    mode: 'onChange',
   })
 
   const onSubmit = async (values: SignUpPayload) => {

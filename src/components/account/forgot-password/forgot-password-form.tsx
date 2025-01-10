@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Button } from '~/components/ui/button'
@@ -11,9 +10,22 @@ import { Form } from '~/components/ui/form'
 import { CustomFormField } from '~/components/common/custom-form-field'
 
 import { createClient } from '~/utils/supabase/client'
+import { CheckEmailPayload, checkEmailSchema } from '~/schema/user'
 
 const supabase = createClient()
-// DB에 해당 이메일이 있는지 확인
+
+const MESSAGES = {
+  emailNotRegistered: 'The email address is not registered.',
+  sentEmail:
+    'We’ve sent you a confirmation email to proceed with your request. Check your email.',
+  unexpectedError: 'Something went wrong. Please try again later.',
+}
+
+type Status = {
+  error: string
+  message: string
+}
+
 const getUsersEmail = async (email: string): Promise<string | null> => {
   const { data, error } = await supabase
     .from('users')
@@ -27,34 +39,24 @@ const getUsersEmail = async (email: string): Promise<string | null> => {
   return data?.email || null
 }
 
-const emailSchema = z.object({
-  email: z
-    .string()
-    .min(1, { message: 'Email required.' })
-    .email({ message: 'Invalid email.' }),
-})
-
 function ForgotPasswordForm() {
-  const [status, setStatus] = useState({ error: '', message: '' })
+  const [status, setStatus] = useState<Status>({ error: '', message: '' })
 
-  const form = useForm<z.infer<typeof emailSchema>>({
-    resolver: zodResolver(emailSchema),
+  const form = useForm<CheckEmailPayload>({
+    resolver: zodResolver(checkEmailSchema),
     defaultValues: {
       email: '',
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof emailSchema>) => {
+  const onSubmit = async (values: CheckEmailPayload) => {
+    setStatus({ error: '', message: '' })
+
     try {
-      setStatus({ error: '', message: '' })
       const userEmail = await getUsersEmail(values.email)
 
-      // 유저 이메일이 DB에 없음
       if (!userEmail) {
-        setStatus({
-          error: 'The email address is not registered.',
-          message: '',
-        })
+        setStatus({ error: MESSAGES.emailNotRegistered, message: '' })
         return
       }
 
@@ -65,26 +67,15 @@ function ForgotPasswordForm() {
         },
       )
 
-      // DB에 데이터는 있는데, 오류가 있음
       if (error) {
-        setStatus({
-          error: `${error.message}`,
-          message: '',
-        })
+        setStatus({ error: error.message, message: '' })
         return
       }
 
-      setStatus({
-        error: '',
-        message:
-          'We’ve sent you a confirmation email to proceed with your request. Check your email.',
-      })
+      setStatus({ error: '', message: MESSAGES.sentEmail })
     } catch (err) {
       console.error('Unexpected error:', err)
-      setStatus({
-        error: 'Something went wrong. Please try again later.',
-        message: '',
-      })
+      setStatus({ error: MESSAGES.unexpectedError, message: '' })
     }
   }
 
@@ -102,14 +93,18 @@ function ForgotPasswordForm() {
               <p className="text-sm text-red-500">{status.error}</p>
             )}
             {status.message && <p className="mt-6 text-sm">{status.message}</p>}
-            <Button type="submit" className="mb-3 w-full py-6">
+            <Button
+              type="submit"
+              className="mb-3 w-full py-6"
+              disabled={!form.formState.isValid}
+            >
               Send Email
             </Button>
           </div>
         </form>
       </Form>
       <div className="flex text-sm text-gray-500">
-        <p className="">Remember Your Address? </p>
+        <p>Remember Your Address? </p>
         <Link
           href="/account/login"
           className="ml-1 underline underline-offset-4"

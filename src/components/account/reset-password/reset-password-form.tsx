@@ -20,6 +20,7 @@ function ResetPasswordForm() {
       password: '',
       passwordConfirm: '',
     },
+    mode: 'onChange',
   })
 
   const supabase = createClient()

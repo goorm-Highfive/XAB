@@ -20,6 +20,7 @@ function LoginForm() {
       email: '',
       password: '',
     },
+    mode: 'onChange',
   })
 
   const supabase = createClient()
