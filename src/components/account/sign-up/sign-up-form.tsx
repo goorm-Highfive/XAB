@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { redirect } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -10,10 +11,10 @@ import { CustomFormField } from '~/components/common/custom-form-field'
 
 import { SignUpPayload, signUpSchema } from '~/schema/user'
 import { createClient } from '~/utils/supabase/client'
-import { toast } from 'sonner'
-import { Toaster } from '~/components/ui/sonner'
 
 function SignUpForm() {
+  const [error, setError] = useState<string | null>()
+
   const form = useForm<SignUpPayload>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -23,13 +24,16 @@ function SignUpForm() {
       passwordConfirm: '',
       createdAt: new Date(),
     },
+
+    mode: 'onChange',
   })
 
   const onSubmit = async (values: SignUpPayload) => {
     const supabase = createClient()
     const { email, password, userName: username } = values
+    setError(null)
 
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -40,14 +44,11 @@ function SignUpForm() {
     })
 
     if (error) {
-      toast.error('Sign up failed', {
-        description: `${error}`,
-      })
+      setError(error.message)
       return
     }
 
-    console.log('회원가입 성공:', data)
-    redirect('/login')
+    redirect(`/account/check-email?email=${email}`)
   }
 
   return (
@@ -80,13 +81,12 @@ function SignUpForm() {
             type="password"
             placeholder="password confirm"
           />
-
+          {error && <p className="text-sm text-red-500">{error}</p>}
           <Button type="submit" className="my-4 w-full py-6">
             Sign Up
           </Button>
         </div>
       </form>
-      <Toaster richColors />
     </Form>
   )
 }

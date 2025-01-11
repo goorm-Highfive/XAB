@@ -21,7 +21,7 @@ function PasswordForm() {
       newPasswordConfirm: '',
     },
   })
-
+  
   const router = useRouter()
 
   const updatePassword = async (data: FormDataType) => {

@@ -2,7 +2,10 @@
 
 import { Provider } from '@supabase/supabase-js'
 import Image from 'next/image'
+import { toast } from 'sonner'
+
 import { createClient } from '~/utils/supabase/client'
+import { Toaster } from '~/components/ui/sonner'
 
 type SocialLoginButtonProps = {
   provider: Provider
@@ -18,12 +21,22 @@ type SocialLoginButtonProps = {
 const supabase = createClient()
 
 const handleSocialLogin = async (provider: Provider) => {
-  await supabase.auth.signInWithOAuth({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
       redirectTo: `${window.location.origin}/auth/callback`,
     },
   })
+
+  if (error) {
+    toast.error(`${provider} Login Failed`, {
+      description: `${error.message}`,
+    })
+  }
+
+  if (data) {
+    toast.success(`${provider} Login Success`)
+  }
 }
 
 function SocialLoginButton({
@@ -43,6 +56,7 @@ function SocialLoginButton({
     >
       <Image src={icon} alt={iconAlt} width={iconSize} className="shrink-0" />
       <span className="flex-grow text-center">{label}</span>
+      <Toaster />
     </button>
   )
 }

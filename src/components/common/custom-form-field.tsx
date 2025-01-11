@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { HTMLInputTypeAttribute } from 'react'
 import { useFormContext } from 'react-hook-form'
 
@@ -19,6 +20,9 @@ type FormProps = {
   placeholder?: string
   description?: string
   type?: HTMLInputTypeAttribute
+} & {
+  addLinkTitle?: string
+  addLinkHref?: string
 }
 
 function CustomFormField({
@@ -27,6 +31,8 @@ function CustomFormField({
   placeholder,
   description,
   type,
+  addLinkTitle,
+  addLinkHref = '/',
 }: FormProps) {
   const { control } = useFormContext()
 
@@ -36,7 +42,17 @@ function CustomFormField({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <Label className="font-semibold">{label}</Label>
+          <div className="flex items-center">
+            <Label className="font-semibold">{label}</Label>
+            {addLinkTitle && (
+              <Link
+                href={addLinkHref}
+                className="ml-auto inline-block cursor-pointer text-xs text-gray-500 underline-offset-4 hover:underline"
+              >
+                {addLinkTitle}
+              </Link>
+            )}
+          </div>
           <FormControl>
             <Input
               type={type}
