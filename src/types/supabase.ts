@@ -164,6 +164,24 @@ export type Database = {
           },
         ]
       }
+      delete_sessions: {
+        Row: {
+          deleted_at: string | null
+          id: number
+          user_id: string
+        }
+        Insert: {
+          deleted_at?: string | null
+          id?: number
+          user_id: string
+        }
+        Update: {
+          deleted_at?: string | null
+          id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       follows: {
         Row: {
           created_at: string
@@ -229,6 +247,38 @@ export type Database = {
           },
           {
             foreignKeyName: 'likes_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: number
+          is_read: boolean
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: number
+          is_read?: boolean
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: number
+          is_read?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'notifications_user_id_fkey'
             columns: ['user_id']
             isOneToOne: false
             referencedRelation: 'users'
@@ -309,6 +359,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_user_account: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: string
+      }
       get_feed_posts_for_user: {
         Args: {
           p_user_id: string
