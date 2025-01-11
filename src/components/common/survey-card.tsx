@@ -15,7 +15,7 @@ type SurveyCardProps = {
   initLikeCount: number
   userLiked: boolean // 현재 사용자 좋아요 상태
   onLikeToggle?: () => void
-  onVoteSubmit?: (option: 'A' | 'B') => void
+  onVoteSubmit?: (option: 'A' | 'B') => Promise<void> // onVoteSubmit 함수가 비동기 함수로 변경됨
 }
 
 function SurveyCard({
@@ -33,6 +33,12 @@ function SurveyCard({
 }: SurveyCardProps) {
   // 전체 투표 수
   const totalVotes = votesA + votesB
+
+  const handleVoteSubmit = async (option: 'A' | 'B') => {
+    if (onVoteSubmit) {
+      await onVoteSubmit(option) // 비동기 함수 호출 시 await 사용
+    }
+  }
 
   return (
     <Card className="mb-4 p-6 shadow-sm">
@@ -61,7 +67,9 @@ function SurveyCard({
               triggerBtnText="Vote"
               alertTitle={`Your vote for ${optionA} has been submitted.`}
               actionBtnText="Confirm"
-              onActionClick={() => onVoteSubmit && onVoteSubmit('A')}
+              cancelBtnText="Cancel" // cancelBtnText 추가
+              description={`Are you sure you want to submit your vote for ${optionA}?`} // description 추가
+              onActionClick={() => handleVoteSubmit('A')} // 수정된 부분
             />
           )}
         </div>
@@ -78,10 +86,12 @@ function SurveyCard({
           {/* 투표 버튼은 isVoteComplete가 false일 때만 보입니다 */}
           {!voteComplete && (
             <CustomAlertDialog
-              triggerBtnText={'Vote'}
-              alertTitle={`Your vote for ${optionB} has been submitted.`}
+              triggerBtnText="Vote"
+              alertTitle={`Your vote for ${optionA} has been submitted.`}
               actionBtnText="Confirm"
-              onActionClick={() => onVoteSubmit && onVoteSubmit('B')}
+              cancelBtnText="Cancel" // cancelBtnText 추가
+              description={`Are you sure you want to submit your vote for ${optionA}?`} // description 추가
+              onActionClick={() => handleVoteSubmit('B')} // 수정된 부분
             />
           )}
         </div>
