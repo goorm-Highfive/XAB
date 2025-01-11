@@ -2,7 +2,8 @@ interface User {
   id: number
   name: string
   username: string
-  isFollowing: boolean
+  bio?: string
+  isFollowing?: boolean
   image?: string
 }
 

@@ -1,11 +1,21 @@
+import { redirect } from 'next/navigation'
 import SettingsMenu from '~/components/setting/setting-menu'
 import { ProfileCard } from '~/components/setting/setting-profile-card'
-export default function SettingsPage() {
+import { fetchUserProfile } from '~/utils/fetch-user'
+
+async function SettingsPage() {
+  const profileData = await fetchUserProfile()
+
+  if (!profileData) {
+    redirect('/login')
+    return null // 리디렉션 후 렌더링 방지
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md rounded-lg bg-white p-6 shadow">
         <section className="p-0 pb-6">
-          <ProfileCard />
+          <ProfileCard username={profileData.username} />
         </section>
         <h1 className="mb-4 text-xl font-semibold">Settings</h1>
         <SettingsMenu />
@@ -13,3 +23,5 @@ export default function SettingsPage() {
     </div>
   )
 }
+
+export default SettingsPage
