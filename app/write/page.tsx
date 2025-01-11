@@ -21,32 +21,127 @@ import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
 import { ToggleGroup, ToggleGroupItem } from '~/components/ui/toggle-group'
 import { AspectRatio } from '~/components/ui/aspect-ratio'
+import { createClient } from '~/utils/supabase/client'
 
-const formSchema = z.object({
-  body: z.string(),
-  type: z.enum(['text', 'image']).default('text'),
-  textA: z.string().optional(),
-  textB: z.string().optional(),
-  imageA: z.instanceof(File).optional(),
-  imageB: z.instanceof(File).optional(),
-})
+const formSchema = z
+  .object({
+    body: z.string().optional(),
+    type: z.enum(['text', 'image'], undefined).optional(),
+    textA: z.string().optional(),
+    textB: z.string().optional(),
+    imageA: z.instanceof(File).optional(),
+    imageB: z.instanceof(File).optional(),
+  })
+  .refine(
+    (data) => data.type !== undefined || (data.body?.trim().length ?? 0) > 0,
+    {
+      message:
+        'If you do not choose a survey option type, you must write the text',
+      path: ['body'],
+    },
+  )
 
 export default function Write() {
+  const supabase = createClient()
+
   const [previewA, setPreviewA] = useState<string | undefined>(undefined)
   const [previewB, setPreviewB] = useState<string | undefined>(undefined)
+
+  // 데이터 URL 생성하기
+  const uploadImage = async (file: File, filePath: string) => {
+    // 사진 supabase storage에 저장
+    const { error } = await supabase.storage.from('xab').upload(filePath, file)
+
+    if (error) {
+      console.log(`upload Error: ${error.message}`)
+    }
+
+    // URL 추가
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('xab').getPublicUrl(filePath)
+
+    return publicUrl
+  }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       body: '',
-      type: 'text',
+      type: undefined,
       textA: '',
       textB: '',
     },
   })
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values)
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      const { data: userData } = await supabase.auth.getUser()
+
+      if (!userData.user) {
+        console.error('userData가 없습니다.')
+        return
+      }
+
+      const userId = userData.user.id
+
+      // post 데이터 추가
+      const { data: postsData, error } = await supabase
+        .from('posts')
+        .insert({ user_id: userId, caption: values.body })
+        .select('id')
+
+      if (error) throw new Error(error.message)
+
+      console.log('Post inserted successfully:', postsData)
+
+      const postId = postsData[0].id // 방금 post 올린 데이터
+
+      // survey를 선택 했을 때
+      switch (values.type) {
+        case 'text': {
+          const { data, error } = await supabase.from('ab_tests').insert({
+            post_id: postId,
+            description_a: values.textA,
+            description_b: values.textB,
+          })
+
+          if (error) throw new Error(error.message)
+          console.log('Post inserted successfully:', data)
+          break
+        }
+
+        case 'image': {
+          const imageAPath = `images/${postId}/option-A/${Date.now()}`
+          const imageBPath = `images/${postId}/option-B/${Date.now()}`
+
+          const imageAurl = values.imageA
+            ? await uploadImage(values.imageA, imageAPath)
+            : undefined
+
+          const imageBurl = values.imageB
+            ? await uploadImage(values.imageB, imageBPath)
+            : undefined
+
+          const { data, error } = await supabase.from('ab_tests').insert({
+            post_id: postId,
+            variant_a_url: imageAurl,
+            variant_b_url: imageBurl,
+          })
+
+          if (error) throw new Error(error.message)
+          console.log('AB_Tests inserted successfully:', data)
+          break
+        }
+
+        default:
+          console.log('survey type을 추가하지 않음')
+      }
+
+      console.log('Values:', values)
+    } catch (error) {
+      console.error('An error occurred:', (error as Error).message)
+    }
   }
 
   const renderSurveyForm = (formType: z.infer<typeof formSchema>['type']) => {
