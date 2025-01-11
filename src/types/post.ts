@@ -40,4 +40,5 @@ export interface Post {
   comments_count: number
   likes_count: number
   userLiked: boolean
+  userVote: 'A' | 'B' | null // 사용자 투표 정보 추가
 }

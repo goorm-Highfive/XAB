@@ -1,56 +1,193 @@
 // app/home/page.tsx
 
-import { cookies } from 'next/headers' // 쿠키 가져오기
+'use client'
+
+import { useEffect, useState } from 'react'
 import { ProfileSection } from '~/components/home/profile-section'
 import { SuggestSection } from '~/components/home/suggest-section'
 import { NewSurveyButton } from '~/components/home/new-survey-button'
 import SurveyList from './survey-list'
 import { Post } from '~/types/post' // 타입 임포트
 
-// (옵션) 매 요청마다 페이지를 새로 그리려면:
-export const revalidate = 0
+export default function HomePage() {
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
 
-export default async function HomePage() {
-  // 1) API 경로 설정 (절대 URL 사용)
-  const apiUrl = `http://localhost:3000/api/posts/feed`
+  useEffect(() => {
+    async function fetchPosts() {
+      const apiUrl = `/api/posts/feed` // 상대 경로 사용
 
-  // 2) 서버에서 API 호출 시 쿠키 포함
-  let postsData: Post[] = []
-  try {
-    const cookieStore = await cookies()
-    const cookie = cookieStore.toString()
+      try {
+        const res = await fetch(apiUrl, {
+          cache: 'no-store',
+        })
 
-    const res = await fetch(apiUrl, {
-      cache: 'no-store', // 매번 최신 데이터 가져오기
-      headers: {
-        Cookie: cookie, // 클라이언트의 쿠키를 포함
-      },
-    })
+        if (!res.ok) {
+          const errJson = await res.json().catch(() => ({}))
+          throw new Error(errJson.error || 'Failed to fetch posts')
+        }
 
-    // 응답 상태 확인
-    if (!res.ok) {
-      const errJson = await res.json().catch(() => ({}))
-      throw new Error(errJson.error || 'Failed to fetch posts')
+        const json = await res.json()
+        setPosts(json.data ?? [])
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message)
+        } else {
+          setError('An unexpected error occurred')
+        }
+      } finally {
+        setLoading(false)
+      }
     }
 
-    const json = await res.json()
-    postsData = json.data ?? []
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      console.error('Failed to fetch posts:', err.message)
-    } else {
-      console.error('Failed to fetch posts:', err)
+    fetchPosts()
+  }, [])
+
+  // useEffect(() => {
+  //   async function fetchUser() {
+  //     try {
+  //       const res = await fetch('/api/user', { credentials: 'include' });
+  //       if (!res.ok) {
+  //         throw new Error('Failed to fetch user');
+  //       }
+  //       const userData = await res.json();
+  //       setUser(userData);
+  //     } catch (err) {
+  //       console.error('User fetch error:', err);
+  //     }
+  //   }
+
+  //   fetchUser();
+  // }, []);
+
+  const handleLikeToggle = async (postId: number) => {
+    try {
+      // 서버에 좋아요 토글 요청
+      const res = await fetch('/api/like', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId }),
+        credentials: 'include', // 쿠키 포함
+      })
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}))
+        throw new Error(errJson.error || 'Failed to toggle like')
+      }
+
+      const data = await res.json()
+
+      // 서버 응답에 따라 로컬 상태 업데이트
+      const updatedPosts = posts.map((post: Post) => {
+        if (post.post_id === postId) {
+          return {
+            ...post,
+            userLiked: data.liked,
+            likes_count: data.liked
+              ? post.likes_count + 1
+              : post.likes_count - 1,
+          }
+        }
+        return post
+      })
+
+      setPosts(updatedPosts)
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message)
+        // 사용자에게 에러를 표시할 수 있는 로직 추가 (예: 알림)
+      } else {
+        console.error('An unexpected error occurred')
+      }
     }
   }
 
-  // 3) 렌더링
+  const handleVoteSubmit = async (abTestId: number, option: 'A' | 'B') => {
+    try {
+      console.log('Submitting vote for abTestId:', abTestId)
+      console.log('Option selected:', option)
+
+      if (option !== 'A' && option !== 'B') {
+        throw new Error('Invalid option type')
+      }
+
+      const res = await fetch('/api/vote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ abTestId, option }),
+        credentials: 'include',
+      })
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}))
+        throw new Error(errJson.error || 'Failed to submit vote')
+      }
+
+      const data = await res.json()
+      console.log('Vote response:', data)
+
+      // 상태 업데이트 로직
+      if (data.voted) {
+        const updatedPosts = posts.map((post: Post) => {
+          if (post.ab_test_id === abTestId) {
+            // 이전 투표를 취소하고 새로운 투표를 반영
+            const previousVote = post.userVote
+            let newVotesA = post.votesA
+            let newVotesB = post.votesB
+
+            if (previousVote === 'A') {
+              newVotesA -= 1
+            } else if (previousVote === 'B') {
+              newVotesB -= 1
+            }
+
+            if (option === 'A') {
+              newVotesA += 1
+            } else if (option === 'B') {
+              newVotesB += 1
+            }
+
+            return {
+              ...post,
+              userVote: option,
+              votesA: newVotesA,
+              votesB: newVotesB,
+            }
+          }
+          return post
+        })
+
+        setPosts(updatedPosts)
+      }
+    } catch (err) {
+      console.error('Vote submission error:', err)
+    }
+  }
+
+  if (loading) {
+    return <div>Loading posts...</div>
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="mx-auto max-w-screen-2xl items-start gap-6 p-6 lg:flex">
-        <ProfileSection />
+        <ProfileSection user={user} />
         <div className="flex-1 space-y-6">
           <NewSurveyButton />
-          <SurveyList posts={postsData} />
+          <SurveyList
+            posts={posts}
+            onLikeToggle={handleLikeToggle}
+            onVoteSubmit={handleVoteSubmit}
+          />
         </div>
         <SuggestSection />
       </div>
