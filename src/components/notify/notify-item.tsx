@@ -1,15 +1,31 @@
 'use client'
 
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
-import type { NotifyItemProp } from '~/types/mockdata'
+import type { Tables } from '~/types/supabase'
+import { createClient } from '~/utils/supabase/client'
 
-function NotifyItem({ data, updateIsRead }: NotifyItemProp) {
-  const { id, isRead, userId, action, createdAt } = data
+type NotifyItemProps = {
+  item: Tables<'notifications'>
+  createdAt: string
+}
+
+const handleIsRead = async (id: number) => {
+  const supabase = createClient()
+  const { error } = await supabase
+    .from('notifications')
+    .update({ is_read: true })
+    .eq('id', id)
+
+  console.log(error)
+}
+
+function NotifyItem({ item, createdAt }: NotifyItemProps) {
+  const { is_read, action, id } = item
 
   return (
     <Alert
-      onClick={() => updateIsRead(id)}
-      className={`relative my-4 flex cursor-pointer justify-between p-4 pr-10 ${isRead ? 'opacity-50' : 'opacity-100'}`}
+      onClick={() => handleIsRead(id)}
+      className={`relative my-4 flex cursor-pointer justify-between p-4 pr-10 ${is_read ? 'opacity-50' : 'opacity-100'}`}
     >
       <div className="items-top flex">
         <div className="mr-4">
@@ -17,15 +33,14 @@ function NotifyItem({ data, updateIsRead }: NotifyItemProp) {
         </div>
         <div>
           <AlertTitle className="text-base font-semibold">
-            {userId}
-            <span className="font-normal"> {action}</span>
+            <span className="font-normal"> {action || 'undefined'}</span>
           </AlertTitle>
           <AlertDescription className="text-sm text-muted-foreground">
             {createdAt}
           </AlertDescription>
         </div>
       </div>
-      {isRead ? null : (
+      {is_read ? null : (
         <div className="absolute right-4 h-3 w-3 rounded-full bg-chart-1" />
       )}
     </Alert>

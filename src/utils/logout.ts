@@ -11,7 +11,7 @@ const logout = async () => {
   }
 
   alert('로그아웃이 완료되었습니다!')
-  redirect('/login')
+  redirect('/account/login')
 }
 
 export { logout }
