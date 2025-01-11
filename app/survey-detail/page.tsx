@@ -81,19 +81,23 @@ const useSurveyData = (initialData: SurveyData[]) => {
     )
   }
 
-  const handleVoteSubmit = (index: number, option: 'A' | 'B') => {
-    setSurvey((prev) =>
-      prev.map((item, i) =>
-        i === index
-          ? {
-              ...item,
-              voteComplete: true,
-              votesA: option === 'A' ? item.votesA + 1 : item.votesA,
-              votesB: option === 'B' ? item.votesB + 1 : item.votesB,
-            }
-          : item,
-      ),
-    )
+  const handleVoteSubmit = async (index: number, option: 'A' | 'B') => {
+    // 비동기 작업을 기다려야 하는 경우 여기에 추가하면 됩니다.
+    return new Promise<void>((resolve) => {
+      setSurvey((prev) =>
+        prev.map((item, i) =>
+          i === index
+            ? {
+                ...item,
+                voteComplete: true,
+                votesA: option === 'A' ? item.votesA + 1 : item.votesA,
+                votesB: option === 'B' ? item.votesB + 1 : item.votesB,
+              }
+            : item,
+        ),
+      )
+      resolve() // Promise가 성공적으로 완료되었음을 알리기 위해 resolve 호출
+    })
   }
 
   return { survey, updateLike, handleVoteSubmit }
@@ -190,10 +194,11 @@ function SurveyDetailPage() {
       <div className="mx-auto max-w-[1248px] pt-6">
         <SurveyCard
           {...survey[0]}
-          onVoteSubmit={(option) => handleVoteSubmit(0, option)}
+          onVoteSubmit={async (option) => {
+            await handleVoteSubmit(0, option)
+          }}
           onLikeToggle={() => updateLike(0, !survey[0].userLiked)}
         />
-
         {/* 댓글 영역 */}
         <Card className="mt-6">
           <CardHeader>

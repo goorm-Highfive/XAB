@@ -8,8 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card'
-import { CustomAlertDialog } from '~/components/common/custom-alert-dialog'
 import { fetchUserProfile } from '~/utils/fetch-user'
+import { CustomAlertDialogWrapper } from '~/components/common/custom-alert-dialog-wrapper' // 클라이언트 컴포넌트 가져오기
 
 async function ProfileInfoPage() {
   const profileData = await fetchUserProfile()
@@ -39,13 +39,7 @@ async function ProfileInfoPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <CustomAlertDialog
-              alertTitle="Are you sure you want to delete your account?"
-              description="This action is permanent and cannot be undone."
-              triggerBtnText="Delete Account"
-              cancelBtnText="Cancel"
-              actionBtnText="Continue"
-            />
+            <CustomAlertDialogWrapper />
           </CardContent>
         </Card>
       </ProfileEditLayout>
