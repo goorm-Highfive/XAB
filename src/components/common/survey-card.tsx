@@ -65,9 +65,11 @@ function SurveyCard({
 
       try {
         console.log('Selected option:', option) // 디버깅용
-        await onVoteSubmit(ab_test_id, option) // 문자열로 전달
+        await onVoteSubmit(ab_test_id, option)
       } catch (error: unknown) {
-        setVoteError(error.message || 'Failed to submit vote')
+        setVoteError(
+          error instanceof Error ? error.message : 'Failed to submit vote',
+        )
       } finally {
         setIsSubmitting(false)
       }
