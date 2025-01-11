@@ -7,7 +7,7 @@ async function SettingsPage() {
   const profileData = await fetchUserProfile()
 
   if (!profileData) {
-    redirect('/login')
+    redirect('/account/login')
     return null // 리디렉션 후 렌더링 방지
   }
 
