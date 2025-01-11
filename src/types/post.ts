@@ -38,7 +38,10 @@ export interface Post {
   comments: { id: number }[]
   likes: { id: number }[]
   comments_count: number
+  voteComplete: boolean
   likes_count: number
   userLiked: boolean
   userVote: 'A' | 'B' | null // 사용자 투표 정보 추가
+  votesA: number // A 옵션에 대한 투표 수
+  votesB: number // B 옵션에 대한 투표 수
 }
