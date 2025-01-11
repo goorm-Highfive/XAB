@@ -37,20 +37,37 @@ const useNotifyStore = create<NotifyStore>((set, get) => ({
 
     // 실시간 구독
     const channel = supabase
-      .channel('notify')
+      .channel('public:notifications')
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*',
           schema: 'public',
           table: 'notifications',
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
           const newNotify = payload.new as Tables<'notifications'>
-          set((state) => ({
-            notify: [newNotify, ...state.notify],
-          }))
+
+          set((state) => {
+            // 새로운 알림 울릴 떄
+            if (payload.eventType === 'INSERT') {
+              return {
+                notify: [newNotify, ...state.notify],
+              }
+
+              // 알림 데이터가 바뀌었을 때
+            } else if (payload.eventType === 'UPDATE') {
+              return {
+                notify: state.notify.map((notify) =>
+                  notify.id === newNotify.id
+                    ? { ...notify, ...newNotify }
+                    : notify,
+                ),
+              }
+            }
+            return state
+          })
         },
       )
       .subscribe()

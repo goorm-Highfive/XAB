@@ -2,17 +2,29 @@
 
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert'
 import type { Tables } from '~/types/supabase'
+import { createClient } from '~/utils/supabase/client'
 
 type NotifyItemProps = {
   item: Tables<'notifications'>
   createdAt: string
 }
 
+const handleIsRead = async (id: number) => {
+  const supabase = createClient()
+  const { error } = await supabase
+    .from('notifications')
+    .update({ is_read: true })
+    .eq('id', id)
+
+  console.log(error)
+}
+
 function NotifyItem({ item, createdAt }: NotifyItemProps) {
-  const { is_read, action } = item
+  const { is_read, action, id } = item
 
   return (
     <Alert
+      onClick={() => handleIsRead(id)}
       className={`relative my-4 flex cursor-pointer justify-between p-4 pr-10 ${is_read ? 'opacity-50' : 'opacity-100'}`}
     >
       <div className="items-top flex">
