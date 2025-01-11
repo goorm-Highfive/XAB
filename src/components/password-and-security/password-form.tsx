@@ -1,10 +1,10 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
+import { useForm, FormProvider } from 'react-hook-form'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 import { Button } from '~/components/ui/button'
-import { Form } from '~/components/ui/form'
 import { CustomFormField } from '~/components/common/custom-form-field'
 
 export type FormDataType = {
@@ -22,28 +22,72 @@ function PasswordForm() {
     },
   })
 
-  const updatePassword = (data: FormDataType): void => {
-    toast.success('비밀번호가 변경되었습니다.')
-    console.log(data)
-    form.reset()
+  const router = useRouter()
+
+  const updatePassword = async (data: FormDataType) => {
+    if (data.newPassword !== data.newPasswordConfirm) {
+      toast.error(
+        '새 비밀번호와 확인용 비밀번호가 일치하지 않습니다. 다시 입력해 주세요.',
+      )
+      return
+    }
+
+    if (data.newPassword.length < 8) {
+      toast.error('새 비밀번호는 최소 8자 이상이어야 합니다.')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/user-edit/edit-pswd', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword,
+        }),
+      })
+
+      if (!response.ok) {
+        const { error } = await response.json()
+        throw new Error(
+          error || '비밀번호 변경에 실패했습니다. 다시 시도해 주세요.',
+        )
+      }
+
+      toast.success(
+        '비밀번호가 성공적으로 변경되었습니다! 다시 로그인해 주세요.',
+      )
+
+      //딜레이 후 로그인 페이지로 리다이렉트
+      setTimeout(() => {
+        router.push('/login')
+      }, 1500)
+
+      form.reset()
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'An unexpected error occurred.'
+
+      console.error('Error updating password:', errorMessage)
+      toast.error(errorMessage)
+    }
   }
 
   return (
-    <Form {...form}>
-      <p className="mb-5 text-xl font-bold">Change Password</p>
+    <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(updatePassword)} className="space-y-8">
         <CustomFormField
           name="currentPassword"
           label="Current Password"
           type="password"
         />
-
         <CustomFormField
           name="newPassword"
           label="New Password"
           type="password"
         />
-
         <CustomFormField
           name="newPasswordConfirm"
           label="Confirm New Password"
@@ -51,7 +95,7 @@ function PasswordForm() {
         />
         <Button type="submit">Update Password</Button>
       </form>
-    </Form>
+    </FormProvider>
   )
 }
 

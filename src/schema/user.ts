@@ -24,6 +24,21 @@ export const loginSchema = z.object({
   password: passwordSchema,
 })
 
+export const updatePasswordSchema = z
+  .object({
+    password: passwordSchema,
+    passwordConfirm: passwordConfirmSchema,
+  })
+  .superRefine(({ password, passwordConfirm }, ctx) => {
+    if (password !== passwordConfirm) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'password not matched',
+        path: ['password'],
+      })
+    }
+  })
+
 export const signUpSchema = z
   .object({
     userName: userNameSchema,
@@ -36,17 +51,17 @@ export const signUpSchema = z
     if (password !== passwordConfirm) {
       ctx.addIssue({
         code: 'custom',
-        message: 'password not matched',
-        path: ['checkPassword'],
-      })
-
-      ctx.addIssue({
-        code: 'custom',
-        message: 'password not matched',
-        path: ['password'],
+        message: 'Passwords do not match',
+        path: ['passwordConfirm'], // passwordConfirm 필드에 에러 추가
       })
     }
   })
 
+export const checkEmailSchema = z.object({
+  email: emailSchema,
+})
+
 export type LoginPayload = z.infer<typeof loginSchema>
 export type SignUpPayload = z.infer<typeof signUpSchema>
+export type UpdatePasswordPayload = z.infer<typeof updatePasswordSchema>
+export type CheckEmailPayload = z.infer<typeof checkEmailSchema>

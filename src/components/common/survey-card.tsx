@@ -73,6 +73,25 @@ function SurveyCard({
     }
   }
 
+  const isOptionASelected = userVote === 'A'
+  const isOptionBSelected = userVote === 'B'
+
+  const handleOptionClick = async (option: 'A' | 'B') => {
+    if (ab_test_id && onVoteSubmit) {
+      setIsSubmitting(true)
+      setVoteError(null)
+
+      try {
+        console.log('Selected option:', option) // 디버깅용
+        await onVoteSubmit(ab_test_id, option) // 문자열로 전달
+      } catch (error: unknown) {
+        setVoteError(error.message || 'Failed to submit vote')
+      } finally {
+        setIsSubmitting(false)
+      }
+    }
+  }
+
   return (
     <Card className="mb-4 p-6 shadow-sm">
       <Link href={`/survey-detail/${postId}`}>
