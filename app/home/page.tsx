@@ -180,7 +180,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="mx-auto max-w-screen-2xl items-start gap-6 p-6 lg:flex">
-        <ProfileSection user={user} />
+        <ProfileSection />
         <div className="flex-1 space-y-6">
           <NewSurveyButton />
           <SurveyList

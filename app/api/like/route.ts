@@ -29,7 +29,6 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (likeError && likeError.code !== 'PGRST116') {
-    // PGRST116: No rows found
     console.error('Error fetching like status:', likeError.message)
     return NextResponse.json({ error: likeError.message }, { status: 500 })
   }

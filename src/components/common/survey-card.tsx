@@ -50,6 +50,7 @@ function SurveyCard({
   postId,
 }: SurveyCardProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [voteError, setVoteError] = useState<string | null>(null)
 
   const totalVotes = votesA + votesB
 
@@ -59,12 +60,13 @@ function SurveyCard({
   const handleOptionClick = async (option: 'A' | 'B') => {
     if (ab_test_id && onVoteSubmit) {
       setIsSubmitting(true)
+      setVoteError(null)
 
       try {
         console.log('Selected option:', option) // 디버깅용
         await onVoteSubmit(ab_test_id, option) // 문자열로 전달
       } catch (error: unknown) {
-        console.error('Error submitting vote:', error)
+        setVoteError(error.message || 'Failed to submit vote')
       } finally {
         setIsSubmitting(false)
       }
@@ -97,6 +99,17 @@ function SurveyCard({
           )}
         </div>
       </Link>
+
+      {/* 투표 에러 메시지 표시 */}
+      {voteError && (
+        <div
+          className="relative mb-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
+          role="alert"
+        >
+          <strong className="font-bold">Error:</strong>
+          <span className="block sm:inline">{voteError}</span>
+        </div>
+      )}
 
       {/* AB 테스트가 있는 경우에만 투표 옵션 표시 */}
       {ab_test_id && (
