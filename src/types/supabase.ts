@@ -56,8 +56,8 @@ export type Database = {
           id: number
           post_id: number
           updated_at: string
-          variant_a_url: string
-          variant_b_url: string
+          variant_a_url: string | null
+          variant_b_url: string | null
         }
         Insert: {
           created_at?: string
@@ -66,8 +66,8 @@ export type Database = {
           id?: number
           post_id: number
           updated_at?: string
-          variant_a_url: string
-          variant_b_url: string
+          variant_a_url?: string | null
+          variant_b_url?: string | null
         }
         Update: {
           created_at?: string
@@ -76,8 +76,8 @@ export type Database = {
           id?: number
           post_id?: number
           updated_at?: string
-          variant_a_url?: string
-          variant_b_url?: string
+          variant_a_url?: string | null
+          variant_b_url?: string | null
         }
         Relationships: [
           {
@@ -291,7 +291,7 @@ export type Database = {
           caption: string | null
           created_at: string
           id: number
-          image_url: string
+          image_url: string | null
           updated_at: string
           user_id: string
         }
@@ -299,7 +299,7 @@ export type Database = {
           caption?: string | null
           created_at?: string
           id?: number
-          image_url: string
+          image_url?: string | null
           updated_at?: string
           user_id: string
         }
@@ -307,7 +307,7 @@ export type Database = {
           caption?: string | null
           created_at?: string
           id?: number
-          image_url?: string
+          image_url?: string | null
           updated_at?: string
           user_id?: string
         }
