@@ -37,12 +37,13 @@ export default function SurveyList({
           userVote={post.userVote}
           onLikeToggle={() => onLikeToggle(post.post_id)}
           onVoteSubmit={(abTestId: number, selectedOption: 'A' | 'B') => {
-            console.log('SurveyList - Option:', selectedOption)
-            console.log('abTestId ' + abTestId)
             if (post.ab_test_id) {
               onVoteSubmit(post.ab_test_id, selectedOption)
             }
           }}
+          voteComplete={
+            post.voteComplete !== undefined ? post.voteComplete : false
+          }
         />
       ))}
     </>

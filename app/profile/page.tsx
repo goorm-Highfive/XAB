@@ -10,24 +10,21 @@ function ProfilePage() {
 
           <SurveyCard
             date="March 15, 2025"
+            username="John Doe" // 필수 prop 추가
             question="Which landing page design do you prefer for our new product?"
+            post_image_url={null} // 필수 prop 추가
             optionA="Design A"
             optionB="Design B"
+            optionA_url={null} // 필수 prop 추가
+            optionB_url={null} // 필수 prop 추가
             votesA={790}
             votesB={444}
+            commentsCount={10} // 필수 prop 추가
+            userVote={null} // 필수 prop 추가
+            ab_test_id={null} // 필수 prop 추가
+            postId={1} // 필수 prop 추가
             voteComplete={true}
             initLikeCount={999}
-            userLiked={false}
-          />
-          <SurveyCard
-            date="March 14, 2025"
-            question="Which color scheme resonates better with our brand identity?"
-            optionA="Palette A"
-            optionB="Palette B"
-            votesA={360}
-            votesB={496}
-            voteComplete={true}
-            initLikeCount={1100}
             userLiked={false}
           />
         </div>

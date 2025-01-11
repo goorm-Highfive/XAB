@@ -23,10 +23,11 @@ type SurveyCardProps = {
   userLiked: boolean
   commentsCount: number
   userVote: 'A' | 'B' | null
-  ab_test_id: number | null // ab_test_id 추가
+  ab_test_id: number | null
   onLikeToggle?: () => void
-  onVoteSubmit?: (abTestId: number, option: 'A' | 'B') => void // ab_test_id 사용
-  postId: number // postId 추가
+  onVoteSubmit?: (abTestId: number, option: 'A' | 'B') => void
+  postId: number
+  voteComplete: boolean // 추가된 부분
 }
 
 function SurveyCard({
