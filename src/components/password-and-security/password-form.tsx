@@ -29,9 +29,6 @@ function PasswordForm() {
     },
   })
 
-  const router = useRouter()
-
-
   const updatePassword = async (data: FormDataType) => {
     if (data.newPassword !== data.newPasswordConfirm) {
       toast.error(
