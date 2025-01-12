@@ -100,7 +100,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const supabase = createClient(request)
+  const supabase = await createClient(request)
   const targetUserId = params.id
 
   try {
