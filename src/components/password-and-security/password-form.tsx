@@ -2,15 +2,22 @@
 
 import { useForm, FormProvider } from 'react-hook-form'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
 
 import { Button } from '~/components/ui/button'
 import { CustomFormField } from '~/components/common/custom-form-field'
+import { createClient } from '~/utils/supabase/client'
 
 export type FormDataType = {
   currentPassword: string
   newPassword: string
   newPasswordConfirm: string
+}
+
+const passwordUpdateSuccess = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 1500))
+
+  const supabase = createClient()
+  await supabase.auth.signOut()
 }
 
 function PasswordForm() {
@@ -23,6 +30,7 @@ function PasswordForm() {
   })
 
   const router = useRouter()
+
 
   const updatePassword = async (data: FormDataType) => {
     if (data.newPassword !== data.newPasswordConfirm) {
@@ -60,10 +68,8 @@ function PasswordForm() {
         '비밀번호가 성공적으로 변경되었습니다! 다시 로그인해 주세요.',
       )
 
-      //딜레이 후 로그인 페이지로 리다이렉트
-      setTimeout(() => {
-        router.push('/login')
-      }, 1500)
+      //딜레이 후 로그아웃
+      passwordUpdateSuccess()
 
       form.reset()
     } catch (error) {

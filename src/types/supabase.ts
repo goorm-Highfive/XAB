@@ -56,8 +56,8 @@ export type Database = {
           id: number
           post_id: number
           updated_at: string
-          variant_a_url: string
-          variant_b_url: string
+          variant_a_url: string | null
+          variant_b_url: string | null
         }
         Insert: {
           created_at?: string
@@ -66,8 +66,8 @@ export type Database = {
           id?: number
           post_id: number
           updated_at?: string
-          variant_a_url: string
-          variant_b_url: string
+          variant_a_url?: string | null
+          variant_b_url?: string | null
         }
         Update: {
           created_at?: string
@@ -76,8 +76,8 @@ export type Database = {
           id?: number
           post_id?: number
           updated_at?: string
-          variant_a_url?: string
-          variant_b_url?: string
+          variant_a_url?: string | null
+          variant_b_url?: string | null
         }
         Relationships: [
           {
@@ -164,6 +164,24 @@ export type Database = {
           },
         ]
       }
+      delete_sessions: {
+        Row: {
+          deleted_at: string | null
+          id: number
+          user_id: string
+        }
+        Insert: {
+          deleted_at?: string | null
+          id?: number
+          user_id: string
+        }
+        Update: {
+          deleted_at?: string | null
+          id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       follows: {
         Row: {
           created_at: string
@@ -236,12 +254,44 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          action: string
+          created_at: string | null
+          id: number
+          is_read: boolean
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          id?: number
+          is_read?: boolean
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          id?: number
+          is_read?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'notifications_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       posts: {
         Row: {
           caption: string | null
           created_at: string
           id: number
-          image_url: string
+          image_url: string | null
           updated_at: string
           user_id: string
         }
@@ -249,7 +299,7 @@ export type Database = {
           caption?: string | null
           created_at?: string
           id?: number
-          image_url: string
+          image_url?: string | null
           updated_at?: string
           user_id: string
         }
@@ -257,7 +307,7 @@ export type Database = {
           caption?: string | null
           created_at?: string
           id?: number
-          image_url?: string
+          image_url?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -309,6 +359,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_user_account: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: string
+      }
       get_feed_posts_for_user: {
         Args: {
           p_user_id: string

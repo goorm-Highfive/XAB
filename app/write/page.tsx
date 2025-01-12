@@ -5,8 +5,9 @@ import { ImageIcon, TypeIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { toast } from 'sonner'
 
+import { Toaster } from '~/components/ui/sonner'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import {
@@ -21,35 +22,123 @@ import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
 import { ToggleGroup, ToggleGroupItem } from '~/components/ui/toggle-group'
 import { AspectRatio } from '~/components/ui/aspect-ratio'
-
-const formSchema = z.object({
-  body: z.string(),
-  type: z.enum(['text', 'image']).default('text'),
-  textA: z.string().optional(),
-  textB: z.string().optional(),
-  imageA: z.instanceof(File).optional(),
-  imageB: z.instanceof(File).optional(),
-})
+import { createClient } from '~/utils/supabase/client'
+import { WritePayload, writeSchema } from '~/schema/write'
+import { useRouter } from 'next/navigation'
 
 export default function Write() {
+  const supabase = createClient()
+  const router = useRouter()
+
   const [previewA, setPreviewA] = useState<string | undefined>(undefined)
   const [previewB, setPreviewB] = useState<string | undefined>(undefined)
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  // 데이터 URL 생성하기
+  const uploadImage = async (file: File, filePath: string) => {
+    // 사진 supabase storage에 저장
+    const { error } = await supabase.storage.from('xab').upload(filePath, file)
+
+    if (error) {
+      toast.error(`Upload Error: ${error.message}`)
+      console.log(`upload Error: ${error.message}`)
+    }
+
+    // URL 추가
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('xab').getPublicUrl(filePath)
+
+    return publicUrl
+  }
+
+  const form = useForm<WritePayload>({
+    resolver: zodResolver(writeSchema),
     defaultValues: {
       body: '',
-      type: 'text',
+      type: undefined,
       textA: '',
       textB: '',
     },
   })
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values)
+  const onSubmit = async (values: WritePayload) => {
+    try {
+      const { data: userData } = await supabase.auth.getUser()
+
+      if (!userData.user) {
+        console.error('userData가 없습니다.')
+        return
+      }
+
+      const userId = userData.user.id
+
+      // post 데이터 추가
+      const { data: postsData, error: postError } = await supabase
+        .from('posts')
+        .insert({ user_id: userId, caption: values.body })
+        .select('id')
+
+      if (postError) throw new Error(postError.message)
+
+      console.log('Post inserted successfully:', postsData)
+
+      const postId = postsData[0].id // 방금 올린 post의 id
+
+      // survey를 선택 했을 때
+      switch (values.type) {
+        case 'text': {
+          const { error: textError } = await supabase.from('ab_tests').insert({
+            post_id: postId,
+            description_a: values.textA,
+            description_b: values.textB,
+          })
+
+          if (textError) {
+            toast.error(`Failed to upload post. Please try again`)
+            throw new Error(textError.message)
+          }
+          console.log('Post inserted successfully')
+          break
+        }
+
+        case 'image': {
+          const imageAPath = `images/${postId}/option-A${Date.now()}`
+          const imageBPath = `images/${postId}/option-B${Date.now()}`
+
+          const imageAurl = values.imageA
+            ? await uploadImage(values.imageA, imageAPath)
+            : undefined
+
+          const imageBurl = values.imageB
+            ? await uploadImage(values.imageB, imageBPath)
+            : undefined
+
+          const { error: imageError } = await supabase.from('ab_tests').insert({
+            post_id: postId,
+            variant_a_url: imageAurl,
+            variant_b_url: imageBurl,
+          })
+
+          if (imageError) {
+            toast.error('Failed to upload post. Please try again.')
+            throw new Error(imageError.message)
+          }
+          console.log('AB_Testsinserted successfully')
+          break
+        }
+
+        default:
+          console.log('survey type을 추가하지 않음')
+      }
+
+      console.log('Values:', values)
+      router.back()
+    } catch (error) {
+      console.error('An error occurred:', (error as Error).message)
+    }
   }
 
-  const renderSurveyForm = (formType: z.infer<typeof formSchema>['type']) => {
+  const renderSurveyForm = (formType: WritePayload['type']) => {
     switch (formType) {
       case 'text':
         return (
@@ -190,6 +279,7 @@ export default function Write() {
 
   return (
     <Form {...form}>
+      <Toaster />
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
@@ -219,7 +309,7 @@ export default function Write() {
                   type="single"
                   onValueChange={(value) => {
                     form.reset({
-                      type: value as z.infer<typeof formSchema>['type'],
+                      type: value as WritePayload['type'],
                       body: form.getValues('body'),
                     })
                     setPreviewA(undefined)
@@ -254,7 +344,13 @@ export default function Write() {
         />
         {renderSurveyForm(form.getValues('type'))}
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              router.back()
+            }}
+          >
             Cancel
           </Button>
           <Button type="submit">Post</Button>

@@ -2,9 +2,7 @@
 
 import Link from 'next/link'
 import { Bell } from 'lucide-react'
-import { useState } from 'react'
 
-import type { MockDataType } from '~/types/mockdata'
 import { NotifyItem } from '~/components/notify/notify-item'
 import { Button } from '~/components/ui/button'
 import {
@@ -15,47 +13,11 @@ import {
   SheetTrigger,
   SheetDescription,
 } from '~/components/ui/custom-sheet'
-
-const mockData: MockDataType[] = [
-  {
-    id: 1,
-    userId: 'wontory',
-    action: '님이 게시글에 좋아요를 눌렀습니다.',
-    createdAt: '2024.12.20',
-    isRead: false,
-  },
-  {
-    id: 2,
-    userId: 'jyooni99',
-    action: '님이 회원님을 팔로우하기 시작했습니다.',
-    createdAt: '2024.12.20',
-    isRead: false,
-  },
-  {
-    id: 3,
-    userId: 'E0min',
-    action: '님이 회원님의 게시글에 댓글을 남겼습니다.',
-    createdAt: '2024.12.19',
-    isRead: false,
-  },
-  {
-    id: 4,
-    userId: 'yujsoo',
-    action: '님이 회원님의 게시글에 좋아요를 눌렀습니다.',
-    createdAt: '2024.12.19',
-    isRead: false,
-  },
-]
+import { useNotify } from '~/hooks/useNotify'
 
 function NotificationButton() {
-  const [data, setData] = useState(mockData)
-
-  const updateIsRead = (id: number) => {
-    const newData = data.map((item) =>
-      item.id === id ? { ...item, isRead: true } : item,
-    )
-    setData(newData)
-  }
+  const { notify, loading } = useNotify()
+  const previewNotify = notify.slice(0, 10)
 
   return (
     <Sheet>
@@ -73,16 +35,26 @@ function NotificationButton() {
         <SheetDescription className="opacity-0">
           View Notifications
         </SheetDescription>
-        <div>
-          {data.map((item) => (
-            <NotifyItem key={item.id} data={item} updateIsRead={updateIsRead} />
-          ))}
+        {loading ? (
+          <div>로딩중</div>
+        ) : (
+          <div className="h-5/6 overflow-y-scroll">
+            {previewNotify.map((item) => (
+              <NotifyItem
+                key={item.id}
+                item={item}
+                createdAt={item.created_at?.split('T')[0] || 'Unknown'}
+              />
+            ))}
+          </div>
+        )}
+        <div className="pt-6">
+          <SheetClose asChild>
+            <Button className="h-12 w-full py-3 text-center" asChild>
+              <Link href="/notify">View All</Link>
+            </Button>
+          </SheetClose>
         </div>
-        <SheetClose asChild>
-          <Button className="h-12 w-full py-3 text-center" asChild>
-            <Link href="/notify">View All</Link>
-          </Button>
-        </SheetClose>
       </SheetContent>
     </Sheet>
   )
