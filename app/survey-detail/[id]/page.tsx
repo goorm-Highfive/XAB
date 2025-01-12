@@ -1,28 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { SurveyCard } from '~/components/common/survey-card'
+import { use, useEffect, useState } from 'react'
+import { SurveyCard, SurveyCardProps } from '~/components/common/survey-card'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { SurveyComment } from '~/components/survey-detail/survey-comment'
 import { SurveyCommentInput } from '~/components/survey-detail/survey-comment-input'
-import { SurveyData } from '~/types/survey'
 import { CommentData } from '~/types/comment'
 
-// 임시 데이터
-const initialSurveyData: SurveyData[] = [
-  {
-    date: 'March 15, 2025',
-    question: 'Which landing page design do you prefer for our new product?',
-    optionA: 'Design A',
-    optionB: 'Design B',
-    votesA: 50,
-    votesB: 50,
-    voteComplete: false,
-    initLikeCount: 999,
-    userLiked: false,
-  },
-]
-
+// 초기 댓글 데이터
 const initialCommentData: CommentData[] = [
   {
     id: '1',
@@ -61,7 +46,7 @@ const initialCommentData: CommentData[] = [
 ]
 
 // 좋아요 및 투표 로직 관리
-const useSurveyData = (initialData: SurveyData[]) => {
+const useSurveyData = (initialData: SurveyCardProps[]) => {
   const [survey, setSurvey] = useState(initialData)
 
   const updateLike = (index: number, newLikeStatus: boolean) => {
@@ -81,7 +66,6 @@ const useSurveyData = (initialData: SurveyData[]) => {
   }
 
   const handleVoteSubmit = async (index: number, option: 'A' | 'B') => {
-    // 비동기 작업을 기다려야 하는 경우 여기에 추가하면 됩니다.
     return new Promise<void>((resolve) => {
       setSurvey((prev) =>
         prev.map((item, i) =>
@@ -95,7 +79,7 @@ const useSurveyData = (initialData: SurveyData[]) => {
             : item,
         ),
       )
-      resolve() // Promise가 성공적으로 완료되었음을 알리기 위해 resolve 호출
+      resolve()
     })
   }
 
@@ -181,43 +165,91 @@ const useCommentData = (initialData: CommentData[]) => {
   return { comments, toggleLike, addComment, addReply }
 }
 
-function SurveyDetailPage() {
-  const { survey, updateLike, handleVoteSubmit } =
-    useSurveyData(initialSurveyData)
+function SurveyDetailPage({
+  params,
+}: {
+  params: Promise<{ [key: string]: string | undefined }>
+}) {
+  const { id } = use(params)
+  const [postData, setPostData] = useState<SurveyCardProps>()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const { updateLike } = useSurveyData([]) //handleVoteSubmit 추가해야 함
   const { comments, toggleLike, addComment, addReply } =
     useCommentData(initialCommentData)
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!id) {
+        setError('id is undefined')
+        setLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/survey-detail/${id}`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch post data')
+        }
+        const data = await response.json()
+        setPostData({
+          date: new Date(data.post.created_at).toLocaleDateString(),
+          username: data.username,
+          question: data.abTest.description_a || 'Which option do you prefer?',
+          post_image_url: data.post.image_url,
+          optionA: data.abTest.description_a,
+          optionB: data.abTest.description_b,
+          optionA_url: data.abTest.variant_a_url,
+          optionB_url: data.abTest.variant_b_url,
+          votesA: data.votesA,
+          votesB: data.votesB,
+          initLikeCount: data.initLikeCount,
+          userLiked: data.userLiked,
+          commentsCount: data.commentsCount,
+          userVote: data.userVote,
+          ab_test_id: data.abTest.id,
+          postId: data.post.id,
+          voteComplete: data.voteComplete,
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [id])
+
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>Error: {error}</div>
+  if (!postData) return <div>No data found</div>
+
   return (
-    <div className="bg-gray-100">
-      <div className="mx-auto max-w-[1248px] pt-6">
-        <SurveyCard
-          {...survey[0]}
-          onVoteSubmit={async (option) => {
-            await handleVoteSubmit(0, option)
-          }}
-          onLikeToggle={() => updateLike(0, !survey[0].userLiked)}
-        />
-        {/* 댓글 영역 */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Comments ({comments.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {comments.map((comment) => (
-              <SurveyComment
-                key={comment.id}
-                comment={comment}
-                onToggleLike={() => toggleLike(comment.id)}
-                onToggleReplyLike={(replyId) =>
-                  toggleLike(comment.id, true, replyId)
-                }
-                onAddReply={addReply}
-              />
-            ))}
-            <SurveyCommentInput onCommentSubmit={addComment} />
-          </CardContent>
-        </Card>
-      </div>
+    <div className="container mx-auto py-8">
+      <SurveyCard
+        {...postData}
+        // onVoteSubmit={(option) => handleVoteSubmit(0, option)}
+        onLikeToggle={() => updateLike(0, !postData.userLiked)}
+      />
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Comments ({comments.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {comments.map((comment) => (
+            <SurveyComment
+              key={comment.id}
+              comment={comment}
+              onToggleLike={() => toggleLike(comment.id)}
+              onToggleReplyLike={(replyId) =>
+                toggleLike(comment.id, true, replyId)
+              }
+              onAddReply={addReply}
+            />
+          ))}
+          <SurveyCommentInput onCommentSubmit={addComment} />
+        </CardContent>
+      </Card>
     </div>
   )
 }

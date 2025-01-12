@@ -7,14 +7,17 @@ import { Heart, MessageSquare, Share2 } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
 import Link from 'next/link'
+import { Tables } from '~/types/supabase'
 
-type SurveyCardProps = {
+export type SurveyCardProps = {
+  post?: Tables<'posts'>
+  abTest?: Tables<'ab_tests'>
   date: string
   username: string
   question: string
   post_image_url: string | null
-  optionA: string
-  optionB: string
+  optionA: string | null
+  optionB: string | null
   optionA_url: string | null
   optionB_url: string | null
   votesA: number
@@ -124,7 +127,7 @@ function SurveyCard({
             } hover:border-gray-400 ${isSubmitting ? 'cursor-not-allowed opacity-50' : ''}`}
             onClick={() => handleOptionClick('A')}
           >
-            {/* <span className="text-gray-600">{optionA}</span> */}
+            <span className="text-gray-600">{optionA}</span>
             {optionA_url && (
               <a
                 href={optionA_url}
@@ -134,7 +137,7 @@ function SurveyCard({
               >
                 <Image
                   src={optionA_url}
-                  alt={optionA}
+                  alt={optionA || 'optionA'}
                   width={150}
                   height={150}
                   className="rounded-md"
@@ -159,7 +162,7 @@ function SurveyCard({
             } hover:border-gray-400 ${isSubmitting ? 'cursor-not-allowed opacity-50' : ''}`}
             onClick={() => handleOptionClick('B')}
           >
-            {/* <span className="text-gray-600">{optionB}</span> */}
+            <span className="text-gray-600">{optionB}</span>
             {optionB_url && (
               <a
                 href={optionB_url}
@@ -169,7 +172,7 @@ function SurveyCard({
               >
                 <Image
                   src={optionB_url}
-                  alt={optionB}
+                  alt={optionB || 'optionB'}
                   width={150}
                   height={150}
                   className="rounded-md"
