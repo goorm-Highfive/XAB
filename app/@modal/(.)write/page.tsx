@@ -20,7 +20,7 @@ export default function WriteModal() {
 
   return (
     <Dialog open onOpenChange={handleClose}>
-      <DialogContent className="mx-auto mt-20 max-w-lg rounded-lg bg-white p-6 shadow-lg">
+      <DialogContent className="mx-auto max-h-[85%] max-w-lg overflow-y-scroll rounded-lg bg-white p-6 shadow-lg">
         <DialogHeader>
           <DialogTitle>Create Post with A/B Testing</DialogTitle>
         </DialogHeader>
