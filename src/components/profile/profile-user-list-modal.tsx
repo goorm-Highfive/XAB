@@ -2,23 +2,27 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import type { User } from '~/types/user'
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '~/components/ui/dialog'
+} from '~/components/ui/dialog' // Shadcn Dialog
 import { SearchBar } from '~/components/profile/profile-search-bar'
 import { UserFollowList } from '~/components/profile/profile-user-follow-list'
 
+// API 응답 데이터 타입 정의
 interface UserListResponseItem {
-  id: string
+  id: number
   name: string
   username?: string
   isFollowing?: boolean
   image?: string
 }
 
+// UserListModalProps 타입 정의
 interface UserListModalProps {
   title: string
   apiEndpoint: string
@@ -33,8 +37,8 @@ function ErrorIndicator({ message }: { message: string }) {
 }
 
 function UserListModal({ title, apiEndpoint }: UserListModalProps) {
-  const [users, setUsers] = useState<UserListResponseItem[]>([])
-  const [filteredUsers, setFilteredUsers] = useState<UserListResponseItem[]>([])
+  const [users, setUsers] = useState<User[]>([])
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const router = useRouter()
@@ -45,11 +49,26 @@ function UserListModal({ title, apiEndpoint }: UserListModalProps) {
         const response = await fetch(apiEndpoint)
         if (!response.ok) throw new Error('Failed to fetch data')
 
+        // API 응답 데이터 타입 명시
         const data: UserListResponseItem[] = await response.json()
-        setUsers(data)
-        setFilteredUsers(data)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error occurred.')
+
+        // User 타입으로 변환
+        const formattedData: User[] = data.map((item) => ({
+          id: item.id,
+          name: item.name,
+          username: item.username || 'Unknown',
+          isFollowing: item.isFollowing || false,
+          image: item.image || undefined,
+        }))
+
+        setUsers(formattedData)
+        setFilteredUsers(formattedData)
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message)
+        } else {
+          setError('Unknown error occurred.')
+        }
       } finally {
         setLoading(false)
       }
@@ -59,7 +78,7 @@ function UserListModal({ title, apiEndpoint }: UserListModalProps) {
 
   const handleSearch = (query: string) => {
     setFilteredUsers(
-      users.filter((user) =>
+      users.filter((user: User) =>
         user.name.toLowerCase().includes(query.toLowerCase()),
       ),
     )
