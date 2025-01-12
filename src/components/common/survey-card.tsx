@@ -124,7 +124,7 @@ function SurveyCard({
             } hover:border-gray-400 ${isSubmitting ? 'cursor-not-allowed opacity-50' : ''}`}
             onClick={() => handleOptionClick('A')}
           >
-            <span className="text-gray-600">{optionA}</span>
+            {/* <span className="text-gray-600">{optionA}</span> */}
             {optionA_url && (
               <a
                 href={optionA_url}
@@ -159,7 +159,7 @@ function SurveyCard({
             } hover:border-gray-400 ${isSubmitting ? 'cursor-not-allowed opacity-50' : ''}`}
             onClick={() => handleOptionClick('B')}
           >
-            <span className="text-gray-600">{optionB}</span>
+            {/* <span className="text-gray-600">{optionB}</span> */}
             {optionB_url && (
               <a
                 href={optionB_url}

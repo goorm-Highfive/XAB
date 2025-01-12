@@ -4,6 +4,7 @@ import { createClient } from '~/utils/supabase/server' // 서버용 클라이언
 export async function GET() {
   const supabase = await createClient() // 서버용 클라이언트 초기화
   console.log('API 호출 시작')
+
   try {
     // 1) Supabase Auth 세션 확인
     const {
@@ -98,61 +99,10 @@ export async function GET() {
     const userLikedPostIds = userLikes?.map((like) => like.post_id) || []
 
     // 5) 포스트별로 댓글 수와 좋아요 수, userLiked, userVote 설정
-    const bucketName = 'xab' // 비공개 버킷 이름으로 변경하세요.
 
     const formattedPosts = await Promise.all(
       posts.map(async (post) => {
-        // 이미지 URL 서명 생성
-        let signedImageUrl = null
-        if (post.image_url) {
-          const { data: signedUrlData, error: signedUrlError } =
-            await supabase.storage
-              .from(bucketName)
-              .createSignedUrl(post.image_url, 60) // 60초 동안 유효한 URL
-          if (signedUrlError) {
-            console.error(
-              `Error generating signed URL for post ${post.id}:`,
-              signedUrlError.message,
-            )
-          } else {
-            signedImageUrl = signedUrlData?.signedUrl || null
-          }
-        }
-
-        // optionA_url 서명 생성
-        let signedOptionAUrl = null
-        if (post.ab_tests && post.ab_tests[0]?.variant_a_url) {
-          const { data: signedUrlData, error: signedUrlError } =
-            await supabase.storage
-              .from(bucketName)
-              .createSignedUrl(post.ab_tests[0].variant_a_url, 60)
-          if (signedUrlError) {
-            console.error(
-              `Error generating signed URL for option A of post ${post.id}:`,
-              signedUrlError.message,
-            )
-          } else {
-            signedOptionAUrl = signedUrlData?.signedUrl || null
-          }
-        }
-
-        // optionB_url 서명 생성
-        let signedOptionBUrl = null
-        if (post.ab_tests && post.ab_tests[0]?.variant_b_url) {
-          const { data: signedUrlData, error: signedUrlError } =
-            await supabase.storage
-              .from(bucketName)
-              .createSignedUrl(post.ab_tests[0].variant_b_url, 60)
-          if (signedUrlError) {
-            console.error(
-              `Error generating signed URL for option B of post ${post.id}:`,
-              signedUrlError.message,
-            )
-          } else {
-            signedOptionBUrl = signedUrlData?.signedUrl || null
-          }
-        }
-
+        console.log(post.ab_tests)
         // 사용자의 투표 정보 확인 및 votesA, votesB 계산
         let userVote: 'A' | 'B' | null = null
         let votesA = 0
@@ -175,18 +125,17 @@ export async function GET() {
           post_id: post.id,
           post_user_id: post.user_id,
           username: post.users.username,
-          post_image_url: signedImageUrl,
+          post_image_url: post.image_url,
           post_caption: post.caption,
           post_created_at: post.created_at,
           post_updated_at: post.updated_at,
           ab_test_id: post.ab_tests?.[0]?.id || null,
-          variant_a_url: signedOptionAUrl,
-          variant_b_url: signedOptionBUrl,
+          variant_a_url: post.ab_tests?.[0]?.variant_a_url || null,
+          variant_b_url: post.ab_tests?.[0]?.variant_b_url || null,
           description_a: post.ab_tests?.[0]?.description_a || null,
           description_b: post.ab_tests?.[0]?.description_b || null,
           ab_test_created_at: post.ab_tests?.[0]?.created_at || null,
           ab_test_updated_at: post.ab_tests?.[0]?.updated_at || null,
-          ab_test_votes: post.ab_tests?.[0]?.ab_test_votes || [],
           comments: post.comments || [],
           likes: post.likes || [],
           comments_count: post.comments ? post.comments.length : 0,

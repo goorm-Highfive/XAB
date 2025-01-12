@@ -14,6 +14,8 @@ export default function SurveyList({
   onLikeToggle,
   onVoteSubmit,
 }: SurveyListProps) {
+  console.log(posts)
+
   return (
     <>
       {posts.map((post) => (
