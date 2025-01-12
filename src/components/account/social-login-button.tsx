@@ -5,7 +5,6 @@ import Image from 'next/image'
 import { toast } from 'sonner'
 
 import { createClient } from '~/utils/supabase/client'
-import { Toaster } from '~/components/ui/sonner'
 
 type SocialLoginButtonProps = {
   provider: Provider
@@ -56,7 +55,6 @@ function SocialLoginButton({
     >
       <Image src={icon} alt={iconAlt} width={iconSize} className="shrink-0" />
       <span className="flex-grow text-center">{label}</span>
-      <Toaster />
     </button>
   )
 }

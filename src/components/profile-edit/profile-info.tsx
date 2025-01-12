@@ -1,6 +1,6 @@
 'use client'
 
-import { toast, Toaster } from 'sonner'
+import { toast } from 'sonner'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Label } from '~/components/ui/label'
@@ -109,7 +109,6 @@ function ProfileInfo({ defaultValues }: { defaultValues: ProfileData }) {
           </form>
         </CardContent>
       </Card>
-      <Toaster />
     </>
   )
 }
