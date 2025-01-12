@@ -5,7 +5,6 @@ import Image from 'next/image'
 import { toast } from 'sonner'
 
 import { createClient } from '~/utils/supabase/client'
-import { Toaster } from '~/components/ui/sonner'
 
 type SocialLoginButtonProps = {
   provider: Provider
@@ -18,13 +17,17 @@ type SocialLoginButtonProps = {
   label: string
 }
 
+const defaultUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+  ? `https://xab-gamma.vercel.app/auth/callback`
+  : 'http://localhost:3000/auth/callback'
+
 const supabase = createClient()
 
 const handleSocialLogin = async (provider: Provider) => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
+      redirectTo: defaultUrl,
     },
   })
 
@@ -56,7 +59,6 @@ function SocialLoginButton({
     >
       <Image src={icon} alt={iconAlt} width={iconSize} className="shrink-0" />
       <span className="flex-grow text-center">{label}</span>
-      <Toaster />
     </button>
   )
 }
