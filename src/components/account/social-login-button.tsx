@@ -17,13 +17,18 @@ type SocialLoginButtonProps = {
   label: string
 }
 
+const defaultUrl =
+  process.env.NODE_ENV === 'production'
+    ? process.env.NEXT_PUBLIC_SITE_URL || `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:3000'
+
 const supabase = createClient()
 
 const handleSocialLogin = async (provider: Provider) => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
+      redirectTo: `${defaultUrl}/auth/callback`,
     },
   })
 
