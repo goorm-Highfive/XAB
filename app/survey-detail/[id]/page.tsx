@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { SiteHeader } from '~/components/common/site-header'
 import { SurveyCard } from '~/components/common/survey-card'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { SurveyComment } from '~/components/survey-detail/survey-comment'
@@ -190,7 +189,6 @@ function SurveyDetailPage() {
 
   return (
     <div className="bg-gray-100">
-      <SiteHeader />
       <div className="mx-auto max-w-[1248px] pt-6">
         <SurveyCard
           {...survey[0]}
