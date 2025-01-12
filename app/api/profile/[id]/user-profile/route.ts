@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '~/utils/supabase/server'
 
-export async function GET() {
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } },
+) {
   const supabase = await createClient()
   try {
     // 1) 현재 인증 사용자 정보 가져오기
@@ -14,7 +17,8 @@ export async function GET() {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
-    const userId = user.id
+    // `params.id` 안전하게 사용
+    const userId = params.id
 
     // 2) DB에서 해당 사용자의 프로필 정보 조회
     const { data: userProfile, error: profileError } = await supabase
@@ -76,6 +80,7 @@ export async function GET() {
       { status: 200 },
     )
   } catch (err: unknown) {
+    console.error('Error fetching user profile:', err)
     if (err instanceof Error) {
       return NextResponse.json({ error: err.message }, { status: 500 })
     }

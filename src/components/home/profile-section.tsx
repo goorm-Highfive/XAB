@@ -5,13 +5,11 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '~/components/ui/card'
 import { Avatar, AvatarImage, AvatarFallback } from '~/components/ui/avatar'
-import { Button } from '~/components/ui/button'
-import Link from 'next/link'
+import { createClient } from '~/utils/supabase/client'
 
 function ProfileSection() {
   const [user, setUser] = useState<{
@@ -24,14 +22,34 @@ function ProfileSection() {
     followerCount: number
     followingCount: number
   } | null>(null)
+
+  const [authUserId, setAuthUserId] = useState<string | null>(null) // Supabase auth user ID
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchAuthUser = async () => {
+      const supabase = createClient()
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
+
+      if (error) {
+        console.error('Failed to fetch authenticated user:', error.message)
+      } else if (user) {
+        setAuthUserId(user.id)
+      }
+    }
+
+    fetchAuthUser()
+  }, [])
 
   useEffect(() => {
     async function fetchUserProfile() {
       try {
         setLoading(true)
-        const response = await fetch('/api/profile')
+        const response = await fetch(`/api/profile/${authUserId}/user-profile`)
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.statusText}`)
         }
@@ -46,8 +64,10 @@ function ProfileSection() {
       }
     }
 
-    fetchUserProfile()
-  }, [])
+    if (authUserId) {
+      fetchUserProfile()
+    }
+  }, [authUserId])
 
   if (loading) {
     return <div>Loading profile...</div>
@@ -92,13 +112,6 @@ function ProfileSection() {
           <span className="text-sm text-muted-foreground">Following</span>
         </div>
       </CardContent>
-      <CardFooter>
-        <Link href="/settings/personal-information" passHref>
-          <Button variant="default" className="w-full">
-            Edit Profile
-          </Button>
-        </Link>
-      </CardFooter>
     </Card>
   )
 }
