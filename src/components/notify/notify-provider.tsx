@@ -14,12 +14,13 @@ const NotificationProvider = () => {
     const getUserId = async () => {
       try {
         const {
-          data: { user },
-        } = await supabase.auth.getUser()
-        if (user?.id) {
-          fetchNotify(user.id)
+          data: { session },
+        } = await supabase.auth.getSession()
+
+        if (session?.user?.id) {
+          fetchNotify(session.user.id)
         } else {
-          console.error('사용자 ID를 가져올 수 없습니다.')
+          console.log('사용자가 로그인 상태가 아닙니다.')
         }
       } catch (err) {
         console.error('사용자 정보를 가져오는 중 오류 발생:', err)
