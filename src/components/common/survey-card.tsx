@@ -125,6 +125,7 @@ function SurveyCard({
             onClick={() => handleOptionClick('A')}
           >
             <span className="text-gray-600">{optionA}</span>
+
             {optionA_url && (
               <a
                 href={optionA_url}
@@ -160,6 +161,7 @@ function SurveyCard({
             onClick={() => handleOptionClick('B')}
           >
             <span className="text-gray-600">{optionB}</span>
+
             {optionB_url && (
               <a
                 href={optionB_url}
