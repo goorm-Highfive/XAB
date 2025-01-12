@@ -7,8 +7,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const supabase = await createClient(request)
   const targetUserId = params.id
+  const supabase = await createClient(request)
 
   try {
     // 인증된 사용자 정보 가져오기
@@ -100,8 +100,8 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const supabase = await createClient(request)
   const targetUserId = params.id
+  const supabase = await createClient(request)
 
   try {
     // 인증된 사용자 정보 가져오기

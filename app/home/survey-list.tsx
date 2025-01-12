@@ -27,8 +27,8 @@ export default function SurveyList({
           username={post.username}
           question={post.post_caption ?? 'No caption'}
           post_image_url={post.post_image_url}
-          optionA={post.description_a ?? 'Variant A'}
-          optionB={post.description_b ?? 'Variant B'}
+          optionA={post.description_a ?? 'A'}
+          optionB={post.description_b ?? 'B'}
           optionA_url={post.variant_a_url}
           optionB_url={post.variant_b_url}
           votesA={post.votesA}
