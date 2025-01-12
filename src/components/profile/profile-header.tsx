@@ -22,7 +22,7 @@ function ProfileHeader() {
   const [authUserId, setAuthUserId] = useState<string | null>(null) // 인증된 사용자 ID 저장
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { userId } = useParams() // URL에서 userId 추출
+  const { id } = useParams() // URL에서 userId 추출
 
   useEffect(() => {
     const fetchAuthUser = async () => {
@@ -46,7 +46,7 @@ function ProfileHeader() {
     const fetchUserData = async () => {
       setIsLoading(true)
       try {
-        const response = await fetch(`/api/profile/${userId}/user-profile`)
+        const response = await fetch(`/api/profile/${id}/user-profile`)
         if (!response.ok) {
           throw new Error('Failed to fetch user profile')
         }
@@ -60,7 +60,7 @@ function ProfileHeader() {
     }
 
     fetchUserData()
-  }, [userId])
+  }, [id])
 
   const toggleFollow = () => {
     setIsFollowing((prev) => !prev)
@@ -98,7 +98,7 @@ function ProfileHeader() {
 
         {/* 버튼 그룹 */}
         <div className="flex gap-2">
-          {authUserId === userId ? (
+          {authUserId === id ? (
             // 인증된 사용자와 userId가 같으면 Edit Profile 버튼 표시
             <Link href="/settings/personal-information" passHref>
               <Button variant="default">Edit Profile</Button>
@@ -123,10 +123,10 @@ function ProfileHeader() {
 
       {/* Stats */}
       <div className="mt-4 flex gap-6 text-sm text-gray-700">
-        <Link href="/profile/followings" className="hover:underline">
+        <Link href={`/profile/${id}/followings`} className="hover:underline">
           <strong>{userData?.followingCount || 0}</strong> Following
         </Link>
-        <Link href="/profile/followers" className="hover:underline">
+        <Link href={`/profile/${id}/followers`} className="hover:underline">
           <strong>{userData?.followerCount || 0}</strong> Followers
         </Link>
         <span>

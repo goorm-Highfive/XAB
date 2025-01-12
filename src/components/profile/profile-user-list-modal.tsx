@@ -42,7 +42,6 @@ function UserListModal({ title, apiEndpoint }: UserListModalProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const router = useRouter()
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -51,7 +50,7 @@ function UserListModal({ title, apiEndpoint }: UserListModalProps) {
 
         // API 응답 데이터 타입 명시
         const data: UserListResponseItem[] = await response.json()
-
+        console.log(data)
         // User 타입으로 변환
         const formattedData: User[] = data.map((item) => ({
           id: item.id,

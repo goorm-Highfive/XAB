@@ -10,11 +10,11 @@ function ProfilePage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
-  const { userId } = useParams() // URL에서 id 추출
+  const { id } = useParams() // URL에서 id 추출
 
   useEffect(() => {
     async function fetchPosts() {
-      const apiUrl = `/api/profile/${userId}/user-posts` // 상대 경로 사용
+      const apiUrl = `/api/profile/${id}/user-posts` // 상대 경로 사용
 
       try {
         const res = await fetch(apiUrl, {
@@ -40,7 +40,7 @@ function ProfilePage() {
     }
 
     fetchPosts()
-  }, [userId])
+  }, [id])
 
   const handleLikeToggle = async (postId: number) => {
     try {
