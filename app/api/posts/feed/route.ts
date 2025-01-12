@@ -1,5 +1,3 @@
-// app/api/posts/feed/route.ts
-
 import { NextResponse } from 'next/server'
 import { createClient } from '~/utils/supabase/server' // 서버용 클라이언트 가져오기
 
@@ -34,16 +32,14 @@ export async function GET() {
       throw new Error(followingError.message)
     }
 
-    const followingIds =
-      followingData?.map((follow) => follow.following_id) || []
-    console.log('팔로우하는 유저 ID들:', followingIds)
+    // 본인 ID를 포함한 팔로우 대상 ID 리스트
+    const followingIds = [
+      ...followingData.map((follow) => follow.following_id),
+      userId,
+    ]
+    console.log('팔로우하는 유저 ID들 및 본인 ID:', followingIds)
 
-    if (followingIds.length === 0) {
-      // 팔로우하는 유저가 없으면 빈 배열 반환
-      return NextResponse.json({ data: [] }, { status: 200 })
-    }
-
-    // 3) 팔로우하는 유저들의 포스트 가져오기
+    // 3) 팔로우하는 유저들과 본인의 포스트 가져오기
     const { data: posts, error: postsError } = await supabase
       .from('posts')
       .select(
@@ -75,7 +71,7 @@ export async function GET() {
         users (username)
       `,
       )
-      .in('user_id', followingIds)
+      .in('user_id', followingIds) // 본인과 팔로우한 사용자의 포스트 가져오기
       .order('created_at', { ascending: false })
 
     if (postsError) {
@@ -205,7 +201,6 @@ export async function GET() {
 
     return NextResponse.json({ data: formattedPosts }, { status: 200 })
   } catch (err) {
-    // 에러 처리
     console.error('Error fetching posts:', err)
     if (err instanceof Error) {
       return NextResponse.json({ error: err.message }, { status: 500 })
