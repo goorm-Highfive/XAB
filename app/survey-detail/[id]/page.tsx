@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SurveyCard, SurveyCardProps } from '~/components/common/survey-card'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { SurveyComment } from '~/components/survey-detail/survey-comment'
@@ -165,12 +165,7 @@ const useCommentData = (initialData: CommentData[]) => {
   return { comments, toggleLike, addComment, addReply }
 }
 
-function SurveyDetailPage({
-  params,
-}: {
-  params: Promise<{ [key: string]: string | undefined }>
-}) {
-  const { id } = use(params)
+function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [postData, setPostData] = useState<SurveyCardProps>()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -181,8 +176,10 @@ function SurveyDetailPage({
 
   useEffect(() => {
     const fetchData = async () => {
+      const { id } = await params
+
       if (!id) {
-        setError('id is undefined')
+        setError('id is not define')
         setLoading(false)
         return
       }
@@ -190,35 +187,38 @@ function SurveyDetailPage({
       try {
         const response = await fetch(`/api/survey-detail/${id}`)
         if (!response.ok) {
-          throw new Error('Failed to fetch post data')
+          throw new Error(`API Error: ${response.statusText}`)
         }
         const data = await response.json()
         setPostData({
           date: new Date(data.post.created_at).toLocaleDateString(),
-          username: data.username,
+          username: data.username || '',
           question: data.abTest.description_a || 'Which option do you prefer?',
           post_image_url: data.post.image_url,
           optionA: data.abTest.description_a,
           optionB: data.abTest.description_b,
           optionA_url: data.abTest.variant_a_url,
           optionB_url: data.abTest.variant_b_url,
-          votesA: data.votesA,
-          votesB: data.votesB,
-          initLikeCount: data.initLikeCount,
-          userLiked: data.userLiked,
-          commentsCount: data.commentsCount,
-          userVote: data.userVote,
+          votesA: data.votesA || 1,
+          votesB: data.votesB || 1,
+          initLikeCount: data.initLikeCount || 1,
+          userLiked: data.userLiked || false,
+          commentsCount: data.commentsCount || 1,
+          userVote: data.userVote || 'A',
           ab_test_id: data.abTest.id,
           postId: data.post.id,
-          voteComplete: data.voteComplete,
+          voteComplete: data.voteComplete || false,
         })
+        setError(null) // 에러 초기화
+      } catch (err) {
+        setError((err as Error).message || '데이터를 가져오지 못했습니다.')
       } finally {
         setLoading(false)
       }
     }
 
     fetchData()
-  }, [id])
+  }, [params])
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>Error: {error}</div>

@@ -7,7 +7,7 @@ export async function GET(
   request: Request,
   { params }: { params: { id: string } },
 ) {
-  console.log('API Route Params:', params) // params 확인
+  console.log('API Route Params:', params)
 
   const supabase = await createClient()
   const { id } = params
@@ -15,8 +15,6 @@ export async function GET(
   const postId = Number(id)
 
   try {
-    // const postId = Number(id)
-
     const {
       data: { session },
       error: sessionError,
@@ -102,7 +100,7 @@ export async function GET(
 
     const initLikeCount = likesData.length
 
-    // ab_tests 데이터 가져오기
+    //ab_tests 데이터 가져오기
     const { data: abTest, error: abTestError } = await supabase
       .from('ab_tests')
       .select('*')
