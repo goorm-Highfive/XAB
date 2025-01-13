@@ -5,45 +5,45 @@ import { SurveyCard, SurveyCardProps } from '~/components/common/survey-card'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { SurveyComment } from '~/components/survey-detail/survey-comment'
 import { SurveyCommentInput } from '~/components/survey-detail/survey-comment-input'
-import { CommentData } from '~/types/comment'
+import { CommentData, ReplyData } from '~/types/comment'
 
 // 초기 댓글 데이터
-const initialCommentData: CommentData[] = [
-  {
-    id: '1',
-    writer: 'wontory',
-    content: 'This is a comment on the post. Great article!',
-    likeCount: 10,
-    date: '2 hours ago',
-    userLiked: false,
-  },
-  {
-    id: '2',
-    writer: 'E0min',
-    content: 'This is a comment on the post. Great article!',
-    likeCount: 10,
-    date: '3 hours ago',
-    userLiked: false,
-  },
-  {
-    id: '3',
-    writer: 'jyooni99',
-    content: 'I totally agree with this perspective. Very insightful!',
-    likeCount: 5,
-    date: '1 hour ago',
-    userLiked: true,
-    replies: [
-      {
-        id: '3-1',
-        writer: 'yujsoo',
-        content: 'Thanks! Glad you liked it.',
-        likeCount: 2,
-        date: '30 minutes ago',
-        userLiked: false,
-      },
-    ],
-  },
-]
+// const initialCommentData: CommentData[] = [
+//   {
+//     id: '1',
+//     writer: 'wontory',
+//     content: 'This is a comment on the post. Great article!',
+//     likeCount: 10,
+//     date: '2 hours ago',
+//     userLiked: false,
+//   },
+//   {
+//     id: '2',
+//     writer: 'E0min',
+//     content: 'This is a comment on the post. Great article!',
+//     likeCount: 10,
+//     date: '3 hours ago',
+//     userLiked: false,
+//   },
+//   {
+//     id: '3',
+//     writer: 'jyooni99',
+//     content: 'I totally agree with this perspective. Very insightful!',
+//     likeCount: 5,
+//     date: '1 hour ago',
+//     userLiked: true,
+//     replies: [
+//       {
+//         id: '3-1',
+//         writer: 'yujsoo',
+//         content: 'Thanks! Glad you liked it.',
+//         likeCount: 2,
+//         date: '30 minutes ago',
+//         userLiked: false,
+//       },
+//     ],
+//   },
+// ]
 
 // 좋아요 및 투표 로직 관리
 const useSurveyData = (initialData: SurveyCardProps[]) => {
@@ -167,12 +167,14 @@ const useCommentData = (initialData: CommentData[]) => {
 
 function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [postData, setPostData] = useState<SurveyCardProps>()
+  const [commandData, setCommandData] = useState<ReplyData[]>()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const { updateLike } = useSurveyData([]) //handleVoteSubmit 추가해야 함
-  const { comments, toggleLike, addComment, addReply } =
-    useCommentData(initialCommentData)
+  const { comments, toggleLike, addComment, addReply } = useCommentData(
+    commandData || [],
+  )
 
   useEffect(() => {
     const fetchData = async () => {
@@ -193,22 +195,24 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
         setPostData({
           date: new Date(data.post.created_at).toLocaleDateString(),
           username: data.username || '',
-          question: data.abTest.description_a || 'Which option do you prefer?',
+          question: data.post.caption || 'Which option do you prefer?',
           post_image_url: data.post.image_url,
           optionA: data.abTest.description_a,
           optionB: data.abTest.description_b,
           optionA_url: data.abTest.variant_a_url,
           optionB_url: data.abTest.variant_b_url,
-          votesA: data.votesA || 1,
-          votesB: data.votesB || 1,
-          initLikeCount: data.initLikeCount || 1,
-          userLiked: data.userLiked || false,
-          commentsCount: data.commentsCount || 1,
-          userVote: data.userVote || 'A',
+          votesA: data.votesA,
+          votesB: data.votesB,
+          initLikeCount: data.initLikeCount,
+          userLiked: data.userLiked,
+          commentsCount: data.commentsCount,
+          userVote: data.userVote,
           ab_test_id: data.abTest.id,
           postId: data.post.id,
-          voteComplete: data.voteComplete || false,
+          voteComplete: data.voteComplete,
         })
+        setCommandData(data.commentWithLikes)
+
         setError(null) // 에러 초기화
       } catch (err) {
         setError((err as Error).message || '데이터를 가져오지 못했습니다.')

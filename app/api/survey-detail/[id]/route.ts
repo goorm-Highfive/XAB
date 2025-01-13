@@ -1,16 +1,14 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '~/utils/supabase/server'
 
-// Supabase 클라이언트 초기화
-
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } },
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   console.log('API Route Params:', params)
 
   const supabase = await createClient()
-  const { id } = params
+  const { id } = await params
 
   const postId = Number(id)
 
@@ -24,7 +22,8 @@ export async function GET(
 
     const currentUserId = session?.user.id
 
-    // posts 데이터
+    //Post 부분
+    //posts 데이터
     const { data: post, error: postError } = await supabase
       .from('posts')
       .select('*')
@@ -106,11 +105,51 @@ export async function GET(
       .select('*')
       .eq('post_id', postId) //id타입 int
       .single()
-    console.log('AB Test Data:', abTest, 'AB Test Error:', abTestError)
 
-    if (abTestError) {
-      throw new Error('Failed to fetch AB Test data')
-    }
+    if (abTestError) throw new Error('Failed to fetch AB Test data')
+
+    // comment 부분
+    const { data: comments, error: commentError } = await supabase
+      .from('comments')
+      .select('id, content, created_at, user_id, parent_id, users(username)')
+      .eq('post_id', postId)
+
+    if (commentError) throw commentError
+
+    // 댓글이 있으면 likes 데이터를 가져옴
+    const { data: likes, error: likeError } = await supabase
+      .from('comment_likes')
+      .select('comment_id, user_id')
+      .in(
+        'comment_id',
+        comments.map((comment) => comment.id),
+      )
+
+    if (likeError) throw likeError
+
+    //like 데이터가 있으면 처리, 없으면 기본값으로 처리
+    const likeCounts = (likes || []).reduce<Record<number, number>>(
+      (acc, like) => {
+        acc[like.comment_id] = (acc[like.comment_id] || 0) + 1
+        return acc
+      },
+      {},
+    )
+
+    const userLikes = new Set(
+      (likes || [])
+        .filter((like) => like.user_id === userId)
+        .map((like) => like.comment_id),
+    )
+
+    const commentWithLikes = comments.map((comment) => ({
+      id: String(comment.id),
+      writer: comment.users.username,
+      content: comment.content,
+      likeCount: likeCounts[comment.id] || 0,
+      date: comment.created_at.split('T')[0],
+      userLiked: userLikes.has(comment.id),
+    }))
 
     // 데이터 반환
     return NextResponse.json({
@@ -124,6 +163,8 @@ export async function GET(
       userVote,
       voteComplete,
       initLikeCount,
+      comments,
+      commentWithLikes,
     })
   } catch (error) {
     console.error('Unexpected Error:', error)
