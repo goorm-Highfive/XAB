@@ -4,7 +4,7 @@ import React from 'react'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/utils/cn'
 
-interface User {
+interface UserListResponseItem {
   id: string
   name: string
   username: string
@@ -12,7 +12,7 @@ interface User {
   image?: string
 }
 
-function UserFollowList({ users }: { users: User[] }) {
+function UserFollowList({ users }: { users: UserListResponseItem[] }) {
   const toggleFollow = async (id: string, isFollowing: boolean) => {
     try {
       const endpoint = `/api/follow/${id}`

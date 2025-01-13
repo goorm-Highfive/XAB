@@ -4,10 +4,10 @@ import type { NextRequest } from 'next/server'
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const supabase = await createClient(request)
-  const { id } = context.params
+  const supabase = await createClient()
+  const { id } = await params
 
   if (!id) {
     return NextResponse.json(

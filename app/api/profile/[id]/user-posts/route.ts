@@ -1,11 +1,13 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { createClient } from '~/utils/supabase/server' // 서버용 클라이언트 가져오기
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } },
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const supabase = await createClient() // 서버용 클라이언트 초기화
+  const supabase = await createClient()
+  const { id } = await params
+
   console.log('API 호출 시작')
   try {
     // 1) Supabase Auth 세션 확인
@@ -29,7 +31,7 @@ export async function GET(
     const { data: followingData, error: followingError } = await supabase
       .from('follows')
       .select('following_id')
-      .eq('follower_id', params.id)
+      .eq('follower_id', id)
 
     if (followingError) {
       throw new Error(followingError.message)

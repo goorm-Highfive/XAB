@@ -1,11 +1,13 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { createClient } from '~/utils/supabase/server'
 
 export async function GET(
-  request: Request,
-  context: { params: { id: string } }, // `params`가 프로미스인 경우 타입 수정 필요
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const supabase = await createClient()
+  const { id } = await params
+
   try {
     // 1) 현재 인증 사용자 정보 가져오기
     const {
@@ -18,9 +20,8 @@ export async function GET(
     }
 
     // `params.id` 안전하게 사용
-    const params = await context.params // `params`가 프로미스인 경우
-    const userId = params.id
 
+    const userId = id
     // 2) DB에서 해당 사용자의 프로필 정보 조회
     const { data: userProfile, error: profileError } = await supabase
       .from('users')

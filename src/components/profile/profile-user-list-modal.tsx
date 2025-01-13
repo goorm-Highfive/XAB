@@ -14,8 +14,8 @@ import { UserFollowList } from '~/components/profile/profile-user-follow-list'
 interface UserListResponseItem {
   id: string
   name: string
-  username?: string
-  isFollowing?: boolean
+  username: string
+  isFollowing: boolean
   image?: string
 }
 

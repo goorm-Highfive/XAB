@@ -8,19 +8,19 @@ export async function GET() {
   try {
     // 1) Supabase Auth 세션 확인
     const {
-      data: { session },
+      data: { user },
       error: sessionError,
-    } = await supabase.auth.getSession()
+    } = await supabase.auth.getUser()
 
     if (sessionError) {
       throw new Error(sessionError.message)
     }
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const userId = session.user.id
+    const userId = user.id
     console.log('로그인된 유저 ID:', userId)
 
     // 2) 팔로우하는 유저들의 ID 가져오기

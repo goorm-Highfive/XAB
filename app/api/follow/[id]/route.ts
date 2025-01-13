@@ -1,3 +1,4 @@
+//app/api/follow/[id]/route.ts
 import { NextResponse } from 'next/server'
 import { createClient } from '~/utils/supabase/server'
 import type { NextRequest } from 'next/server'
@@ -5,10 +6,10 @@ import type { NextRequest } from 'next/server'
 // POST 요청: 팔로우 추가
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const targetUserId = params.id
-  const supabase = await createClient(request)
+  const supabase = await createClient()
+  const { id } = await params
 
   try {
     // 인증된 사용자 정보 가져오기
@@ -27,7 +28,7 @@ export async function POST(
     const followerId = user.id
 
     // 자신을 팔로우하려는 경우 방지
-    if (followerId === targetUserId) {
+    if (followerId === id) {
       return NextResponse.json(
         { error: '자신을 팔로우할 수 없습니다.' },
         { status: 400 },
@@ -38,7 +39,7 @@ export async function POST(
     const { data: targetUser, error: targetUserError } = await supabase
       .from('users')
       .select('id')
-      .eq('id', targetUserId)
+      .eq('id', id)
       .single()
 
     if (targetUserError || !targetUser) {
@@ -53,7 +54,7 @@ export async function POST(
       .from('follows')
       .select('id')
       .eq('follower_id', followerId)
-      .eq('following_id', targetUserId)
+      .eq('following_id', id)
       .single()
 
     if (existingFollowError && existingFollowError.code !== 'PGRST116') {
@@ -70,7 +71,7 @@ export async function POST(
     // 팔로우 관계 생성
     const { data: newFollow, error: followError } = await supabase
       .from('follows')
-      .insert([{ follower_id: followerId, following_id: targetUserId }])
+      .insert([{ follower_id: followerId, following_id: id }])
       .select()
 
     if (followError) {
@@ -98,10 +99,10 @@ export async function POST(
 // DELETE 요청: 팔로우 삭제
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const targetUserId = params.id
-  const supabase = await createClient(request)
+  const supabase = await createClient()
+  const { id } = await params
 
   try {
     // 인증된 사용자 정보 가져오기
@@ -120,7 +121,7 @@ export async function DELETE(
     const followerId = user.id
 
     // 자신을 언팔로우하려는 경우 방지
-    if (followerId === targetUserId) {
+    if (followerId === id) {
       return NextResponse.json(
         { error: '자신을 언팔로우할 수 없습니다.' },
         { status: 400 },
@@ -131,7 +132,7 @@ export async function DELETE(
     const { data: targetUser, error: targetUserError } = await supabase
       .from('users')
       .select('id')
-      .eq('id', targetUserId)
+      .eq('id', id)
       .single()
 
     if (targetUserError || !targetUser) {
@@ -146,7 +147,7 @@ export async function DELETE(
       .from('follows')
       .delete()
       .eq('follower_id', followerId)
-      .eq('following_id', targetUserId)
+      .eq('following_id', id)
       .select()
 
     if (deleteError) {
