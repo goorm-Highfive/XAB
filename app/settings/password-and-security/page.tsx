@@ -1,6 +1,7 @@
 'use client'
 
 import { PasswordForm } from '~/components/password-and-security/password-form'
+import { Toaster } from '~/components/ui/sonner'
 
 function PasswordAndSecurity() {
   return (
@@ -15,6 +16,7 @@ function PasswordAndSecurity() {
       <div className="rounded-lg bg-background px-5 py-5">
         <PasswordForm />
       </div>
+      <Toaster />
     </div>
   )
 }

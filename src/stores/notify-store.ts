@@ -1,6 +1,4 @@
 import { create } from 'zustand'
-import { toast } from 'sonner'
-
 import { createClient } from '~/utils/supabase/client'
 import { Tables } from '~/types/supabase'
 
@@ -54,9 +52,6 @@ const useNotifyStore = create<NotifyStore>((set, get) => ({
           set((state) => {
             // 새로운 알림 울릴 떄
             if (payload.eventType === 'INSERT') {
-              toast.info('New Notifications:', {
-                description: newNotify.action,
-              })
               return {
                 notify: [newNotify, ...state.notify],
               }

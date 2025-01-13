@@ -13,10 +13,10 @@ import {
   SheetTrigger,
   SheetDescription,
 } from '~/components/ui/custom-sheet'
-import { useNotifyStore } from '~/stores/notify-store'
+import { useNotify } from '~/hooks/useNotify'
 
 function NotificationButton() {
-  const { notify } = useNotifyStore()
+  const { notify, loading } = useNotify()
   const previewNotify = notify.slice(0, 10)
 
   return (
@@ -35,7 +35,7 @@ function NotificationButton() {
         <SheetDescription className="opacity-0">
           View Notifications
         </SheetDescription>
-        {notify.length < 0 ? (
+        {loading ? (
           <div>로딩중</div>
         ) : (
           <div className="h-5/6 overflow-y-scroll">

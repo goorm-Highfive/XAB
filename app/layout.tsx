@@ -2,8 +2,6 @@ import type { Metadata } from 'next'
 
 import { SiteHeader } from '~/components/common/site-header'
 import { ClientSessionManager } from '~/components/auth/client-session-manager'
-import { Toaster } from '~/components/ui/sonner'
-import { NotificationProvider } from '~/components/notify/notify-provider'
 import '~/styles/globals.css'
 
 export const metadata: Metadata = {
@@ -23,12 +21,10 @@ export default function RootLayout({
       <body className="bg-gray-100 antialiased">
         <ClientSessionManager />
         <SiteHeader />
-        <NotificationProvider />
         <main className="min-h-screen px-5 pb-20 pt-10" role="main">
           <div className="mx-auto max-w-screen-2xl">{children}</div>
         </main>
         {modal}
-        <Toaster />
       </body>
     </html>
   )

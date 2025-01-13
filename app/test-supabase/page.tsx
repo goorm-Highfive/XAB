@@ -8,11 +8,12 @@ export default function TestSupabasePage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch('/api/test-supabase')
+      const response = await fetch('/api/posts/feed')
       const result = await response.json()
 
       if (response.ok) {
         setData(result.data)
+        console.log(result.data)
       } else {
         setError(result.error)
       }
