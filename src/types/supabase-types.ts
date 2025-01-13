@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -15,21 +15,21 @@ export type Database = {
           created_at: string
           id: number
           preferred_variant: string
-          user_id: string
+          user_id: number
         }
         Insert: {
           ab_test_id: number
           created_at?: string
           id?: number
           preferred_variant: string
-          user_id: string
+          user_id: number
         }
         Update: {
           ab_test_id?: number
           created_at?: string
           id?: number
           preferred_variant?: string
-          user_id?: string
+          user_id?: number
         }
         Relationships: [
           {
@@ -56,8 +56,8 @@ export type Database = {
           id: number
           post_id: number
           updated_at: string
-          variant_a_url: string | null
-          variant_b_url: string | null
+          variant_a_url: string
+          variant_b_url: string
         }
         Insert: {
           created_at?: string
@@ -66,8 +66,8 @@ export type Database = {
           id?: number
           post_id: number
           updated_at?: string
-          variant_a_url?: string | null
-          variant_b_url?: string | null
+          variant_a_url: string
+          variant_b_url: string
         }
         Update: {
           created_at?: string
@@ -76,8 +76,8 @@ export type Database = {
           id?: number
           post_id?: number
           updated_at?: string
-          variant_a_url?: string | null
-          variant_b_url?: string | null
+          variant_a_url?: string
+          variant_b_url?: string
         }
         Relationships: [
           {
@@ -94,19 +94,19 @@ export type Database = {
           comment_id: number
           created_at: string
           id: number
-          user_id: string
+          user_id: number
         }
         Insert: {
           comment_id: number
           created_at?: string
           id?: number
-          user_id: string
+          user_id: number
         }
         Update: {
           comment_id?: number
           created_at?: string
           id?: number
-          user_id?: string
+          user_id?: number
         }
         Relationships: [
           {
@@ -129,38 +129,25 @@ export type Database = {
         Row: {
           content: string
           created_at: string
-          dept: number | null
           id: number
-          parent_id: number | null
           post_id: number
-          user_id: string
+          user_id: number
         }
         Insert: {
           content: string
           created_at?: string
-          dept?: number | null
           id?: number
-          parent_id?: number | null
           post_id: number
-          user_id: string
+          user_id: number
         }
         Update: {
           content?: string
           created_at?: string
-          dept?: number | null
           id?: number
-          parent_id?: number | null
           post_id?: number
-          user_id?: string
+          user_id?: number
         }
         Relationships: [
-          {
-            foreignKeyName: 'comments_parent_id_fkey'
-            columns: ['parent_id']
-            isOneToOne: false
-            referencedRelation: 'comments'
-            referencedColumns: ['id']
-          },
           {
             foreignKeyName: 'comments_post_id_fkey'
             columns: ['post_id']
@@ -177,41 +164,23 @@ export type Database = {
           },
         ]
       }
-      delete_sessions: {
-        Row: {
-          deleted_at: string | null
-          id: number
-          user_id: string
-        }
-        Insert: {
-          deleted_at?: string | null
-          id?: number
-          user_id: string
-        }
-        Update: {
-          deleted_at?: string | null
-          id?: number
-          user_id?: string
-        }
-        Relationships: []
-      }
       follows: {
         Row: {
           created_at: string
-          follower_id: string
-          following_id: string
+          follower_id: number
+          following_id: number
           id: number
         }
         Insert: {
           created_at?: string
-          follower_id: string
-          following_id: string
+          follower_id: number
+          following_id: number
           id?: number
         }
         Update: {
           created_at?: string
-          follower_id?: string
-          following_id?: string
+          follower_id?: number
+          following_id?: number
           id?: number
         }
         Relationships: [
@@ -236,19 +205,19 @@ export type Database = {
           created_at: string
           id: number
           post_id: number
-          user_id: string
+          user_id: number
         }
         Insert: {
           created_at?: string
           id?: number
           post_id: number
-          user_id: string
+          user_id: number
         }
         Update: {
           created_at?: string
           id?: number
           post_id?: number
-          user_id?: string
+          user_id?: number
         }
         Relationships: [
           {
@@ -267,62 +236,30 @@ export type Database = {
           },
         ]
       }
-      notifications: {
-        Row: {
-          action: string
-          created_at: string | null
-          id: number
-          is_read: boolean
-          user_id: string
-        }
-        Insert: {
-          action: string
-          created_at?: string | null
-          id?: number
-          is_read?: boolean
-          user_id: string
-        }
-        Update: {
-          action?: string
-          created_at?: string | null
-          id?: number
-          is_read?: boolean
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: 'notifications_user_id_fkey'
-            columns: ['user_id']
-            isOneToOne: false
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
-        ]
-      }
       posts: {
         Row: {
           caption: string | null
           created_at: string
           id: number
-          image_url: string | null
+          image_url: string
           updated_at: string
-          user_id: string
+          user_id: number
         }
         Insert: {
           caption?: string | null
           created_at?: string
           id?: number
-          image_url?: string | null
+          image_url: string
           updated_at?: string
-          user_id: string
+          user_id: number
         }
         Update: {
           caption?: string | null
           created_at?: string
           id?: number
-          image_url?: string | null
+          image_url?: string
           updated_at?: string
-          user_id?: string
+          user_id?: number
         }
         Relationships: [
           {
@@ -339,8 +276,8 @@ export type Database = {
           bio: string | null
           created_at: string
           email: string
-          id: string
-          password: string | null
+          id: number
+          password: string
           profile_image: string | null
           updated_at: string
           username: string
@@ -349,8 +286,8 @@ export type Database = {
           bio?: string | null
           created_at?: string
           email: string
-          id: string
-          password?: string | null
+          id?: number
+          password: string
           profile_image?: string | null
           updated_at?: string
           username: string
@@ -359,8 +296,8 @@ export type Database = {
           bio?: string | null
           created_at?: string
           email?: string
-          id?: string
-          password?: string | null
+          id?: number
+          password?: string
           profile_image?: string | null
           updated_at?: string
           username?: string
@@ -372,99 +309,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      delete_user_account: {
-        Args: {
-          p_user_id: string
-        }
-        Returns: string
-      }
-      fetch_post_with_comments: {
-        Args: {
-          post_id: number
-          user_id: string
-        }
-        Returns: Json
-      }
-      get_feed_posts_for_user: {
-        Args: {
-          p_user_id: string
-        }
-        Returns: {
-          post_id: number
-          post_user_id: string
-          post_image_url: string
-          post_caption: string
-          post_created_at: string
-          post_updated_at: string
-          ab_test_id: number
-          variant_a_url: string
-          variant_b_url: string
-          description_a: string
-          description_b: string
-          ab_test_created_at: string
-          ab_test_updated_at: string
-        }[]
-      }
-      get_followers_posts: {
-        Args: {
-          p_user_id: string
-        }
-        Returns: {
-          post_id: number
-          post_user_id: string
-          post_image_url: string
-          post_caption: string
-          post_created_at: string
-          post_updated_at: string
-          ab_test_id: number
-          variant_a_url: string
-          variant_b_url: string
-          description_a: string
-          description_b: string
-          ab_test_created_at: string
-          ab_test_updated_at: string
-        }[]
-      }
-      get_random_posts: {
-        Args: {
-          p_limit: number
-        }
-        Returns: {
-          post_id: number
-          post_user_id: string
-          post_image_url: string
-          post_caption: string
-          post_created_at: string
-          post_updated_at: string
-          ab_test_id: number
-          variant_a_url: string
-          variant_b_url: string
-          description_a: string
-          description_b: string
-          ab_test_created_at: string
-          ab_test_updated_at: string
-        }[]
-      }
-      get_random_posts_with_ab: {
-        Args: {
-          p_limit: number
-        }
-        Returns: {
-          post_id: number
-          user_id: string
-          image_url: string
-          caption: string
-          post_created_at: string
-          post_updated_at: string
-          abtest_id: number
-          variant_a_url: string
-          variant_b_url: string
-          description_a: string
-          description_b: string
-          ab_created_at: string
-          ab_updated_at: string
-        }[]
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

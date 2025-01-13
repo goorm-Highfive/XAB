@@ -1,22 +1,21 @@
-// app/home/page.tsx
-
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ProfileSection } from '~/components/home/profile-section'
-import { SuggestSection } from '~/components/home/suggest-section'
-import { NewSurveyButton } from '~/components/home/new-survey-button'
-import SurveyList from './survey-list'
-import { Post } from '~/types/post' // 타입 임포트
+import { useParams } from 'next/navigation'
 
-export default function HomePage() {
+import { ProfileHeader } from '~/components/profile/profile-header'
+import { SurveyCard } from '~/components/common/survey-card'
+import { Post } from '~/types/post'
+
+function ProfilePage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const { id } = useParams() // URL에서 id 추출
 
   useEffect(() => {
     async function fetchPosts() {
-      const apiUrl = `/api/posts/feed` // 상대 경로 사용
+      const apiUrl = `/api/profile/${id}/user-posts` // 상대 경로 사용
 
       try {
         const res = await fetch(apiUrl, {
@@ -42,24 +41,7 @@ export default function HomePage() {
     }
 
     fetchPosts()
-  }, [])
-
-  // useEffect(() => {
-  //   async function fetchUser() {
-  //     try {
-  //       const res = await fetch('/api/user', { credentials: 'include' });
-  //       if (!res.ok) {
-  //         throw new Error('Failed to fetch user');
-  //       }
-  //       const userData = await res.json();
-  //       setUser(userData);
-  //     } catch (err) {
-  //       console.error('User fetch error:', err);
-  //     }
-  //   }
-
-  //   fetchUser();
-  // }, []);
+  }, [id])
 
   const handleLikeToggle = async (postId: number) => {
     try {
@@ -170,27 +152,52 @@ export default function HomePage() {
   }
 
   if (loading) {
-    return <div>Loading posts...</div>
+    return <p>Loading...</p>
   }
 
   if (error) {
-    return <div>Error: {error}</div>
+    return <p className="text-red-500">Error: {error}</p>
   }
-
+  console.log(posts)
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="mx-auto max-w-screen-2xl items-start gap-6 p-6 lg:flex">
-        <ProfileSection />
-        <div className="flex-1 space-y-6">
-          <NewSurveyButton />
-          <SurveyList
-            posts={posts}
-            onLikeToggle={handleLikeToggle}
-            onVoteSubmit={handleVoteSubmit}
-          />
+      <div className="p-6">
+        <div className="mx-auto mt-6 max-w-3xl space-y-6">
+          <ProfileHeader />
+          {posts.map((post) => (
+            <SurveyCard
+              key={post.post_id}
+              postId={post.post_id}
+              ab_test_id={post.ab_test_id}
+              date={post.post_created_at.split('T')[0] ?? 'Unknown date'}
+              username={post.username}
+              question={post.post_caption ?? 'No caption'}
+              post_image_url={post.post_image_url}
+              optionA={post.description_a ?? 'Variant A'}
+              optionB={post.description_b ?? 'Variant B'}
+              optionA_url={post.variant_a_url}
+              optionB_url={post.variant_b_url}
+              votesA={post.votesA}
+              votesB={post.votesB}
+              initLikeCount={post.likes_count}
+              userLiked={post.userLiked}
+              commentsCount={post.comments_count}
+              userVote={post.userVote}
+              onLikeToggle={() => handleLikeToggle(post.post_id)}
+              onVoteSubmit={(abTestId: number, selectedOption: 'A' | 'B') => {
+                if (post.ab_test_id) {
+                  handleVoteSubmit(post.ab_test_id, selectedOption)
+                }
+              }}
+              voteComplete={
+                post.voteComplete !== undefined ? post.voteComplete : false
+              }
+            />
+          ))}
         </div>
-        <SuggestSection />
       </div>
     </div>
   )
 }
+
+export default ProfilePage

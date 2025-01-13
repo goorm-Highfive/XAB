@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  images: {
+    domains: ['pvnulsmnssufqahnareh.supabase.co', 'example.com'], // Supabase와 다른 외부 이미지 호스트 추가
+  },
 }
 
 export default nextConfig
