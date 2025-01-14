@@ -1,13 +1,13 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-
 import { SettingButton } from '~/components/profile/profile-setting-button'
 import { Button } from '~/components/ui/button'
 import { createClient } from '~/utils/supabase/client'
-import { Avatar, AvatarImage } from '~/components/ui/avatar'
+import defaultProfile from '~/assets/svgs/default-profile.svg'
 
 function ProfileHeader() {
   const [isFollowing, setIsFollowing] = useState(true)
@@ -78,23 +78,13 @@ function ProfileHeader() {
   return (
     <div className="flex flex-col rounded-lg bg-white p-6 shadow">
       {/* Avatar */}
-      <Avatar className="mb-4 h-20 w-20">
+      <div className="mb-4">
         {userData?.profile_image ? (
-          <AvatarImage
-            width={150}
-            height={150}
-            src={userData?.profile_image}
-            alt="프로필 사진"
-          />
+          <Image width={80} height={80} src={userData?.profile_image} alt="" />
         ) : (
-          <AvatarImage
-            width={150}
-            height={150}
-            src={'/assets/svgs/default-profile.svg'}
-            alt="프로필 사진"
-          />
+          <Image width={80} height={80} src={defaultProfile} alt="" />
         )}
-      </Avatar>
+      </div>
       {/* Header 상단 */}
       <div className="flex items-center justify-between">
         <div>

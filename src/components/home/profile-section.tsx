@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import {
   Card,
@@ -8,8 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card'
-import { Avatar, AvatarImage } from '~/components/ui/avatar'
 import { createClient } from '~/utils/supabase/client'
+import defaultProfile from '~/assets/svgs/default-profile.svg'
 
 function ProfileSection() {
   const [user, setUser] = useState<{
@@ -84,23 +85,23 @@ function ProfileSection() {
   return (
     <Card className="static top-[92px] mb-6 w-full lg:sticky lg:w-72">
       <CardHeader className="items-center gap-5">
-        <Avatar className="h-20 w-20">
+        <div>
           {user.profile_image ? (
-            <AvatarImage
-              width={150}
-              height={150}
+            <Image
+              width={80}
+              height={80}
               src={user.profile_image}
               alt={`@${user.username}`}
             />
           ) : (
-            <AvatarImage
-              width={150}
-              height={150}
-              src={'/assets/svgs/default-profile.svg'}
+            <Image
+              width={80}
+              height={80}
+              src={defaultProfile}
               alt={`@${user.username}`}
             />
           )}
-        </Avatar>
+        </div>
         <div className="flex flex-col items-center gap-1.5 text-center">
           <CardTitle>{user.username}</CardTitle>
           <CardDescription>{user.bio || 'No bio available'}</CardDescription>

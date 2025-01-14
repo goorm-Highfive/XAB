@@ -1,4 +1,5 @@
-import { Avatar, AvatarImage } from '~/components/ui/avatar'
+import defaultProfile from '~/assets/svgs/default-profile.svg'
+import Image from 'next/image'
 
 type ProfileCardProps = {
   username?: string
@@ -7,25 +8,15 @@ type ProfileCardProps = {
 
 function ProfileCard({ username, profileImageUrl }: ProfileCardProps) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center">
       {/* Avatar */}
-      <Avatar className="h-20 w-20">
+      <div className="mr-4">
         {profileImageUrl ? (
-          <AvatarImage
-            width={150}
-            height={150}
-            src={profileImageUrl}
-            alt="프로필 사진"
-          />
+          <Image width={60} height={60} src={profileImageUrl} alt="" />
         ) : (
-          <AvatarImage
-            width={150}
-            height={150}
-            src={'/assets/svgs/default-profile.svg'}
-            alt="프로필 사진"
-          />
+          <Image width={60} height={60} src={defaultProfile} alt="" />
         )}
-      </Avatar>
+      </div>
       {/* User Info */}
       <div>
         <p className="text-md font-semibold leading-none">

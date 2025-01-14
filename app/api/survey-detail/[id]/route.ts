@@ -66,7 +66,7 @@ export async function GET(
     const { data: userLikedData } = await supabase
       .from('likes')
       .select('*')
-      .eq('post_id', id)
+      .eq('post_id', postId)
       .eq('user_id', currentUserId as string)
     const userLiked = userLikedData?.length ?? 0 > 0
 

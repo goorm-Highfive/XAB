@@ -5,9 +5,11 @@ import { Progress } from '~/components/ui/progress'
 import { formatLikeCount } from '~/utils/like-formatters'
 import { Heart, MessageSquare, Share2 } from 'lucide-react'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Tables } from '~/types/supabase'
+import { createClient } from '~/utils/supabase/client'
+import defaultProfile from '~/assets/svgs/default-profile.svg'
 
 export type SurveyCardProps = {
   post?: Tables<'posts'>
@@ -53,6 +55,33 @@ function SurveyCard({
   ab_test_id,
   postId,
 }: SurveyCardProps) {
+  const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
+  //const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const supabase = createClient()
+    const fetchProfileImage = async () => {
+      // 게시글 ID로 작성자의 프로필 이미지 가져오기
+      const { data } = await supabase
+        .from('posts')
+        .select(
+          `
+            user_id,
+            users (
+              profile_image
+            )
+          `,
+        )
+        .eq('id', postId)
+        .single()
+
+      if (data?.users?.profile_image) {
+        setUserProfileImage(data.users.profile_image)
+      }
+    }
+    fetchProfileImage()
+  }, [postId])
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [voteError, setVoteError] = useState<string | null>(null)
 
@@ -84,9 +113,13 @@ function SurveyCard({
       <Link href={`/survey-detail/${postId}`}>
         <div className="block cursor-pointer">
           <div className="mb-4 flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-gray-300" />
+            {userProfileImage ? (
+              <Image width={40} height={40} src={userProfileImage} alt="" />
+            ) : (
+              <Image width={40} height={40} src={defaultProfile} alt="" />
+            )}
             <div>
-              <p className="text-sm font-medium">{username}</p>{' '}
+              <p className="text-sm font-medium">{username}</p>
               <p className="text-xs text-gray-500">{date}</p>
             </div>
           </div>

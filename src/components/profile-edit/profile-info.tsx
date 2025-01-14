@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { toast } from 'sonner'
 import { useState, useRef } from 'react'
 import { createClient } from '~/utils/supabase/client'
@@ -8,8 +9,8 @@ import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader } from '~/components/ui/card'
-import { Avatar, AvatarImage } from '~/components/ui/avatar'
 import { fetchUserProfile } from '~/utils/fetch-user'
+import defaultProfile from '~/assets/svgs/default-profile.svg'
 
 interface ProfileInfoProps {
   user: Awaited<ReturnType<typeof fetchUserProfile>>
@@ -58,6 +59,22 @@ function ProfileInfo({ user }: ProfileInfoProps) {
     }
   }
 
+  const handleSetDefaultImage = async () => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ profile_image: null }) // 프로필 이미지를 null로 업데이트
+        .eq('id', user!.id)
+
+      if (error) throw new Error('프로필 기본 이미지로 변경 실패')
+
+      setAvatarUrl(null) // UI 상태 업데이트
+      toast.success('기본 이미지로 성공적으로 변경되었습니다!')
+    } catch (error: unknown) {
+      if (error instanceof Error) toast.error(error.message)
+    }
+  }
+
   const handleSave = async () => {
     try {
       const { error } = await supabase
@@ -77,14 +94,13 @@ function ProfileInfo({ user }: ProfileInfoProps) {
     <>
       <Card>
         <CardHeader className="flex">
-          <Avatar className="mb-4 h-20 w-20">
-            <AvatarImage
-              width={150}
-              height={150}
-              src={avatarUrl || '/assets/svgs/default-profile.svg'}
-              alt="프로필 사진"
-            />
-          </Avatar>
+          <div className="h-20 w-20">
+            {avatarUrl ? (
+              <Image width={80} height={80} src={avatarUrl} alt="" />
+            ) : (
+              <Image width={80} height={80} src={defaultProfile} alt="" />
+            )}
+          </div>
           <div>
             <Button
               variant="outline"
@@ -93,7 +109,7 @@ function ProfileInfo({ user }: ProfileInfoProps) {
             >
               프로필 이미지 변경
             </Button>
-            <Button variant="outline" onClick={() => setAvatarUrl(null)}>
+            <Button variant="outline" onClick={handleSetDefaultImage}>
               기본 이미지로 변경
             </Button>
             <input
