@@ -71,7 +71,7 @@ function SurveyCommentInput() {
               <Button
                 type="submit"
                 variant="ghost"
-                className="z-1 absolute right-2 top-[-4] w-[30px] hover:bg-transparent"
+                className="z-1 absolute right-2 top-2 w-[30px] hover:bg-transparent"
                 disabled={isSubmitting} // 중복 제출 방지
               >
                 <Send />
