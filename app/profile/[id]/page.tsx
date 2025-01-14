@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ProfileHeader } from '~/components/profile/profile-header'
 import { useParams } from 'next/navigation'
+
+import { ProfileHeader } from '~/components/profile/profile-header'
 import { SurveyCard } from '~/components/common/survey-card'
 import { Post } from '~/types/post'
 

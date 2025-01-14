@@ -129,25 +129,38 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          dept: number | null
           id: number
+          parent_id: number | null
           post_id: number
           user_id: string
         }
         Insert: {
           content: string
           created_at?: string
+          dept?: number | null
           id?: number
+          parent_id?: number | null
           post_id: number
           user_id: string
         }
         Update: {
           content?: string
           created_at?: string
+          dept?: number | null
           id?: number
+          parent_id?: number | null
           post_id?: number
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: 'comments_parent_id_fkey'
+            columns: ['parent_id']
+            isOneToOne: false
+            referencedRelation: 'comments'
+            referencedColumns: ['id']
+          },
           {
             foreignKeyName: 'comments_post_id_fkey'
             columns: ['post_id']
@@ -364,6 +377,13 @@ export type Database = {
           p_user_id: string
         }
         Returns: string
+      }
+      fetch_post_with_comments: {
+        Args: {
+          post_id: number
+          user_id: string
+        }
+        Returns: Json
       }
       get_feed_posts_for_user: {
         Args: {

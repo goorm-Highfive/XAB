@@ -1,14 +1,14 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import { toast, Toaster } from 'sonner'
+import { toast } from 'sonner'
+import { useState, useRef } from 'react'
 import { createClient } from '~/utils/supabase/client'
+import { Label } from '~/components/ui/label'
+import { Input } from '~/components/ui/input'
+import { Textarea } from '~/components/ui/textarea'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader } from '~/components/ui/card'
 import { Avatar, AvatarImage } from '~/components/ui/avatar'
-import { Input } from '~/components/ui/input'
-import { Textarea } from '~/components/ui/textarea'
-import { Label } from '../ui/label'
 import { fetchUserProfile } from '~/utils/fetch-user'
 
 interface ProfileInfoProps {
@@ -122,7 +122,6 @@ function ProfileInfo({ user }: ProfileInfoProps) {
           </Button>
         </CardContent>
       </Card>
-      <Toaster />
     </>
   )
 }

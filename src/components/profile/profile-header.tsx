@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
+
 import { SettingButton } from '~/components/profile/profile-setting-button'
 import { Button } from '~/components/ui/button'
-import { useParams } from 'next/navigation'
 import { createClient } from '~/utils/supabase/client'
 import { Avatar, AvatarImage } from '~/components/ui/avatar'
 
