@@ -1,11 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
+
 import { SettingButton } from '~/components/profile/profile-setting-button'
 import { Button } from '~/components/ui/button'
-import { useParams } from 'next/navigation'
-import Image from 'next/image'
 import { createClient } from '~/utils/supabase/client'
 
 function ProfileHeader() {
