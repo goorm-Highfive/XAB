@@ -1,15 +1,14 @@
-// app/home/page.tsx
-
 'use client'
 
 import { useEffect, useState } from 'react'
+
+import SurveyList from '#/home/survey-list'
 import { ProfileSection } from '~/components/home/profile-section'
 import { SuggestSection } from '~/components/home/suggest-section'
 import { NewSurveyButton } from '~/components/home/new-survey-button'
-import SurveyList from './survey-list'
-import { Post } from '~/types/post' // 타입 임포트
 import { toggleLikeAPI } from '~/utils/toggleLikeAPI'
 import { voteSubmitAPI } from '~/utils/voteSubmitAPI'
+import { Post } from '~/types/post'
 
 export default function HomePage() {
   const [posts, setPosts] = useState<Post[]>([])

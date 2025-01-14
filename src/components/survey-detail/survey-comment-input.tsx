@@ -1,7 +1,9 @@
-import { useState } from 'react'
+'use client'
+
 import Image from 'next/image'
-import { Send } from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Send } from 'lucide-react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -34,7 +36,7 @@ function SurveyCommentInput() {
     defaultValues: { comment: '' },
   })
 
-  const handleSubmit = (data: CommentFormValues) => {
+  const handleSubmit = async (data: CommentFormValues) => {
     if (!isSubmitting) {
       setIsSubmitting(true)
       console.log(data)

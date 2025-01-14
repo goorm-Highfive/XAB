@@ -1,60 +1,20 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+
 import { SurveyCard, SurveyCardProps } from '~/components/common/survey-card'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { SurveyComment } from '~/components/survey-detail/survey-comment'
 import { SurveyCommentInput } from '~/components/survey-detail/survey-comment-input'
 import { Comment } from '~/types/comment'
-
-// 좋아요 및 투표 로직 관리
-const useSurveyData = (initialData: SurveyCardProps[]) => {
-  const [survey, setSurvey] = useState(initialData)
-
-  const updateLike = (index: number, newLikeStatus: boolean) => {
-    setSurvey((prev) =>
-      prev.map((item, i) =>
-        i === index
-          ? {
-              ...item,
-              userLiked: newLikeStatus,
-              initLikeCount: newLikeStatus
-                ? item.initLikeCount + 1
-                : Math.max(item.initLikeCount - 1, 0),
-            }
-          : item,
-      ),
-    )
-  }
-
-  const handleVoteSubmit = async (index: number, option: 'A' | 'B') => {
-    return new Promise<void>((resolve) => {
-      setSurvey((prev) =>
-        prev.map((item, i) =>
-          i === index
-            ? {
-                ...item,
-                voteComplete: true,
-                votesA: option === 'A' ? item.votesA + 1 : item.votesA,
-                votesB: option === 'B' ? item.votesB + 1 : item.votesB,
-              }
-            : item,
-        ),
-      )
-      resolve()
-    })
-  }
-
-  return { survey, updateLike, handleVoteSubmit }
-}
+import { toggleLikeAPI } from '~/utils/toggleLikeAPI'
+import { voteSubmitAPI } from '~/utils/voteSubmitAPI'
 
 function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [postData, setPostData] = useState<SurveyCardProps>()
   const [comments, setComments] = useState<Comment[]>()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
-  const { updateLike } = useSurveyData([]) //handleVoteSubmit 추가해야 함
 
   useEffect(() => {
     const fetchData = async () => {
@@ -105,6 +65,74 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     fetchData()
   }, [params])
 
+  // 좋아요 토글
+  const handleLikeToggle = async (postId: number) => {
+    try {
+      const data = await toggleLikeAPI(postId)
+
+      if (!data) return
+
+      setPostData((prev) => {
+        if (!prev) return prev
+
+        return {
+          ...prev,
+          userLiked: data.liked,
+          initLikeCount: data.liked
+            ? prev.initLikeCount + 1
+            : prev.initLikeCount - 1,
+        }
+      })
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message)
+        // 사용자에게 에러를 표시할 수 있는 로직 추가 (예: 알림)
+      } else {
+        console.error('An unexpected error occurred')
+      }
+    }
+  }
+
+  // 투표 결과 업데이트
+  const updateVoteResults = (
+    postData: SurveyCardProps,
+    option: 'A' | 'B',
+  ): SurveyCardProps => {
+    const { userVote, votesA, votesB } = postData
+
+    const newVotesA =
+      votesA + (option === 'A' ? 1 : 0) - (userVote === 'A' ? 1 : 0)
+    const newVotesB =
+      votesB + (option === 'B' ? 1 : 0) - (userVote === 'B' ? 1 : 0)
+
+    return {
+      ...postData,
+      userVote: option,
+      votesA: newVotesA,
+      votesB: newVotesB,
+    }
+  }
+
+  const handleVoteSubmit = async (abTestId: number, option: 'A' | 'B') => {
+    if (!postData) return
+
+    try {
+      console.log('Submitting vote for abTestId:', abTestId)
+      console.log('Option selected:', option)
+
+      const data = await voteSubmitAPI(abTestId, option)
+
+      if (data.voted) {
+        const updatedPostData = updateVoteResults(postData, option)
+        setPostData(updatedPostData)
+      } else {
+        console.error('Vote submission failed.')
+      }
+    } catch (err) {
+      console.error('Vote submission error:', err)
+    }
+  }
+
   if (loading) return <div>Loading...</div>
   if (error) return <div>Error: {error}</div>
   if (!postData) return <div>No data found</div>
@@ -113,8 +141,8 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     <div className="container mx-auto py-8">
       <SurveyCard
         {...postData}
-        // onVoteSubmit={(option) => handleVoteSubmit(0, option)}
-        onLikeToggle={() => updateLike(0, !postData.userLiked)}
+        onLikeToggle={() => handleLikeToggle(postData.postId)}
+        onVoteSubmit={handleVoteSubmit}
       />
       <Card className="mt-6">
         <CardHeader>
