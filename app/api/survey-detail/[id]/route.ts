@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Tables } from '~/types/supabase'
 import { createClient } from '~/utils/supabase/server'
 
 export async function GET(
@@ -22,33 +23,36 @@ export async function GET(
 
     const currentUserId = session?.user.id
 
-    //Post 부분
-    //posts 데이터
+    //Post 데이터
     const { data: post, error: postError } = await supabase
       .from('posts')
       .select('*')
       .eq('id', postId) //id타입 int
       .single()
-    console.log('Post Data:', post, 'Post Error:', postError)
-
     if (postError) throw new Error(postError.message)
 
-    // userName 데이터
+    //AB Tests 데이터
+    const { data: abTest, error: abTestError } = await supabase
+      .from('ab_tests')
+      .select('*')
+      .eq('post_id', postId)
+      .single()
+    if (abTestError) throw new Error('Failed to fetch AB Test data')
+
+    // UserName 데이터
     const { user_id: userId } = post
     const { data: user, error: userError } = await supabase
       .from('users')
       .select('username')
       .eq('id', userId)
       .single()
-
     if (userError) throw new Error(userError.message)
 
-    //voteA & voteB 데이터
+    //Votes 데이터
     const { data: abTestVotes, error: votesError } = await supabase
       .from('ab_test_votes')
       .select('preferred_variant')
       .eq('ab_test_id', postId)
-
     if (votesError) throw new Error(votesError.message)
 
     const votesA = abTestVotes.filter(
@@ -58,65 +62,49 @@ export async function GET(
       (vote) => vote.preferred_variant === 'B',
     ).length
 
-    // userLiked 여부
+    // UserLiked 여부
     const { data: userLikedData } = await supabase
       .from('likes')
       .select('*')
       .eq('post_id', id)
       .eq('user_id', currentUserId as string)
-
     const userLiked = userLikedData?.length ?? 0 > 0
 
-    // commentsCount
-    const { data: commentsData, error: commentsError } = await supabase
-      .from('comments')
-      .select('id')
-      .eq('post_id', postId)
-
-    if (commentsError) throw new Error(commentsError.message)
-
-    const commentsCount = commentsData.length
-
-    // userVote & voteComplete
+    // UserVote 데이터와 voteComplete 여부
     const { data: userVoteData, error: voteError } = await supabase
       .from('ab_test_votes')
       .select('preferred_variant')
       .eq('ab_test_id', postId)
       .eq('user_id', currentUserId as string)
-
     if (voteError) throw new Error(voteError.message)
 
     const userVote = userVoteData ? userVoteData : null
     const voteComplete = Boolean(userVoteData)
 
-    // initLikeCount
+    // Post LikeCount
     const { data: likesData, error: likesError } = await supabase
       .from('likes')
       .select('id')
       .eq('post_id', postId)
-
     if (likesError) throw new Error(likesError.message)
 
     const initLikeCount = likesData.length
 
-    //ab_tests 데이터 가져오기
-    const { data: abTest, error: abTestError } = await supabase
-      .from('ab_tests')
-      .select('*')
-      .eq('post_id', postId) //id타입 int
-      .single()
-
-    if (abTestError) throw new Error('Failed to fetch AB Test data')
-
-    // comment 부분
-    const { data: comments, error: commentError } = await supabase
+    // Comment 데이터
+    const { data, error: commentsError } = await supabase
       .from('comments')
-      .select('id, content, created_at, user_id, parent_id, users(username)')
+      .select(
+        'id, content, created_at, user_id, parent_id, dept, post_id, users(username)',
+      )
       .eq('post_id', postId)
+    if (commentsError) throw new Error(commentsError.message)
 
-    if (commentError) throw commentError
+    const comments = data.map(({ users, ...comment }) => ({
+      username: users.username,
+      ...comment,
+    }))
 
-    // 댓글이 있으면 likes 데이터를 가져옴
+    // Comment Likes 데이터
     const { data: likes, error: likeError } = await supabase
       .from('comment_likes')
       .select('comment_id, user_id')
@@ -124,10 +112,8 @@ export async function GET(
         'comment_id',
         comments.map((comment) => comment.id),
       )
+    if (likeError) throw new Error(likeError.message)
 
-    if (likeError) throw likeError
-
-    //like 데이터가 있으면 처리, 없으면 기본값으로 처리
     const likeCounts = (likes || []).reduce<Record<number, number>>(
       (acc, like) => {
         acc[like.comment_id] = (acc[like.comment_id] || 0) + 1
@@ -138,18 +124,38 @@ export async function GET(
 
     const userLikes = new Set(
       (likes || [])
-        .filter((like) => like.user_id === userId)
+        .filter((like) => like.user_id === currentUserId)
         .map((like) => like.comment_id),
     )
 
-    const commentWithLikes = comments.map((comment) => ({
-      id: String(comment.id),
-      writer: comment.users.username,
-      content: comment.content,
-      likeCount: likeCounts[comment.id] || 0,
-      date: comment.created_at.split('T')[0],
-      userLiked: userLikes.has(comment.id),
-    }))
+    // 댓글을 트리 구조로 변환
+    type Comment = Tables<'comments'> & {
+      username: string
+      likeCount: number
+      userLiked: boolean
+      replies: Comment[]
+    }
+    const commentMap: Record<number, Comment> = {}
+    const roots: Comment[] = []
+
+    comments.forEach((comment) => {
+      const mappedComment: Comment = {
+        ...comment,
+        likeCount: likeCounts[comment.id] || 0,
+        userLiked: userLikes.has(comment.id),
+        replies: [],
+      }
+
+      commentMap[comment.id] = mappedComment
+
+      if (comment.parent_id === null) {
+        roots.push(commentMap[comment.id])
+      } else {
+        if (commentMap[comment.parent_id]) {
+          commentMap[comment.parent_id].replies.push(commentMap[comment.id])
+        }
+      }
+    })
 
     // 데이터 반환
     return NextResponse.json({
@@ -159,12 +165,11 @@ export async function GET(
       votesA,
       votesB,
       userLiked,
-      commentsCount,
+      commentsCount: comments.length,
       userVote,
       voteComplete,
       initLikeCount,
-      comments,
-      commentWithLikes,
+      comments: roots,
     })
   } catch (error) {
     console.error('Unexpected Error:', error)

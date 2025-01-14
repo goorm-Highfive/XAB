@@ -1,12 +1,8 @@
-export type ReplyData = {
-  id: string
-  writer: string
-  content: string
-  likeCount: number
-  date: string
-  userLiked: boolean
-}
+import { Tables } from '~/types/supabase'
 
-export type CommentData = ReplyData & {
-  replies?: ReplyData[]
+export type Comment = Tables<'comments'> & {
+  username: string
+  likeCount: number
+  userLiked: boolean
+  replies: Comment[]
 }

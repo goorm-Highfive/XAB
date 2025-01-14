@@ -5,45 +5,7 @@ import { SurveyCard, SurveyCardProps } from '~/components/common/survey-card'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { SurveyComment } from '~/components/survey-detail/survey-comment'
 import { SurveyCommentInput } from '~/components/survey-detail/survey-comment-input'
-import { CommentData, ReplyData } from '~/types/comment'
-
-// 초기 댓글 데이터
-// const initialCommentData: CommentData[] = [
-//   {
-//     id: '1',
-//     writer: 'wontory',
-//     content: 'This is a comment on the post. Great article!',
-//     likeCount: 10,
-//     date: '2 hours ago',
-//     userLiked: false,
-//   },
-//   {
-//     id: '2',
-//     writer: 'E0min',
-//     content: 'This is a comment on the post. Great article!',
-//     likeCount: 10,
-//     date: '3 hours ago',
-//     userLiked: false,
-//   },
-//   {
-//     id: '3',
-//     writer: 'jyooni99',
-//     content: 'I totally agree with this perspective. Very insightful!',
-//     likeCount: 5,
-//     date: '1 hour ago',
-//     userLiked: true,
-//     replies: [
-//       {
-//         id: '3-1',
-//         writer: 'yujsoo',
-//         content: 'Thanks! Glad you liked it.',
-//         likeCount: 2,
-//         date: '30 minutes ago',
-//         userLiked: false,
-//       },
-//     ],
-//   },
-// ]
+import { Comment } from '~/types/comment'
 
 // 좋아요 및 투표 로직 관리
 const useSurveyData = (initialData: SurveyCardProps[]) => {
@@ -86,95 +48,13 @@ const useSurveyData = (initialData: SurveyCardProps[]) => {
   return { survey, updateLike, handleVoteSubmit }
 }
 
-const useCommentData = (initialData: CommentData[]) => {
-  const [comments, setComments] = useState(initialData)
-
-  const toggleLike = (id: string, isReply = false, replyId?: string) => {
-    setComments((prev) =>
-      prev.map((comment) =>
-        comment.id === id
-          ? {
-              ...comment,
-              ...(isReply
-                ? {
-                    replies: comment.replies?.map((reply) =>
-                      reply.id === replyId
-                        ? {
-                            ...reply,
-                            userLiked: !reply.userLiked,
-                            likeCount: reply.userLiked
-                              ? Math.max(reply.likeCount - 1, 0)
-                              : reply.likeCount + 1,
-                          }
-                        : reply,
-                    ),
-                  }
-                : {
-                    userLiked: !comment.userLiked,
-                    likeCount: comment.userLiked
-                      ? Math.max(comment.likeCount - 1, 0)
-                      : comment.likeCount + 1,
-                  }),
-            }
-          : comment,
-      ),
-    )
-  }
-
-  const addComment = (content: string) => {
-    setComments((prev) => [
-      {
-        id: String(prev.length + 1),
-        writer: 'current_user',
-        content,
-        likeCount: 0,
-        date: 'Just now',
-        userLiked: false,
-      },
-      ...prev,
-    ])
-  }
-
-  const addReply = (
-    commentId: string,
-    content: string,
-    mentionedUser: string,
-  ) => {
-    setComments((prev) =>
-      prev.map((comment) =>
-        comment.id === commentId
-          ? {
-              ...comment,
-              replies: [
-                ...(comment.replies || []),
-                {
-                  id: `${comment.id}-${(comment.replies?.length || 0) + 1}`,
-                  writer: 'current_user',
-                  content: `@${mentionedUser} ${content}`,
-                  likeCount: 0,
-                  date: 'Just now',
-                  userLiked: false,
-                },
-              ],
-            }
-          : comment,
-      ),
-    )
-  }
-
-  return { comments, toggleLike, addComment, addReply }
-}
-
 function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [postData, setPostData] = useState<SurveyCardProps>()
-  const [commandData, setCommandData] = useState<ReplyData[]>()
+  const [comments, setComments] = useState<Comment[]>()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const { updateLike } = useSurveyData([]) //handleVoteSubmit 추가해야 함
-  const { comments, toggleLike, addComment, addReply } = useCommentData(
-    commandData || [],
-  )
 
   useEffect(() => {
     const fetchData = async () => {
@@ -192,6 +72,8 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           throw new Error(`API Error: ${response.statusText}`)
         }
         const data = await response.json()
+        console.log(data)
+
         setPostData({
           date: new Date(data.post.created_at).toLocaleDateString(),
           username: data.username || '',
@@ -211,8 +93,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           postId: data.post.id,
           voteComplete: data.voteComplete,
         })
-        setCommandData(data.commentWithLikes)
-
+        setComments(data.comments)
         setError(null) // 에러 초기화
       } catch (err) {
         setError((err as Error).message || '데이터를 가져오지 못했습니다.')
@@ -237,21 +118,19 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
       />
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle>Comments ({comments.length})</CardTitle>
+          <CardTitle>Comments ({comments?.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          {comments.map((comment) => (
-            <SurveyComment
-              key={comment.id}
-              comment={comment}
-              onToggleLike={() => toggleLike(comment.id)}
-              onToggleReplyLike={(replyId) =>
-                toggleLike(comment.id, true, replyId)
-              }
-              onAddReply={addReply}
-            />
-          ))}
-          <SurveyCommentInput onCommentSubmit={addComment} />
+          {comments ? (
+            comments.map((comment) => (
+              <SurveyComment key={comment.id} comment={comment} />
+            ))
+          ) : (
+            <div>
+              <p>Noting Comments</p>
+            </div>
+          )}
+          <SurveyCommentInput />
         </CardContent>
       </Card>
     </div>
