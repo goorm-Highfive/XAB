@@ -1,3 +1,4 @@
+// src/components/common/survey-card.tsx
 'use client'
 import { Card } from '~/components/ui/card'
 import { Progress } from '~/components/ui/progress'
