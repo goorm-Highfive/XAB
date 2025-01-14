@@ -5,8 +5,8 @@ import { useState, useEffect } from 'react'
 import { SettingButton } from '~/components/profile/profile-setting-button'
 import { Button } from '~/components/ui/button'
 import { useParams } from 'next/navigation'
-import Image from 'next/image'
 import { createClient } from '~/utils/supabase/client'
+import { Avatar, AvatarImage } from '~/components/ui/avatar'
 
 function ProfileHeader() {
   const [isFollowing, setIsFollowing] = useState(true)
@@ -77,23 +77,29 @@ function ProfileHeader() {
   return (
     <div className="flex flex-col rounded-lg bg-white p-6 shadow">
       {/* Avatar */}
-      <div className="mb-4 h-24 w-24 rounded-full bg-gray-300">
-        {userData?.profile_image && (
-          <Image
-            src={userData.profile_image}
-            alt={`${userData.username}'s profile`}
-            className="h-full w-full rounded-full object-cover"
+      <Avatar className="mb-4 h-20 w-20">
+        {userData?.profile_image ? (
+          <AvatarImage
+            width={150}
+            height={150}
+            src={userData?.profile_image}
+            alt="프로필 사진"
+          />
+        ) : (
+          <AvatarImage
+            width={150}
+            height={150}
+            src={'/assets/svgs/default-profile.svg'}
+            alt="프로필 사진"
           />
         )}
-      </div>
-
+      </Avatar>
       {/* Header 상단 */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">
-            {userData?.username || 'Username'}
+            {userData?.username || 'Guest'}
           </h2>
-          <p className="text-gray-500">@{userData?.username || 'username'}</p>
         </div>
 
         {/* 버튼 그룹 */}

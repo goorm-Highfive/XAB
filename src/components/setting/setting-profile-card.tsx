@@ -1,33 +1,36 @@
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-import { Lock } from 'lucide-react'
+import { Avatar, AvatarImage } from '~/components/ui/avatar'
 
 type ProfileCardProps = {
   username?: string
+  profileImageUrl?: string
 }
 
-function ProfileCard({ username }: ProfileCardProps) {
+function ProfileCard({ username, profileImageUrl }: ProfileCardProps) {
   return (
     <div className="flex items-center gap-3">
       {/* Avatar */}
-      <div className="relative">
-        <Avatar className="h-10 w-10">
-          <AvatarImage alt={username || 'User'} />
-          <AvatarFallback>
-            {username ? username[0].toUpperCase() : 'G'}
-          </AvatarFallback>
-        </Avatar>
-        {/* Lock Icon */}
-        <div className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-gray-800">
-          <Lock className="h-3 w-3 text-white" />
-        </div>
-      </div>
-
+      <Avatar className="h-20 w-20">
+        {profileImageUrl ? (
+          <AvatarImage
+            width={150}
+            height={150}
+            src={profileImageUrl}
+            alt="프로필 사진"
+          />
+        ) : (
+          <AvatarImage
+            width={150}
+            height={150}
+            src={'/assets/svgs/default-profile.svg'}
+            alt="프로필 사진"
+          />
+        )}
+      </Avatar>
       {/* User Info */}
       <div>
-        <p className="text-sm font-semibold leading-none">
+        <p className="text-md font-semibold leading-none">
           {username || 'Guest'}
         </p>
-        {username && <p className="mt-1 text-xs text-gray-500">@{username}</p>}
       </div>
     </div>
   )

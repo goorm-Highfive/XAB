@@ -1,112 +1,125 @@
 'use client'
 
+import { useRef, useState } from 'react'
 import { toast, Toaster } from 'sonner'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Label } from '~/components/ui/label'
-import { Input } from '~/components/ui/input'
-import { Textarea } from '~/components/ui/textarea'
+import { createClient } from '~/utils/supabase/client'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader } from '~/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
+import { Avatar, AvatarImage } from '~/components/ui/avatar'
+import { Input } from '~/components/ui/input'
+import { Textarea } from '~/components/ui/textarea'
+import { Label } from '../ui/label'
+import { fetchUserProfile } from '~/utils/fetch-user'
 
-type ProfileData = {
-  username: string
-  bio: string
+interface ProfileInfoProps {
+  user: Awaited<ReturnType<typeof fetchUserProfile>>
 }
 
-function ProfileInfo({ defaultValues }: { defaultValues: ProfileData }) {
-  const router = useRouter()
-  const [formData, setFormData] = useState<ProfileData>(
-    defaultValues || { username: '', bio: '' },
-  )
-  const [isLoading, setIsLoading] = useState(false)
+function ProfileInfo({ user }: ProfileInfoProps) {
+  const [avatarUrl, setAvatarUrl] = useState(user?.profileImage || null)
+  const [username, setUsername] = useState(user?.username || '')
+  const [bio, setBio] = useState(user?.bio || '')
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+  const supabase = createClient()
+  console.log('fetchUserProfile result:', user)
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
 
     try {
-      const response = await fetch('/api/user-edit/edit-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: formData.username,
-          bio: formData.bio || '',
-        }),
-      })
+      const fileName = `${user!.id}/${Date.now()}-${file.name}`
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('user_images')
+        .upload(fileName, file)
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || '알 수 없는 오류가 발생했습니다.')
-      }
+      if (uploadError) throw new Error('이미지 업로드 실패')
 
-      const result = await response.json()
-      toast.success(result.message || '변경 사항이 저장되었습니다.')
-      router.refresh()
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message || '예기치 못한 오류가 발생했습니다.')
-      } else {
-        toast.error('알 수 없는 오류가 발생했습니다.')
-      }
-    } finally {
-      setIsLoading(false)
+      const { data: publicUrlData } = supabase.storage
+        .from('user_images')
+        .getPublicUrl(uploadData.path)
+
+      if (!publicUrlData || !publicUrlData.publicUrl)
+        throw new Error('이미지 URL 생성 실패')
+
+      const imageUrl = publicUrlData.publicUrl
+
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ profile_image: imageUrl })
+        .eq('id', user!.id)
+
+      if (updateError) throw new Error('프로필 업데이트 실패')
+
+      setAvatarUrl(imageUrl)
+      toast.success('프로필 사진이 성공적으로 업데이트되었습니다!')
+    } catch (error: unknown) {
+      if (error instanceof Error) toast.error(error.message)
+    }
+  }
+
+  const handleSave = async () => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ username, bio })
+        .eq('id', user!.id)
+
+      if (error) throw new Error('프로필 업데이트 실패')
+
+      toast.success('프로필 정보가 성공적으로 업데이트되었습니다!')
+    } catch (error: unknown) {
+      if (error instanceof Error) toast.error(error.message)
     }
   }
 
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-row items-center">
-          <Avatar className="mr-4 h-16 w-16">
-            <AvatarImage alt={formData.username || 'User'} />
-            <AvatarFallback>
-              {formData.username ? formData.username[0].toUpperCase() : 'G'}
-            </AvatarFallback>
+        <CardHeader className="flex">
+          <Avatar className="mb-4 h-20 w-20">
+            <AvatarImage
+              width={150}
+              height={150}
+              src={avatarUrl || '/assets/svgs/default-profile.svg'}
+              alt="프로필 사진"
+            />
           </Avatar>
-          <Button variant="outline">Change Photo</Button>
+          <div>
+            <Button
+              variant="outline"
+              className="mr-4"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              프로필 이미지 변경
+            </Button>
+            <Button variant="outline" onClick={() => setAvatarUrl(null)}>
+              기본 이미지로 변경
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleUpload}
+            />
+          </div>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="username" className="mb-2 block">
-                Username
-              </Label>
-              <Input
-                id="username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="bio" className="mb-2 block">
-                Bio
-              </Label>
-              <Textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
-                className="h-[120px] max-h-[200px]"
-                onChange={handleChange}
-              />
-            </div>
-            <Button
-              type="submit"
-              className="bg-black text-white hover:bg-gray-800"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </form>
+          <Label className="mb-2 block">username</Label>
+          <Input
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <Label className="mb-2 mt-6 block">bio</Label>
+          <Textarea
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            className="max-h-40"
+          />
+          <Button onClick={handleSave} className="mt-4 w-full">
+            저장
+          </Button>
         </CardContent>
       </Card>
       <Toaster />

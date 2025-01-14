@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card'
-import { Avatar, AvatarImage, AvatarFallback } from '~/components/ui/avatar'
+import { Avatar, AvatarImage } from '~/components/ui/avatar'
 import { createClient } from '~/utils/supabase/client'
 
 function ProfileSection() {
@@ -84,13 +84,21 @@ function ProfileSection() {
   return (
     <Card className="static top-[92px] mb-6 w-full lg:sticky lg:w-72">
       <CardHeader className="items-center gap-5">
-        <Avatar className="size-20 items-center justify-center">
+        <Avatar className="h-20 w-20">
           {user.profile_image ? (
-            <AvatarImage src={user.profile_image} alt={`@${user.username}`} />
+            <AvatarImage
+              width={150}
+              height={150}
+              src={user.profile_image}
+              alt={`@${user.username}`}
+            />
           ) : (
-            <AvatarFallback className="text-4xl font-semibold">
-              {user.username.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
+            <AvatarImage
+              width={150}
+              height={150}
+              src={'/assets/svgs/default-profile.svg'}
+              alt={`@${user.username}`}
+            />
           )}
         </Avatar>
         <div className="flex flex-col items-center gap-1.5 text-center">
