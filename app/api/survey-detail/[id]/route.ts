@@ -157,6 +157,7 @@ export async function GET(
       post,
       abTest,
       username: user.username,
+      userId,
       votesA,
       votesB,
       userLiked,
