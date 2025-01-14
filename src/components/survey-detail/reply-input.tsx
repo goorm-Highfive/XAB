@@ -70,8 +70,6 @@ function ReplyInput({
         form.reset()
         setIsSubmitting(false)
       }, 500)
-
-      console.log(postId, userId, id, dept, values.replyContent)
     }
   }
 
