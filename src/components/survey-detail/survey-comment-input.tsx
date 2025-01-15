@@ -1,69 +1,111 @@
 'use client'
 
-import { useState } from 'react'
 import Image from 'next/image'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Send } from 'lucide-react'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+
 import defaultProfile from '~/assets/svgs/default-profile.svg'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
-import { Send } from 'lucide-react'
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormControl,
+  FormMessage,
+} from '~/components/ui/form'
 
-// 게시글 뷰페이지 : 댓글 입력
-function SurveyCommentInput({
-  onCommentSubmit,
-}: {
-  onCommentSubmit: (comment: string) => void
-}) {
-  const [inputValue, setInputValue] = useState('')
+// 댓글 입력 스키마 정의
+const commentSchema = z.object({
+  comment: z
+    .string()
+    .min(1, 'Please enter a comment.')
+    .max(500, 'Comments must be 500 characters or fewer.'),
+})
+
+type CommentFormValues = z.infer<typeof commentSchema>
+
+type SurveyCommentInputProp = {
+  postId: number
+  userId: string | null
+}
+
+function SurveyCommentInput({ postId, userId }: SurveyCommentInputProp) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value)
-  }
+  const form = useForm<CommentFormValues>({
+    resolver: zodResolver(commentSchema),
+    defaultValues: { comment: '' },
+  })
 
-  const handleSubmit = () => {
-    if (inputValue.trim() && !isSubmitting) {
-      setIsSubmitting(true) // 제출 중으로 설정
-      onCommentSubmit(inputValue) // 댓글 추가
+  const handleSubmit = async (data: CommentFormValues) => {
+    if (!isSubmitting) {
+      setIsSubmitting(true)
 
-      // 중복 제출 방지 타이머 설정
+      const response = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          post_id: postId,
+          user_id: userId,
+          content: data.comment,
+          parent_id: null,
+          dept: null,
+        }),
+      })
+
+      const result = await response.json()
+      if (!result.success) throw new Error(result.error)
+
+      console.log(postId, userId, data.comment)
+
       setTimeout(() => {
-        setInputValue('')
-        setIsSubmitting(false) // 중복 제출 방지 해제
+        form.reset()
+        setIsSubmitting(false)
       }, 500)
-    }
-  }
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      handleSubmit()
+      return result.comment
     }
   }
 
   return (
-    <div className="mt-[25px] flex border-t pt-[25px]">
-      <div className="mr-3 mt-1 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
-        <Image src={defaultProfile} alt="default profile" />
-      </div>
-      <div className="relative flex-auto">
-        <Input
-          type="text"
-          className="h-[40px] rounded-[30px] border-0 bg-primary-foreground pr-[40px]"
-          placeholder="Add a comment..."
-          value={inputValue}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="mt-[25px] flex border-t pt-[25px]"
+      >
+        <div className="mr-3 mt-1 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
+          <Image src={defaultProfile} alt="default profile" />
+        </div>
+        <FormField
+          name="comment"
+          render={({ field }) => (
+            <FormItem className="relative flex-auto">
+              <FormControl>
+                <Input
+                  type="text"
+                  className="h-[40px] rounded-[30px] border-0 bg-primary-foreground pl-5 pr-[40px]"
+                  placeholder="Add a comment..."
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className="pl-5" />
+              <Button
+                type="submit"
+                variant="ghost"
+                className="z-1 absolute right-2 top-2 w-[30px] hover:bg-transparent"
+                disabled={isSubmitting} // 중복 제출 방지
+              >
+                <Send />
+              </Button>
+            </FormItem>
+          )}
         />
-        <Button
-          variant="ghost"
-          className="z-1 absolute right-2 top-1 w-[30px] hover:bg-transparent"
-          onClick={handleSubmit}
-          disabled={isSubmitting} // 중복 제출 방지
-        >
-          <Send />
-        </Button>
-      </div>
-    </div>
+      </form>
+    </Form>
   )
 }
 
