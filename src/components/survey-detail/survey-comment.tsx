@@ -10,9 +10,14 @@ type SurveyCommentProps = {
   comment: Comment
   userId: string | null
   postId?: number
+  handleCommentLikeToggle: (id: number) => void
 }
 
-function SurveyComment({ comment, userId }: SurveyCommentProps) {
+function SurveyComment({
+  comment,
+  userId,
+  handleCommentLikeToggle,
+}: SurveyCommentProps) {
   const {
     id,
     dept,
@@ -48,6 +53,7 @@ function SurveyComment({ comment, userId }: SurveyCommentProps) {
           <button
             type="button"
             className="mr-4 flex items-center justify-start"
+            onClick={() => handleCommentLikeToggle(id)}
           >
             <Heart
               size={14}
@@ -72,7 +78,11 @@ function SurveyComment({ comment, userId }: SurveyCommentProps) {
 
         {replies?.map((reply) => (
           <div key={reply.id} className="ml-5 mt-5 rounded-lg">
-            <SurveyComment comment={reply} userId={userId} />
+            <SurveyComment
+              comment={reply}
+              userId={userId}
+              handleCommentLikeToggle={handleCommentLikeToggle}
+            />
           </div>
         ))}
 

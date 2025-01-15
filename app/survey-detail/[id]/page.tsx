@@ -96,6 +96,52 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     }
   }
 
+  // 댓글 좋아요 토글
+  const handleCommentLikeToggle = async (commentId: number) => {
+    try {
+      const res = await fetch('/api/comment-like', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ commentId }),
+        credentials: 'include', // 쿠키 포함
+      })
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}))
+        throw new Error(errJson.error || 'Failed to toggle like')
+      }
+
+      const data = await res.json()
+
+      if (!data) return
+
+      setComments((prev) => {
+        if (!prev) return prev
+
+        return prev.map((comment) =>
+          comment.id === commentId
+            ? {
+                ...comment,
+                userLiked: data.liked,
+                likeCount: data.liked
+                  ? comment.likeCount + 1
+                  : comment.likeCount - 1,
+              }
+            : comment,
+        )
+      })
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message)
+        // 사용자에게 에러를 표시할 수 있는 로직 추가 (예: 알림)
+      } else {
+        console.error('An unexpected error occurred')
+      }
+    }
+  }
+
   // 투표 결과 업데이트
   const updateVoteResults = (
     postData: SurveyCardProps,
@@ -159,6 +205,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
                 comment={comment}
                 postId={postData.postId}
                 userId={userId}
+                handleCommentLikeToggle={handleCommentLikeToggle}
               />
             ))
           ) : (
