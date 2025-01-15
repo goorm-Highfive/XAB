@@ -1,33 +1,27 @@
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-import { Lock } from 'lucide-react'
+import defaultProfile from '~/assets/svgs/default-profile.svg'
+import Image from 'next/image'
 
 type ProfileCardProps = {
   username?: string
+  profileImageUrl?: string
 }
 
-function ProfileCard({ username }: ProfileCardProps) {
+function ProfileCard({ username, profileImageUrl }: ProfileCardProps) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center">
       {/* Avatar */}
-      <div className="relative">
-        <Avatar className="h-10 w-10">
-          <AvatarImage alt={username || 'User'} />
-          <AvatarFallback>
-            {username ? username[0].toUpperCase() : 'G'}
-          </AvatarFallback>
-        </Avatar>
-        {/* Lock Icon */}
-        <div className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-gray-800">
-          <Lock className="h-3 w-3 text-white" />
-        </div>
+      <div className="mr-4">
+        {profileImageUrl ? (
+          <Image width={60} height={60} src={profileImageUrl} alt="" />
+        ) : (
+          <Image width={60} height={60} src={defaultProfile} alt="" />
+        )}
       </div>
-
       {/* User Info */}
       <div>
-        <p className="text-sm font-semibold leading-none">
+        <p className="text-md font-semibold leading-none">
           {username || 'Guest'}
         </p>
-        {username && <p className="mt-1 text-xs text-gray-500">@{username}</p>}
       </div>
     </div>
   )
