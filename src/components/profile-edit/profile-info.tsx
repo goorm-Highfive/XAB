@@ -23,13 +23,20 @@ function ProfileInfo({ user }: ProfileInfoProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const supabase = createClient()
-  console.log('fetchUserProfile result:', user)
+  //console.log('fetchUserProfile result:', user)
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
     try {
-      const fileName = `${user!.id}/${Date.now()}-${file.name}`
+      // 파일 이름 안전하게 처리
+      const sanitizeFileName = (fileName: string): string =>
+        fileName.replace(/[^a-zA-Z0-9_.-]/g, '_').replace(/\s+/g, '_')
+
+      const safeFileName = sanitizeFileName(file.name)
+      const fileName = `${user!.id}/${Date.now()}-${safeFileName}`
+
+      // 파일 업로드
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('user_images')
         .upload(fileName, file)
@@ -56,6 +63,7 @@ function ProfileInfo({ user }: ProfileInfoProps) {
       toast.success('프로필 사진이 성공적으로 업데이트되었습니다!')
     } catch (error: unknown) {
       if (error instanceof Error) toast.error(error.message)
+      console.error('Upload error:', error)
     }
   }
 
@@ -94,11 +102,23 @@ function ProfileInfo({ user }: ProfileInfoProps) {
     <>
       <Card>
         <CardHeader className="flex">
-          <div className="h-20 w-20">
+          <div className="relative mb-4 h-20 w-20 overflow-hidden rounded-full">
             {avatarUrl ? (
-              <Image width={80} height={80} src={avatarUrl} alt="" />
+              <Image
+                fill
+                className="object-cover"
+                src={avatarUrl}
+                sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+                alt=""
+              />
             ) : (
-              <Image width={80} height={80} src={defaultProfile} alt="" />
+              <Image
+                fill
+                className="object-cover"
+                src={defaultProfile}
+                sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+                alt=""
+              />
             )}
           </div>
           <div>
