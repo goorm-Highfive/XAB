@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const writeSchema = z
   .object({
     body: z.string().optional(),
-    type: z.enum(['text', 'image'], undefined).optional(),
+    type: z.enum(['text', 'image', '']).optional(),
     textA: z.string().optional(),
     textB: z.string().optional(),
     imageA: z.instanceof(File).optional(),
