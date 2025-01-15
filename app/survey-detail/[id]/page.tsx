@@ -187,35 +187,39 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   if (!postData) return <div>No data found</div>
 
   return (
-    <div className="container mx-auto py-8">
-      <SurveyCard
-        {...postData}
-        onLikeToggle={() => handleLikeToggle(postData.postId)}
-        onVoteSubmit={handleVoteSubmit}
-      />
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle>Comments ({comments?.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {comments ? (
-            comments.map((comment) => (
-              <SurveyComment
-                key={comment.id}
-                comment={comment}
-                postId={postData.postId}
-                userId={userId}
-                handleCommentLikeToggle={handleCommentLikeToggle}
-              />
-            ))
-          ) : (
-            <div>
-              <p>Noting Comments</p>
-            </div>
-          )}
-          <SurveyCommentInput postId={postData.postId} userId={userId} />
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-gray-100">
+      <div className="p-6">
+        <div className="mx-auto mt-6 max-w-3xl space-y-6">
+          <SurveyCard
+            {...postData}
+            onLikeToggle={() => handleLikeToggle(postData.postId)}
+            onVoteSubmit={handleVoteSubmit}
+          />
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Comments ({comments?.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {comments ? (
+                comments.map((comment) => (
+                  <SurveyComment
+                    key={comment.id}
+                    comment={comment}
+                    postId={postData.postId}
+                    userId={userId}
+                    handleCommentLikeToggle={handleCommentLikeToggle}
+                  />
+                ))
+              ) : (
+                <div>
+                  <p>Noting Comments</p>
+                </div>
+              )}
+              <SurveyCommentInput postId={postData.postId} userId={userId} />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }
