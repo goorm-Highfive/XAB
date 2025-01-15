@@ -1,13 +1,14 @@
-// app/home/page.tsx
-
 'use client'
 
 import { useEffect, useState } from 'react'
+
+import SurveyList from '#/home/survey-list'
 import { ProfileSection } from '~/components/home/profile-section'
 import { SuggestSection } from '~/components/home/suggest-section'
 import { NewSurveyButton } from '~/components/home/new-survey-button'
-import SurveyList from './survey-list'
-import { Post } from '~/types/post' // 타입 임포트
+import { toggleLikeAPI } from '~/utils/toggleLikeAPI'
+import { voteSubmitAPI } from '~/utils/voteSubmitAPI'
+import { Post } from '~/types/post'
 
 export default function HomePage() {
   const [posts, setPosts] = useState<Post[]>([])
@@ -64,21 +65,7 @@ export default function HomePage() {
   const handleLikeToggle = async (postId: number) => {
     try {
       // 서버에 좋아요 토글 요청
-      const res = await fetch('/api/like', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ postId }),
-        credentials: 'include', // 쿠키 포함
-      })
-
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => ({}))
-        throw new Error(errJson.error || 'Failed to toggle like')
-      }
-
-      const data = await res.json()
+      const data = await toggleLikeAPI(postId)
 
       // 서버 응답에 따라 로컬 상태 업데이트
       const updatedPosts = posts.map((post: Post) => {
@@ -114,21 +101,7 @@ export default function HomePage() {
         throw new Error('Invalid option type')
       }
 
-      const res = await fetch('/api/vote', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ abTestId, option }),
-        credentials: 'include',
-      })
-
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => ({}))
-        throw new Error(errJson.error || 'Failed to submit vote')
-      }
-
-      const data = await res.json()
+      const data = await voteSubmitAPI(abTestId, option)
       console.log('Vote response:', data)
 
       // 상태 업데이트 로직

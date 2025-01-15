@@ -8,16 +8,34 @@ import { ReplyInput } from './reply-input'
 
 type SurveyCommentProps = {
   comment: Comment
+  userId: string | null
+  postId?: number
+  handleCommentLikeToggle: (id: number) => void
 }
 
-function SurveyComment({ comment }: SurveyCommentProps) {
-  const { username, content, created_at, likeCount, userLiked, replies } =
-    comment
+function SurveyComment({
+  comment,
+  userId,
+  handleCommentLikeToggle,
+}: SurveyCommentProps) {
+  const {
+    id,
+    dept,
+    username,
+    content,
+    created_at,
+    likeCount,
+    userLiked,
+    replies,
+    post_id,
+  } = comment
   const date = created_at.split('T')[0]
   const [reply, setReply] = useState<boolean>(false)
+  const [replyId, setReplyId] = useState<number>(id)
 
   const toggleReply = () => {
     setReply(!reply)
+    setReplyId(replyId)
   }
 
   return (
@@ -35,6 +53,7 @@ function SurveyComment({ comment }: SurveyCommentProps) {
           <button
             type="button"
             className="mr-4 flex items-center justify-start"
+            onClick={() => handleCommentLikeToggle(id)}
           >
             <Heart
               size={14}
@@ -59,11 +78,23 @@ function SurveyComment({ comment }: SurveyCommentProps) {
 
         {replies?.map((reply) => (
           <div key={reply.id} className="ml-5 mt-5 rounded-lg">
-            <SurveyComment comment={reply} />
+            <SurveyComment
+              comment={reply}
+              userId={userId}
+              handleCommentLikeToggle={handleCommentLikeToggle}
+            />
           </div>
         ))}
 
-        {reply && <ReplyInput username={username} />}
+        {reply && userId && (
+          <ReplyInput
+            username={username}
+            postId={post_id}
+            userId={userId}
+            replyId={replyId}
+            dept={dept}
+          />
+        )}
       </div>
     </div>
   )

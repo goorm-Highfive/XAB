@@ -14,6 +14,7 @@ import {
   FormControl,
   FormMessage,
 } from '~/components/ui/form'
+import { useState } from 'react'
 
 const replySchema = z.object({
   replyContent: z
@@ -24,14 +25,52 @@ const replySchema = z.object({
 
 type ReplyFormValues = z.infer<typeof replySchema>
 
-function ReplyInput({ username }: { username: string }) {
+type ReplyInputProps = {
+  username: string
+  postId: number
+  replyId: number | null
+  userId: string | null
+  dept: number | null
+}
+
+function ReplyInput({
+  username,
+  postId,
+  replyId,
+  userId,
+  dept,
+}: ReplyInputProps) {
   const form = useForm<ReplyFormValues>({
     resolver: zodResolver(replySchema),
     defaultValues: { replyContent: '' },
   })
 
-  const onSubmit = (values: ReplyFormValues) => {
-    console.log(values)
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+
+  const onSubmit = async (values: ReplyFormValues) => {
+    if (!isSubmitting) {
+      setIsSubmitting(true)
+
+      const response = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          post_id: postId,
+          user_id: userId,
+          content: values.replyContent,
+          parent_id: replyId,
+          dept: (dept || 1) + 1,
+        }),
+      })
+
+      const result = await response.json()
+      if (!result.success) throw new Error(result.error)
+
+      setTimeout(() => {
+        form.reset()
+        setIsSubmitting(false)
+      }, 500)
+    }
   }
 
   return (

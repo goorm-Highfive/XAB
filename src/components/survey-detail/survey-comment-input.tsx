@@ -1,7 +1,9 @@
-import { useState } from 'react'
+'use client'
+
 import Image from 'next/image'
-import { Send } from 'lucide-react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { Send } from 'lucide-react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -26,7 +28,12 @@ const commentSchema = z.object({
 
 type CommentFormValues = z.infer<typeof commentSchema>
 
-function SurveyCommentInput() {
+type SurveyCommentInputProp = {
+  postId: number
+  userId: string | null
+}
+
+function SurveyCommentInput({ postId, userId }: SurveyCommentInputProp) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<CommentFormValues>({
@@ -34,15 +41,33 @@ function SurveyCommentInput() {
     defaultValues: { comment: '' },
   })
 
-  const handleSubmit = (data: CommentFormValues) => {
+  const handleSubmit = async (data: CommentFormValues) => {
     if (!isSubmitting) {
       setIsSubmitting(true)
-      console.log(data)
+
+      const response = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          post_id: postId,
+          user_id: userId,
+          content: data.comment,
+          parent_id: null,
+          dept: null,
+        }),
+      })
+
+      const result = await response.json()
+      if (!result.success) throw new Error(result.error)
+
+      console.log(postId, userId, data.comment)
 
       setTimeout(() => {
         form.reset()
         setIsSubmitting(false)
       }, 500)
+
+      return result.comment
     }
   }
 
@@ -71,7 +96,7 @@ function SurveyCommentInput() {
               <Button
                 type="submit"
                 variant="ghost"
-                className="z-1 absolute right-2 top-[-4] w-[30px] hover:bg-transparent"
+                className="z-1 absolute right-2 top-2 w-[30px] hover:bg-transparent"
                 disabled={isSubmitting} // 중복 제출 방지
               >
                 <Send />

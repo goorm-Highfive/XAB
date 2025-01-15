@@ -48,20 +48,6 @@ export async function GET(
       .single()
     if (userError) throw new Error(userError.message)
 
-    //Votes 데이터
-    const { data: abTestVotes, error: votesError } = await supabase
-      .from('ab_test_votes')
-      .select('preferred_variant')
-      .eq('ab_test_id', postId)
-    if (votesError) throw new Error(votesError.message)
-
-    const votesA = abTestVotes.filter(
-      (vote) => vote.preferred_variant === 'A',
-    ).length
-    const votesB = abTestVotes.filter(
-      (vote) => vote.preferred_variant === 'B',
-    ).length
-
     // UserLiked 여부
     const { data: userLikedData } = await supabase
       .from('likes')
@@ -70,16 +56,25 @@ export async function GET(
       .eq('user_id', currentUserId as string)
     const userLiked = userLikedData?.length ?? 0 > 0
 
-    // UserVote 데이터와 voteComplete 여부
-    const { data: userVoteData, error: voteError } = await supabase
+    //Votes 데이터
+    const { data: abTestVotes, error: votesError } = await supabase
       .from('ab_test_votes')
-      .select('preferred_variant')
-      .eq('ab_test_id', postId)
-      .eq('user_id', currentUserId as string)
-    if (voteError) throw new Error(voteError.message)
+      .select(` *, ab_tests!inner(post_id)`)
+      .eq('ab_tests.post_id', postId)
+    if (votesError) throw new Error(votesError.message)
 
-    const userVote = userVoteData ? userVoteData : null
-    const voteComplete = Boolean(userVoteData)
+    const { votesA, votesB, userVote, voteComplete } = abTestVotes.reduce(
+      (acc, { preferred_variant, user_id }) => {
+        if (preferred_variant === 'A') acc.votesA++
+        if (preferred_variant === 'B') acc.votesB++
+        if (user_id === currentUserId) {
+          acc.userVote = preferred_variant
+          acc.voteComplete = true
+        }
+        return acc
+      },
+      { votesA: 0, votesB: 0, userVote: '', voteComplete: false },
+    )
 
     // Post LikeCount
     const { data: likesData, error: likesError } = await supabase
@@ -162,6 +157,7 @@ export async function GET(
       post,
       abTest,
       username: user.username,
+      userId,
       votesA,
       votesB,
       userLiked,

@@ -128,7 +128,7 @@ function SurveyCard({
           {post_image_url && (
             <div className="mb-4">
               <Image
-                src={post_image_url}
+                src={post_image_url || 'post_image'}
                 alt={question}
                 width={600}
                 height={400}
@@ -155,77 +155,89 @@ function SurveyCard({
         <div className="grid grid-cols-2 gap-4">
           {/* 옵션 A */}
           <div
-            className={`flex cursor-pointer flex-col items-center rounded-lg border-2 bg-gray-200 p-4 transition ${
-              isOptionASelected ? 'border-blue-500' : 'border-transparent'
+            className={`flex cursor-pointer flex-col items-center justify-between rounded-lg border-2 bg-gray-200 p-4 transition ${
+              isOptionASelected ? 'border-gray-800' : 'border-transparent'
             } hover:border-gray-400 ${isSubmitting ? 'cursor-not-allowed opacity-50' : ''}`}
             onClick={() => handleOptionClick('A')}
           >
-            <span className="text-gray-600">{optionA}</span>
-            {optionA_url && (
-              <a
-                href={optionA_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mb-2"
-              >
-                <Image
-                  src={optionA_url}
-                  alt={optionA || 'optionA'}
-                  width={150}
-                  height={150}
-                  className="rounded-md"
-                />
-              </a>
-            )}
-            <Progress
-              value={totalVotes > 0 ? (votesA / totalVotes) * 100 : 0}
-              className="mt-2 w-full"
-            />
-            <span className="text-xs">
-              {totalVotes > 0
-                ? `${Math.round((votesA / totalVotes) * 100)}%`
-                : '0%'}
-            </span>
+            <div className={`flex flex-col items-center`}>
+              <span className="text-md mb-3 font-bold text-gray-600">
+                {optionA || 'A'}
+              </span>
+              {optionA_url && (
+                <a
+                  href={optionA_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mb-2"
+                >
+                  <Image
+                    src={optionA_url}
+                    alt={optionA || 'optionA'}
+                    width={150}
+                    height={150}
+                    className="rounded-md"
+                  />
+                </a>
+              )}
+            </div>
+            <div className="flex w-full flex-col items-center">
+              <Progress
+                value={totalVotes > 0 ? (votesA / totalVotes) * 100 : 0}
+                className="mt-2"
+              />
+              <span className="mt-2 text-xs">
+                {totalVotes > 0
+                  ? `${Math.round((votesA / totalVotes) * 100)}%`
+                  : '0%'}
+              </span>
+            </div>
           </div>
 
           {/* 옵션 B */}
           <div
-            className={`flex cursor-pointer flex-col items-center rounded-lg border-2 bg-gray-200 p-4 transition ${
-              isOptionBSelected ? 'border-blue-500' : 'border-transparent'
+            className={`flex cursor-pointer flex-col items-center justify-between rounded-lg border-2 bg-gray-200 p-4 transition ${
+              isOptionBSelected ? 'border-gray-800' : 'border-transparent'
             } hover:border-gray-400 ${isSubmitting ? 'cursor-not-allowed opacity-50' : ''}`}
             onClick={() => handleOptionClick('B')}
           >
-            <span className="text-gray-600">{optionB}</span>
-            {optionB_url && (
-              <a
-                href={optionB_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mb-2"
-              >
-                <Image
-                  src={optionB_url}
-                  alt={optionB || 'optionB'}
-                  width={150}
-                  height={150}
-                  className="rounded-md"
-                />
-              </a>
-            )}
-            <Progress
-              value={totalVotes > 0 ? (votesB / totalVotes) * 100 : 0}
-              className="mt-2 w-full"
-            />
-            <span className="text-xs">
-              {totalVotes > 0
-                ? `${Math.round((votesB / totalVotes) * 100)}%`
-                : '0%'}
-            </span>
+            <div className={`flex flex-col items-center`}>
+              <span className="text-md mb-3 font-bold text-gray-600">
+                {optionB || 'B'}
+              </span>
+              {optionB_url && (
+                <a
+                  href={optionB_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mb-2"
+                >
+                  <Image
+                    src={optionB_url}
+                    alt={optionA || 'optionA'}
+                    width={150}
+                    height={150}
+                    className="rounded-md"
+                  />
+                </a>
+              )}
+            </div>
+            <div className="flex w-full flex-col items-center">
+              <Progress
+                value={totalVotes > 0 ? (votesB / totalVotes) * 100 : 0}
+                className="mt-2"
+              />
+              <span className="mt-2 text-xs">
+                {totalVotes > 0
+                  ? `${Math.round((votesB / totalVotes) * 100)}%`
+                  : '0%'}
+              </span>
+            </div>
           </div>
         </div>
       )}
 
-      <div className="mt-4 flex items-center gap-4 text-gray-500">
+      <div className="mt-6 flex items-center gap-4 text-gray-500">
         <button onClick={onLikeToggle} className="flex items-center">
           {userLiked ? (
             <Heart size={18} color="red" className="mr-4" strokeWidth={2} />
