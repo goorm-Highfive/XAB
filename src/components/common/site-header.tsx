@@ -14,6 +14,7 @@ import Logo from '~/assets/svgs/logo.svg'
 
 function SiteHeader() {
   const pathname = usePathname()
+  const isNotLogin = pathname.startsWith('/account')
   const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -24,7 +25,7 @@ function SiteHeader() {
         error,
       } = await supabase.auth.getUser()
 
-      if (error) {
+      if (!isNotLogin && error) {
         console.error('Failed to fetch user:', error.message)
       } else if (user) {
         setUserId(user.id)
@@ -34,7 +35,7 @@ function SiteHeader() {
     fetchUser()
   }, [])
 
-  if (pathname.startsWith('/account')) {
+  if (isNotLogin) {
     return null
   }
 
