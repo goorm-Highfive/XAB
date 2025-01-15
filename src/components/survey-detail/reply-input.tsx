@@ -91,7 +91,7 @@ function ReplyInput({ username, postId, replyId, dept }: ReplyInputProps) {
               <Button
                 type="submit"
                 variant="ghost"
-                className="absolute right-2 top-1 w-[30px] hover:bg-transparent"
+                className="absolute right-2 top-[-4px] w-[30px] hover:bg-transparent"
               >
                 <Send />
               </Button>
