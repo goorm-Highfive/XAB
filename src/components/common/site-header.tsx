@@ -51,7 +51,7 @@ function SiteHeader() {
 
         {/* Navbar 메뉴 */}
         <nav className="flex items-center gap-4">
-          <Link href={userId ? `/profile/${userId}` : '/login'}>
+          <Link href={userId ? `/profile/${userId}` : '/account/login'}>
             <Button variant="ghost" className="flex items-center gap-2">
               <User className="h-5 w-5" />
               Profile
