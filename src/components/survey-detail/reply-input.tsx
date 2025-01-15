@@ -29,17 +29,10 @@ type ReplyInputProps = {
   username: string
   postId: number
   replyId: number | null
-  userId: string | null
   dept: number | null
 }
 
-function ReplyInput({
-  username,
-  postId,
-  replyId,
-  userId,
-  dept,
-}: ReplyInputProps) {
+function ReplyInput({ username, postId, replyId, dept }: ReplyInputProps) {
   const form = useForm<ReplyFormValues>({
     resolver: zodResolver(replySchema),
     defaultValues: { replyContent: '' },
@@ -56,7 +49,6 @@ function ReplyInput({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           post_id: postId,
-          user_id: userId,
           content: values.replyContent,
           parent_id: replyId,
           dept: (dept || 1) + 1,
@@ -99,7 +91,7 @@ function ReplyInput({
               <Button
                 type="submit"
                 variant="ghost"
-                className="absolute right-2 top-[-4] w-[30px] hover:bg-transparent"
+                className="absolute right-2 top-1 w-[30px] hover:bg-transparent"
               >
                 <Send />
               </Button>

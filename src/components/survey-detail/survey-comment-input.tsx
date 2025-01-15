@@ -30,10 +30,9 @@ type CommentFormValues = z.infer<typeof commentSchema>
 
 type SurveyCommentInputProp = {
   postId: number
-  userId: string | null
 }
 
-function SurveyCommentInput({ postId, userId }: SurveyCommentInputProp) {
+function SurveyCommentInput({ postId }: SurveyCommentInputProp) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<CommentFormValues>({
@@ -50,7 +49,6 @@ function SurveyCommentInput({ postId, userId }: SurveyCommentInputProp) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           post_id: postId,
-          user_id: userId,
           content: data.comment,
           parent_id: null,
           dept: null,
@@ -60,7 +58,7 @@ function SurveyCommentInput({ postId, userId }: SurveyCommentInputProp) {
       const result = await response.json()
       if (!result.success) throw new Error(result.error)
 
-      console.log(postId, userId, data.comment)
+      console.log(postId, data.comment)
 
       setTimeout(() => {
         form.reset()

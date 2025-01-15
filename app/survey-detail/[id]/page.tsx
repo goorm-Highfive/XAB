@@ -11,7 +11,6 @@ import { toggleLikeAPI } from '~/utils/toggleLikeAPI'
 import { voteSubmitAPI } from '~/utils/voteSubmitAPI'
 
 function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const [userId, setUserId] = useState<string | null>(null)
   const [postData, setPostData] = useState<SurveyCardProps>()
   const [comments, setComments] = useState<Comment[]>()
   const [loading, setLoading] = useState(true)
@@ -55,7 +54,6 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           voteComplete: data.voteComplete,
         })
         setComments(data.comments)
-        setUserId(data.userId)
 
         setError(null) // 에러 초기화
       } catch (err) {
@@ -206,7 +204,6 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
                     key={comment.id}
                     comment={comment}
                     postId={postData.postId}
-                    userId={userId}
                     handleCommentLikeToggle={handleCommentLikeToggle}
                   />
                 ))
@@ -215,7 +212,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
                   <p>Noting Comments</p>
                 </div>
               )}
-              <SurveyCommentInput postId={postData.postId} userId={userId} />
+              <SurveyCommentInput postId={postData.postId} />
             </CardContent>
           </Card>
         </div>
