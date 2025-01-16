@@ -11,7 +11,6 @@ import { toggleLikeAPI } from '~/utils/toggleLikeAPI'
 import { voteSubmitAPI } from '~/utils/voteSubmitAPI'
 
 function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const [userId, setUserId] = useState<string | null>(null)
   const [postData, setPostData] = useState<SurveyCardProps>()
   const [comments, setComments] = useState<Comment[]>()
   const [loading, setLoading] = useState(true)
@@ -40,22 +39,21 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           username: data.username || '',
           question: data.post.caption || 'Which option do you prefer?',
           post_image_url: data.post.image_url,
-          optionA: data.abTest.description_a,
-          optionB: data.abTest.description_b,
-          optionA_url: data.abTest.variant_a_url,
-          optionB_url: data.abTest.variant_b_url,
+          optionA: data.abTest?.description_a,
+          optionB: data.abTest?.description_b,
+          optionA_url: data.abTest?.variant_a_url,
+          optionB_url: data.abTest?.variant_b_url,
           votesA: data.votesA,
           votesB: data.votesB,
           initLikeCount: data.initLikeCount,
           userLiked: data.userLiked,
           commentsCount: data.commentsCount,
           userVote: data.userVote,
-          ab_test_id: data.abTest.id,
+          ab_test_id: data.abTest?.id,
           postId: data.post.id,
           voteComplete: data.voteComplete,
         })
         setComments(data.comments)
-        setUserId(data.userId)
 
         setError(null) // 에러 초기화
       } catch (err) {
@@ -187,35 +185,38 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   if (!postData) return <div>No data found</div>
 
   return (
-    <div className="container mx-auto py-8">
-      <SurveyCard
-        {...postData}
-        onLikeToggle={() => handleLikeToggle(postData.postId)}
-        onVoteSubmit={handleVoteSubmit}
-      />
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle>Comments ({comments?.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {comments ? (
-            comments.map((comment) => (
-              <SurveyComment
-                key={comment.id}
-                comment={comment}
-                postId={postData.postId}
-                userId={userId}
-                handleCommentLikeToggle={handleCommentLikeToggle}
-              />
-            ))
-          ) : (
-            <div>
-              <p>Noting Comments</p>
-            </div>
-          )}
-          <SurveyCommentInput postId={postData.postId} userId={userId} />
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-gray-100">
+      <div className="p-6">
+        <div className="mx-auto mt-6 max-w-3xl space-y-6">
+          <SurveyCard
+            {...postData}
+            onLikeToggle={() => handleLikeToggle(postData.postId)}
+            onVoteSubmit={handleVoteSubmit}
+          />
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Comments ({comments?.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {comments ? (
+                comments.map((comment) => (
+                  <SurveyComment
+                    key={comment.id}
+                    comment={comment}
+                    postId={postData.postId}
+                    handleCommentLikeToggle={handleCommentLikeToggle}
+                  />
+                ))
+              ) : (
+                <div>
+                  <p>Noting Comments</p>
+                </div>
+              )}
+              <SurveyCommentInput postId={postData.postId} />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }

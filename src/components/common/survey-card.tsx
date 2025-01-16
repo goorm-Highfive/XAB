@@ -148,7 +148,7 @@ function SurveyCard({
                 alt={question}
                 width={600}
                 height={400}
-                className="rounded-md"
+                className="h-auto w-full rounded-md"
               />
             </div>
           )}
@@ -192,7 +192,7 @@ function SurveyCard({
                     alt={optionA || 'optionA'}
                     width={150}
                     height={150}
-                    className="rounded-md"
+                    className="h-auto w-full rounded-md"
                   />
                 </a>
               )}
@@ -233,7 +233,7 @@ function SurveyCard({
                     alt={optionA || 'optionA'}
                     width={150}
                     height={150}
-                    className="rounded-md"
+                    className="h-auto w-full rounded-md"
                   />
                 </a>
               )}
