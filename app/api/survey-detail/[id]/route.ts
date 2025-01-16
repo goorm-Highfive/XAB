@@ -90,7 +90,7 @@ export async function GET(
     const { data, error: commentsError } = await supabase
       .from('comments')
       .select(
-        'id, content, created_at, user_id, parent_id, dept, post_id, users(username)',
+        'id, content, created_at, user_id, parent_id, dept, post_id, is_delete, users(username)',
       )
       .eq('post_id', postId)
     if (commentsError) throw new Error(commentsError.message)
