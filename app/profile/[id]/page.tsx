@@ -9,7 +9,6 @@ import { Post } from '~/types/post'
 
 function ProfilePage() {
   const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const { id } = useParams() // URL에서 id 추출
 
@@ -35,8 +34,6 @@ function ProfilePage() {
         } else {
           setError('An unexpected error occurred')
         }
-      } finally {
-        setLoading(false)
       }
     }
 
@@ -149,10 +146,6 @@ function ProfilePage() {
     } catch (err) {
       console.error('Vote submission error:', err)
     }
-  }
-
-  if (loading) {
-    return <p>Loading...</p>
   }
 
   if (error) {
