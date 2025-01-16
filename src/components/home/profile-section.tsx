@@ -11,6 +11,7 @@ import {
 } from '~/components/ui/card'
 import { createClient } from '~/utils/supabase/client'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
+import { Skeleton } from '~/components/ui/skeleton'
 
 function ProfileSection() {
   const [user, setUser] = useState<{
@@ -70,16 +71,34 @@ function ProfileSection() {
     }
   }, [authUserId])
 
-  if (loading) {
-    return <div>Loading profile...</div>
-  }
-
   if (error) {
     return <div>Error: {error}</div>
   }
 
-  if (!user) {
-    return <div>No user data found</div>
+  if (loading || !user) {
+    // 섬세한 스켈레톤 UI
+    return (
+      <Card className="static top-[92px] mb-6 w-full lg:sticky lg:w-72">
+        <CardHeader className="items-center gap-5">
+          <Skeleton className="h-20 w-20 rounded-full" /> {/* 프로필 이미지 */}
+          <div className="flex flex-col items-center gap-1.5 text-center">
+            <Skeleton className="h-6 w-24" /> {/* 사용자 이름 */}
+            <Skeleton className="h-4 w-40" /> {/* 사용자 설명 */}
+          </div>
+        </CardHeader>
+        <CardContent className="grid grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="flex flex-col items-center gap-1 text-center"
+            >
+              <Skeleton className="h-4 w-8" /> {/* 숫자 */}
+              <Skeleton className="h-4 w-16" /> {/* 텍스트 */}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
