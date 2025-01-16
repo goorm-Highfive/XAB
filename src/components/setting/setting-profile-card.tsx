@@ -10,11 +10,23 @@ function ProfileCard({ username, profileImageUrl }: ProfileCardProps) {
   return (
     <div className="flex items-center">
       {/* Avatar */}
-      <div className="mr-4">
+      <div className="relative mr-4 h-[60px] w-[60px] overflow-hidden rounded-full">
         {profileImageUrl ? (
-          <Image width={60} height={60} src={profileImageUrl} alt="" />
+          <Image
+            fill
+            className="object-cover"
+            src={profileImageUrl}
+            sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+            alt=""
+          />
         ) : (
-          <Image width={60} height={60} src={defaultProfile} alt="" />
+          <Image
+            fill
+            className="object-cover"
+            src={defaultProfile}
+            sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+            alt=""
+          />
         )}
       </div>
       {/* User Info */}

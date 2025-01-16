@@ -113,11 +113,27 @@ function SurveyCard({
       <Link href={`/survey-detail/${postId}`}>
         <div className="block cursor-pointer">
           <div className="mb-4 flex items-center gap-2">
-            {userProfileImage ? (
-              <Image width={40} height={40} src={userProfileImage} alt="" />
-            ) : (
-              <Image width={40} height={40} src={defaultProfile} alt="" />
-            )}
+            <div className="relative mr-4 h-[40px] w-[40px] overflow-hidden rounded-full">
+              {userProfileImage ? (
+                <Image
+                  fill
+                  className="object-cover"
+                  src={userProfileImage}
+                  alt={username}
+                  sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+                  priority
+                />
+              ) : (
+                <Image
+                  fill
+                  className="object-cover"
+                  src={defaultProfile}
+                  alt={username}
+                  sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+                  priority
+                />
+              )}
+            </div>
             <div>
               <p className="text-sm font-medium">{username}</p>
               <p className="text-xs text-gray-500">{date}</p>
