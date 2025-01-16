@@ -1,10 +1,12 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
+import defaultProfile from '~/assets/svgs/default-profile.svg'
+
 
 type SuggestedUser = {
   id: string
@@ -127,17 +129,27 @@ function SuggestSection() {
           <ul className="space-y-4">
             {suggestedUsers.map((item) => (
               <li key={item.id} className="flex items-center gap-3">
-                {/* Avatar */}
-                <Avatar>
-                  <AvatarImage
-                    src={item.profile_image || '/default-avatar.png'}
-                    alt={item.username}
-                  />
-                  <AvatarFallback>
-                    {item.username.slice(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-
+                <div className="relative h-10 w-10 overflow-hidden rounded-full">
+                  {item.profile_image ? (
+                    <Image
+                      fill
+                      className="object-cover"
+                      src={item.profile_image}
+                      alt={item.username}
+                      sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+                      priority
+                    />
+                  ) : (
+                    <Image
+                      fill
+                      className="object-cover"
+                      src={defaultProfile}
+                      alt={item.username}
+                      sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+                      priority
+                    />
+                  )}
+                </div>
                 {/* User Info */}
                 <div className="flex flex-1 flex-col">
                   <span className="font-bold">{item.username}</span>

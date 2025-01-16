@@ -104,20 +104,24 @@ function ProfileSection() {
   return (
     <Card className="static top-[92px] mb-6 w-full lg:sticky lg:w-72">
       <CardHeader className="items-center gap-5">
-        <div>
+        <div className="relative h-[70px] w-[70px] overflow-hidden rounded-full">
           {user.profile_image ? (
             <Image
-              width={80}
-              height={80}
+              className="object-cover"
               src={user.profile_image}
               alt={`@${user.username}`}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              fill
+              priority
             />
           ) : (
             <Image
-              width={80}
-              height={80}
+              className="object-cover"
               src={defaultProfile}
               alt={`@${user.username}`}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              fill
+              priority
             />
           )}
         </div>

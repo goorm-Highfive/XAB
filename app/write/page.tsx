@@ -54,7 +54,7 @@ export default function Write() {
     resolver: zodResolver(writeSchema),
     defaultValues: {
       body: '',
-      type: undefined,
+      type: '',
       textA: '',
       textB: '',
     },

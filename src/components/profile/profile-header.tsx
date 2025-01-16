@@ -110,11 +110,23 @@ function ProfileHeader() {
   return (
     <div className="flex flex-col rounded-lg bg-white p-6 shadow">
       {/* Avatar */}
-      <div className="mb-4">
+      <div className="relative mb-4 h-[70px] w-[70px] overflow-hidden rounded-full">
         {userData?.profile_image ? (
-          <Image width={80} height={80} src={userData?.profile_image} alt="" />
+          <Image
+            fill
+            className="object-cover"
+            src={userData?.profile_image}
+            sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+            alt=""
+          />
         ) : (
-          <Image width={80} height={80} src={defaultProfile} alt="" />
+          <Image
+            fill
+            className="object-cover"
+            src={defaultProfile}
+            sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+            alt=""
+          />
         )}
       </div>
       {/* Header 상단 */}

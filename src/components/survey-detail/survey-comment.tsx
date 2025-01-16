@@ -8,14 +8,12 @@ import { ReplyInput } from './reply-input'
 
 type SurveyCommentProps = {
   comment: Comment
-  userId: string | null
   postId?: number
   handleCommentLikeToggle: (id: number) => void
 }
 
 function SurveyComment({
   comment,
-  userId,
   handleCommentLikeToggle,
 }: SurveyCommentProps) {
   const {
@@ -80,17 +78,15 @@ function SurveyComment({
           <div key={reply.id} className="ml-5 mt-5 rounded-lg">
             <SurveyComment
               comment={reply}
-              userId={userId}
               handleCommentLikeToggle={handleCommentLikeToggle}
             />
           </div>
         ))}
 
-        {reply && userId && (
+        {reply && (
           <ReplyInput
             username={username}
             postId={post_id}
-            userId={userId}
             replyId={replyId}
             dept={dept}
           />

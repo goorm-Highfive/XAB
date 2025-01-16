@@ -31,15 +31,16 @@ export async function GET(
       .single()
     if (postError) throw new Error(postError.message)
 
-    //AB Tests 데이터
-    const { data: abTest, error: abTestError } = await supabase
+    //AB Tests 데이터 -> default type의 경우 데이터가 없을 수도 있음
+    const { data: abTestData, error: abTestError } = await supabase
       .from('ab_tests')
       .select('*')
       .eq('post_id', postId)
       .single()
-    if (abTestError) throw new Error('Failed to fetch AB Test data')
 
-    // UserName 데이터
+    const abTest = abTestError ? null : abTestData
+
+    // UserName 데이터 -> 포스트 작성자 이름을 반환
     const { user_id: userId } = post
     const { data: user, error: userError } = await supabase
       .from('users')
