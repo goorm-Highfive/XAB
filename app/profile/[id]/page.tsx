@@ -5,11 +5,14 @@ import { useParams } from 'next/navigation'
 
 import { ProfileHeader } from '~/components/profile/profile-header'
 import { SurveyCard } from '~/components/common/survey-card'
+import { Skeleton } from '~/components/ui/skeleton'
 import { Post } from '~/types/post'
+import { SurveyCardSkeleton } from '~/components/common/surveycard-skeleton'
 
 function ProfilePage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true) // 로딩 상태 추가
   const { id } = useParams() // URL에서 id 추출
 
   useEffect(() => {
@@ -17,6 +20,7 @@ function ProfilePage() {
       const apiUrl = `/api/profile/${id}/user-posts` // 상대 경로 사용
 
       try {
+        setLoading(true)
         const res = await fetch(apiUrl, {
           cache: 'no-store',
         })
@@ -34,6 +38,8 @@ function ProfilePage() {
         } else {
           setError('An unexpected error occurred')
         }
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -42,14 +48,13 @@ function ProfilePage() {
 
   const handleLikeToggle = async (postId: number) => {
     try {
-      // 서버에 좋아요 토글 요청
       const res = await fetch('/api/like', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ postId }),
-        credentials: 'include', // 쿠키 포함
+        credentials: 'include',
       })
 
       if (!res.ok) {
@@ -59,7 +64,6 @@ function ProfilePage() {
 
       const data = await res.json()
 
-      // 서버 응답에 따라 로컬 상태 업데이트
       const updatedPosts = posts.map((post: Post) => {
         if (post.post_id === postId) {
           return {
@@ -77,7 +81,6 @@ function ProfilePage() {
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message)
-        // 사용자에게 에러를 표시할 수 있는 로직 추가 (예: 알림)
       } else {
         console.error('An unexpected error occurred')
       }
@@ -86,9 +89,6 @@ function ProfilePage() {
 
   const handleVoteSubmit = async (abTestId: number, option: 'A' | 'B') => {
     try {
-      console.log('Submitting vote for abTestId:', abTestId)
-      console.log('Option selected:', option)
-
       if (option !== 'A' && option !== 'B') {
         throw new Error('Invalid option type')
       }
@@ -108,13 +108,10 @@ function ProfilePage() {
       }
 
       const data = await res.json()
-      console.log('Vote response:', data)
 
-      // 상태 업데이트 로직
       if (data.voted) {
         const updatedPosts = posts.map((post: Post) => {
           if (post.ab_test_id === abTestId) {
-            // 이전 투표를 취소하고 새로운 투표를 반영
             const previousVote = post.userVote
             let newVotesA = post.votesA
             let newVotesB = post.votesB
@@ -148,10 +145,42 @@ function ProfilePage() {
     }
   }
 
+  if (loading) {
+    // 로딩 중 스켈레톤 UI
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <div className="p-6">
+          <div className="mx-auto mt-6 max-w-3xl space-y-6">
+            {/* Profile Header Skeleton */}
+            <div className="rounded-lg border bg-white p-6 shadow">
+              <div className="mb-4 flex items-center gap-4">
+                <Skeleton className="h-16 w-16 rounded-full" /> {/* Avatar */}
+                <div>
+                  <Skeleton className="mb-2 h-6 w-32" /> {/* Username */}
+                  <Skeleton className="h-4 w-24" /> {/* Bio */}
+                </div>
+              </div>
+              <div className="flex gap-6">
+                <Skeleton className="h-6 w-16" /> {/* Following */}
+                <Skeleton className="h-6 w-16" /> {/* Followers */}
+                <Skeleton className="h-6 w-16" /> {/* Posts */}
+              </div>
+            </div>
+
+            {/* Survey Cards Skeleton */}
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <SurveyCardSkeleton key={idx} />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (error) {
     return <p className="text-red-500">Error: {error}</p>
   }
-  console.log(posts)
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="p-6">
