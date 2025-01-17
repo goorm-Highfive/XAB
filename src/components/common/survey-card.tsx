@@ -15,6 +15,7 @@ export type SurveyCardProps = {
   post?: Tables<'posts'>
   abTest?: Tables<'ab_tests'>
   date: string
+  userId: string
   username: string
   question: string
   post_image_url: string | null
@@ -37,6 +38,7 @@ export type SurveyCardProps = {
 
 function SurveyCard({
   date,
+  userId,
   username,
   question,
   post_image_url,
@@ -57,7 +59,7 @@ function SurveyCard({
 }: SurveyCardProps) {
   const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
   //const [error, setError] = useState<string | null>(null)
-
+  console.log('userid: ' + userId)
   useEffect(() => {
     const supabase = createClient()
     const fetchProfileImage = async () => {
@@ -110,52 +112,21 @@ function SurveyCard({
 
   return (
     <Card className="mb-4 p-6 shadow-sm">
-      <Link href={`/survey-detail/${postId}`}>
-        <div className="block cursor-pointer">
-          <div className="mb-4 flex items-center gap-2">
-            <div className="relative mr-4 h-[40px] w-[40px] overflow-hidden rounded-full">
-              {userProfileImage ? (
-                <Image
-                  fill
-                  className="object-cover"
-                  src={userProfileImage}
-                  alt={username}
-                  sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
-                  priority
-                />
-              ) : (
-                <Image
-                  fill
-                  className="object-cover"
-                  src={defaultProfile}
-                  alt={username}
-                  sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
-                  priority
-                />
-              )}
-            </div>
-            <div>
-              <p className="text-sm font-medium">{username}</p>
-              <p className="text-xs text-gray-500">{date}</p>
-            </div>
+      <div className="mb-4 flex items-center gap-4">
+        <Link href={`/profile/${userId}`} className="flex items-center gap-4">
+          <Image
+            src={userProfileImage || defaultProfile}
+            alt={username}
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+          <div>
+            <p className="text-sm font-medium">{username}</p>
+            <p className="text-xs text-gray-500">{date}</p>
           </div>
-          <p className="mb-4 text-gray-800">{question}</p>
-
-          {post_image_url && (
-            <div className="mb-4">
-              <Image
-                src={post_image_url || 'post_image'}
-                alt={question}
-                width={600}
-                height={400}
-                className="h-auto w-full rounded-md"
-              />
-            </div>
-          )}
-        </div>
-      </Link>
-
-      {/* 투표 에러 메시지 표시 */}
+        </Link>
+      </div>
       {voteError && (
         <div
           className="relative mb-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
@@ -165,6 +136,18 @@ function SurveyCard({
           <span className="block sm:inline">{voteError}</span>
         </div>
       )}
+      <Link href={`/survey-detail/${postId}`} className="block">
+        <p className="mb-4 text-gray-800">{question}</p>
+        {post_image_url && (
+          <Image
+            src={post_image_url}
+            alt={question}
+            width={600}
+            height={400}
+            className="h-auto w-full rounded-md"
+          />
+        )}
+      </Link>
 
       {/* AB 테스트가 있는 경우에만 투표 옵션 표시 */}
       {ab_test_id && (

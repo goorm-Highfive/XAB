@@ -10,42 +10,6 @@ export async function GET(
 
   console.log('API 호출 시작')
   try {
-    // 1) Supabase Auth 세션 확인
-    const {
-      data: { user },
-      error: sessionError,
-    } = await supabase.auth.getUser()
-
-    if (sessionError) {
-      throw new Error(sessionError.message)
-    }
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const userId = user.id
-    console.log('로그인된 유저 ID:', userId)
-
-    // 2) 팔로우하는 유저들의 ID 가져오기
-    const { data: followingData, error: followingError } = await supabase
-      .from('follows')
-      .select('following_id')
-      .eq('follower_id', id)
-
-    if (followingError) {
-      throw new Error(followingError.message)
-    }
-
-    const followingIds =
-      followingData?.map((follow) => follow.following_id) || []
-    console.log('팔로우하는 유저 ID들:', followingIds)
-
-    if (followingIds.length === 0) {
-      // 팔로우하는 유저가 없으면 빈 배열 반환
-      return NextResponse.json({ data: [] }, { status: 200 })
-    }
-
     const { data: posts, error: postsError } = await supabase
       .from('posts')
       .select(
@@ -77,7 +41,7 @@ export async function GET(
       users: user_id (username)
       `,
       )
-      .eq('user_id', userId)
+      .eq('user_id', id)
       .order('created_at', { ascending: false })
     console.log(posts)
     if (postsError) {
@@ -95,7 +59,7 @@ export async function GET(
       .from('likes')
       .select('post_id')
       .in('post_id', postIds)
-      .eq('user_id', userId)
+      .eq('user_id', id)
 
     if (userLikesError) {
       throw new Error(userLikesError.message)
@@ -112,7 +76,7 @@ export async function GET(
 
         if (post.ab_tests && post.ab_tests[0]?.ab_test_votes) {
           const abTestVotes = post.ab_tests[0].ab_test_votes
-          userVote = abTestVotes.find((vote) => vote.user_id === userId)
+          userVote = abTestVotes.find((vote) => vote.user_id === id)
             ?.preferred_variant as 'A' | 'B' | null
 
           votesA = abTestVotes.filter(
