@@ -167,6 +167,7 @@ export async function GET(
       voteComplete,
       initLikeCount,
       comments: roots,
+      currentUserId,
     })
   } catch (error) {
     console.error('Unexpected Error:', error)

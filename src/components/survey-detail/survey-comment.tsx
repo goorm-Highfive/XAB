@@ -18,17 +18,20 @@ import { toast } from 'sonner'
 type SurveyCommentProps = {
   comment: Comment
   postId?: number
+  currentUserId?: string
   handleCommentLikeToggle: (id: number) => void
 }
 
 function SurveyComment({
   comment,
+  currentUserId,
   handleCommentLikeToggle,
 }: SurveyCommentProps) {
   const {
     id,
     dept,
     username,
+    user_id,
     content,
     created_at,
     likeCount,
@@ -43,6 +46,11 @@ function SurveyComment({
   const [editContent, setEditContent] = useState<string>(content)
 
   const handleEdit = () => {
+    if (currentUserId !== user_id) {
+      toast.error(`You are not allowed to edit other user's comments.`)
+      return
+    }
+
     setIsEditing(true)
     console.log(id)
   }
@@ -70,6 +78,11 @@ function SurveyComment({
   }
 
   const handleDelete = async () => {
+    if (currentUserId !== user_id) {
+      toast.error(`You are not allowed to delete other user's comments.`)
+      return
+    }
+
     const response = await fetch('/api/comments/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

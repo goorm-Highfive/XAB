@@ -12,6 +12,7 @@ import { voteSubmitAPI } from '~/utils/voteSubmitAPI'
 import { Skeleton } from '~/components/ui/skeleton'
 
 function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const [currentUserId, setCurrentUserId] = useState<string>('')
   const [postData, setPostData] = useState<SurveyCardProps>()
   const [comments, setComments] = useState<Comment[]>()
   const [loading, setLoading] = useState(true)
@@ -19,7 +20,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { id } = await params
+      const { id } = await params // post id
 
       if (!id) {
         setError('id is not define')
@@ -55,6 +56,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           voteComplete: data.voteComplete,
         })
         setComments(data.comments)
+        setCurrentUserId(data.currentUserId)
 
         setError(null) // 에러 초기화
       } catch (err) {
@@ -255,6 +257,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
                     key={comment.id}
                     comment={comment}
                     postId={postData.postId}
+                    currentUserId={currentUserId}
                     handleCommentLikeToggle={handleCommentLikeToggle}
                   />
                 ))
