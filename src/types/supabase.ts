@@ -129,8 +129,9 @@ export type Database = {
         Row: {
           content: string
           created_at: string
-          dept: number | null
+          dept: number
           id: number
+          is_delete: boolean
           parent_id: number | null
           post_id: number
           user_id: string
@@ -138,8 +139,9 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
-          dept?: number | null
+          dept?: number
           id?: number
+          is_delete?: boolean
           parent_id?: number | null
           post_id: number
           user_id: string
@@ -147,8 +149,9 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
-          dept?: number | null
+          dept?: number
           id?: number
+          is_delete?: boolean
           parent_id?: number | null
           post_id?: number
           user_id?: string

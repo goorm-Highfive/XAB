@@ -8,7 +8,6 @@ import { Skeleton } from '~/components/ui/skeleton'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
 import Link from 'next/link'
 
-
 type SuggestedUser = {
   id: string
   profile_image: string | null

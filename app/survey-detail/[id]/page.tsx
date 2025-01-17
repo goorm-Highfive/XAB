@@ -239,6 +239,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
                   <SurveyComment
                     key={comment.id}
                     comment={comment}
+                    currentUserId={postData.userId}
                     postId={postData.postId}
                     handleCommentLikeToggle={handleCommentLikeToggle}
                   />

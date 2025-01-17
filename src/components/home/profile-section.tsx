@@ -76,7 +76,6 @@ function ProfileSection() {
   }
 
   if (loading || !user) {
-
     return (
       <Card className="static top-[92px] mb-6 w-full lg:sticky lg:w-72">
         <CardHeader className="items-center gap-5">
