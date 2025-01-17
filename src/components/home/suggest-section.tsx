@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { Skeleton } from '~/components/ui/skeleton'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
+import Link from 'next/link'
 
 type SuggestedUser = {
   id: string
@@ -128,37 +129,41 @@ function SuggestSection() {
           <ul className="space-y-4">
             {suggestedUsers.map((item) => (
               <li key={item.id} className="flex items-center gap-3">
-                <div className="relative h-10 w-10 overflow-hidden rounded-full">
-                  {item.profile_image ? (
-                    <Image
-                      fill
-                      className="object-cover"
-                      src={item.profile_image}
-                      alt={item.username}
-                      sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
-                      priority
-                    />
-                  ) : (
-                    <Image
-                      fill
-                      className="object-cover"
-                      src={defaultProfile}
-                      alt={item.username}
-                      sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
-                      priority
-                    />
-                  )}
-                </div>
-                {/* User Info */}
-                <div className="flex flex-1 flex-col">
-                  <span className="font-bold">{item.username}</span>
-                  <span className="text-sm text-muted-foreground">
-                    {item.bio || '소개글이 없습니다.'}
-                  </span>
-                </div>
-
+                <Link
+                  href={`/profile/${item.id}`}
+                  className="flex justify-between gap-4"
+                >
+                  <div className="relative h-10 w-10 overflow-hidden rounded-full">
+                    {item.profile_image ? (
+                      <Image
+                        fill
+                        className="object-cover"
+                        src={item.profile_image}
+                        alt={item.username}
+                        sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+                        priority
+                      />
+                    ) : (
+                      <Image
+                        fill
+                        className="object-cover"
+                        src={defaultProfile}
+                        alt={item.username}
+                        sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+                        priority
+                      />
+                    )}
+                  </div>
+                  {/* User Info */}
+                  <div className="flex flex-1 flex-col">
+                    <span className="font-bold">{item.username}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {item.bio || '소개글이 없습니다.'}
+                    </span>
+                  </div>
+                </Link>
                 {/* Follow Button */}
-                <div className="flex flex-col items-end">
+                <div className="ml-auto flex flex-col items-end">
                   <Button
                     size="sm"
                     variant="outline"
