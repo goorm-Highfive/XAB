@@ -12,7 +12,6 @@ import { Post } from '~/types/post'
 
 export default function HomePage() {
   const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -37,30 +36,11 @@ export default function HomePage() {
         } else {
           setError('An unexpected error occurred')
         }
-      } finally {
-        setLoading(false)
       }
     }
 
     fetchPosts()
   }, [])
-
-  // useEffect(() => {
-  //   async function fetchUser() {
-  //     try {
-  //       const res = await fetch('/api/user', { credentials: 'include' });
-  //       if (!res.ok) {
-  //         throw new Error('Failed to fetch user');
-  //       }
-  //       const userData = await res.json();
-  //       setUser(userData);
-  //     } catch (err) {
-  //       console.error('User fetch error:', err);
-  //     }
-  //   }
-
-  //   fetchUser();
-  // }, []);
 
   const handleLikeToggle = async (postId: number) => {
     try {
@@ -142,10 +122,6 @@ export default function HomePage() {
     }
   }
 
-  if (loading) {
-    return <div>Loading posts...</div>
-  }
-
   if (error) {
     return <div>Error: {error}</div>
   }
@@ -153,7 +129,9 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="mx-auto max-w-screen-2xl items-start gap-6 p-6 lg:flex">
-        <ProfileSection />
+        <div className="lg:w-72">
+          <ProfileSection />
+        </div>
         <div className="flex-1 space-y-6">
           <NewSurveyButton />
           <SurveyList

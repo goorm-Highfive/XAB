@@ -4,7 +4,9 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
+import { Skeleton } from '~/components/ui/skeleton'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
+
 
 type SuggestedUser = {
   id: string
@@ -46,9 +48,7 @@ function SuggestSection() {
 
   const handleFollow = async (userId: string) => {
     try {
-      // 로딩 상태 추가
       setLoadingIds((prev) => new Set(prev).add(userId))
-      // 오류 상태 초기화
       setErrorIds((prev) => {
         const newMap = new Map(prev)
         newMap.delete(userId)
@@ -64,10 +64,8 @@ function SuggestSection() {
         throw new Error(errorData.error || '팔로우 요청에 실패했습니다.')
       }
 
-      // 성공 시 사용자 목록에서 제거
       setSuggestedUsers((prev) => prev.filter((user) => user.id !== userId))
     } catch (err: unknown) {
-      // 오류 상태 업데이트
       setErrorIds((prev) => {
         const newMap = new Map(prev)
         newMap.set(
@@ -79,7 +77,6 @@ function SuggestSection() {
         return newMap
       })
     } finally {
-      // 로딩 상태 제거
       setLoadingIds((prev) => {
         const newSet = new Set(prev)
         newSet.delete(userId)
@@ -89,7 +86,33 @@ function SuggestSection() {
   }
 
   if (loading) {
-    return <p>추천 사용자 불러오는 중...</p>
+    // 스켈레톤 UI
+    return (
+      <div className="sticky top-[92px] hidden w-72 flex-col gap-4 xl:flex">
+        <Card>
+          <CardHeader>
+            <CardTitle>추천 사용자</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-4">
+              {Array.from({ length: 5 }).map((_, idx) => (
+                <li key={idx} className="flex items-center gap-3">
+                  {/* Avatar Skeleton */}
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  {/* User Info Skeleton */}
+                  <div className="flex flex-1 flex-col space-y-1">
+                    <Skeleton className="h-5 w-24" /> {/* Username */}
+                    <Skeleton className="h-4 w-40" /> {/* Bio */}
+                  </div>
+                  {/* Button Skeleton */}
+                  <Skeleton className="h-8 w-16 rounded" />
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   if (error) {

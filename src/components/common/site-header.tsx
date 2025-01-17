@@ -33,7 +33,9 @@ function SiteHeader() {
     }
 
     fetchUser()
-  }, [isNotLogin])
+
+  })
+
 
   if (isNotLogin) {
     return null
