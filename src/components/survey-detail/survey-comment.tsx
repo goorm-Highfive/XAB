@@ -47,12 +47,20 @@ function SurveyComment({
   const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
-  // 수정 모드: 댓글을 단 유저랑 현재 로그인 한 유저가 다르면 수정 불가
-  const handleEdit = () => {
+  // 댓글을 단 유저랑 현재 로그인 한 유저가 같은가? 다르면 수정 및 삭제 불가
+  const isAuthorized = () => {
     if (currentUserId !== user_id) {
-      toast.error(`You are not allowed to edit other user's comments.`)
-      return
+      toast.error(
+        `You are not allowed to edit or delete other user's comments.`,
+      )
+      return false
     }
+    return true
+  }
+
+  // 수정 모드
+  const handleEdit = () => {
+    if (!isAuthorized()) return
 
     setIsEditing(true)
     console.log(id)
@@ -82,22 +90,35 @@ function SurveyComment({
     toast.success('The comment has been successfully updated')
   }
 
-  // 삭제: 댓글을 단 유저랑 현재 로그인 한 유저가 다르면 삭제 불가, Alert 먼저 뜸 -> 수락시 삭제
-  const handleDelete = async () => {
-    if (currentUserId !== user_id) {
-      toast.error(`You are not allowed to delete other user's comments.`)
-      return
+  // 삭제: 댓글을 단 유저랑 현재 로그인 한 유저가 다른지 확인 후 다르면 알림창 대신 toast 뜸
+  const handleMenuItemClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isAuthorized()) {
+      setIsAlertOpen(false)
+    } else {
+      e.preventDefault() //DropdownMenu는 메뉴 선택 시 닫힘 -> Alert도 같이 닫혀서 사용해줌
+      setIsAlertOpen(true)
+      setIsOpen(false)
     }
-    const response = await fetch('/api/comments/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: id,
-      }),
-    })
-    const result = await response.json()
-    if (!result.success) throw new Error(result.error)
-    toast.success(`The comment has been successfully deleted.`)
+  }
+
+  // 댓글 삭제
+  const handleDelete = async () => {
+    if (!isAuthorized()) return
+
+    try {
+      const response = await fetch('/api/comments/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: id,
+        }),
+      })
+      const result = await response.json()
+      if (!result.success) throw new Error(result.error)
+      toast.success(`The comment has been successfully deleted.`)
+    } catch {
+      toast.error('An error occurred while deleting the comment.')
+    }
   }
 
   return (
@@ -123,13 +144,7 @@ function SurveyComment({
                     <DropdownMenuItem onClick={handleEdit}>
                       Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={(e) => {
-                        e.preventDefault() //DropdownMenu는 메뉴 선택 시 닫힘 -> Alert도 같이 닫혀서 사용해줌
-                        setIsAlertOpen(true)
-                        setIsOpen(false)
-                      }}
-                    >
+                    <DropdownMenuItem onClick={(e) => handleMenuItemClick(e)}>
                       Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -157,7 +172,7 @@ function SurveyComment({
                     className="text-neutral-600 hover:text-neutral-950"
                     onClick={handleCancel}
                   >
-                    Cancle
+                    Cancel
                   </button>
                   <button
                     className="text-neutral-600 hover:text-neutral-950"
