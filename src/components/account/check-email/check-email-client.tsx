@@ -35,7 +35,7 @@ function CheckEmailClient({ email }: { email: string | undefined }) {
       type: 'signup',
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/account/login`,
+        emailRedirectTo: `${window.location.origin}/auth/confirm`,
       },
     })
 
