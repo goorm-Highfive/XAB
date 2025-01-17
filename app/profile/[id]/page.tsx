@@ -38,8 +38,6 @@ function ProfilePage() {
         } else {
           setError('An unexpected error occurred')
         }
-      } finally {
-        setLoading(false)
       }
     }
 
