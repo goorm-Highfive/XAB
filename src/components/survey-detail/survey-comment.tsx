@@ -220,6 +220,7 @@ function SurveyComment({
           <div key={reply.id} className="ml-5 mt-5 rounded-lg">
             <SurveyComment
               comment={reply}
+              currentUserId={currentUserId}
               handleCommentLikeToggle={handleCommentLikeToggle}
             />
           </div>
