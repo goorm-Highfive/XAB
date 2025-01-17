@@ -10,6 +10,7 @@ import Link from 'next/link'
 import { Tables } from '~/types/supabase'
 import { createClient } from '~/utils/supabase/client'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
+import { useRouter } from 'next/navigation'
 
 export type SurveyCardProps = {
   post?: Tables<'posts'>
@@ -57,9 +58,9 @@ function SurveyCard({
   ab_test_id,
   postId,
 }: SurveyCardProps) {
+  const router = useRouter()
   const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
   //const [error, setError] = useState<string | null>(null)
-  console.log('userid: ' + userId)
   useEffect(() => {
     const supabase = createClient()
     const fetchProfileImage = async () => {
@@ -110,17 +111,27 @@ function SurveyCard({
     }
   }
 
+  const moveDetailPage = () => {
+    router.push(`/survey-detail/${postId}`)
+  }
+
   return (
-    <Card className="mb-4 p-6 shadow-sm">
+    <Card
+      className="mb-4 cursor-pointer p-6 shadow-sm"
+      onClick={moveDetailPage}
+    >
       <div className="mb-4 flex items-center gap-4">
         <Link href={`/profile/${userId}`} className="flex items-center gap-4">
-          <Image
-            src={userProfileImage || defaultProfile}
-            alt={username}
-            width={40}
-            height={40}
-            className="rounded-full"
-          />
+          <div className="relative mr-4 h-[40px] w-[40px] overflow-hidden rounded-full">
+            <Image
+              fill
+              className="object-cover"
+              src={userProfileImage || defaultProfile}
+              alt={username}
+              sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+              priority
+            />
+          </div>
           <div>
             <p className="text-sm font-medium">{username}</p>
             <p className="text-xs text-gray-500">{date}</p>
