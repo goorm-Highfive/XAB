@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-import SurveyList from '#/home/survey-list'
+import SurveyList from '~/components/home/survey-list'
 import { ProfileSection } from '~/components/home/profile-section'
 import { SuggestSection } from '~/components/home/suggest-section'
 import { NewSurveyButton } from '~/components/home/new-survey-button'

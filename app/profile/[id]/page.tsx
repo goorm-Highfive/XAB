@@ -38,6 +38,8 @@ function ProfilePage() {
         } else {
           setError('An unexpected error occurred')
         }
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -187,6 +189,7 @@ function ProfilePage() {
           {posts.map((post) => (
             <SurveyCard
               key={post.post_id}
+              userId={post.post_user_id}
               postId={post.post_id}
               ab_test_id={post.ab_test_id}
               date={post.post_created_at.split('T')[0] ?? 'Unknown date'}

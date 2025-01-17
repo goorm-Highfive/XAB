@@ -22,9 +22,7 @@ export default function SurveyList({
     return (
       <div className="space-y-4">
         {Array.from({ length: 3 }).map((_, idx) => (
-
           <SurveyCardSkeleton key={idx} />
-
         ))}
       </div>
     )
