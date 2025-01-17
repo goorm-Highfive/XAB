@@ -76,7 +76,7 @@ function ProfileSection() {
   }
 
   if (loading || !user) {
-    // 섬세한 스켈레톤 UI
+
     return (
       <Card className="static top-[92px] mb-6 w-full lg:sticky lg:w-72">
         <CardHeader className="items-center gap-5">

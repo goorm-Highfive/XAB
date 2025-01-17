@@ -2,6 +2,7 @@
 
 import { SurveyCard } from '~/components/common/survey-card'
 import { SurveyCardSkeleton } from '~/components/common/surveycard-skeleton'
+
 import { Post } from '~/types/post'
 
 interface SurveyListProps {
@@ -21,7 +22,9 @@ export default function SurveyList({
     return (
       <div className="space-y-4">
         {Array.from({ length: 3 }).map((_, idx) => (
+
           <SurveyCardSkeleton key={idx} />
+
         ))}
       </div>
     )
