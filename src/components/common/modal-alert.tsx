@@ -12,9 +12,11 @@ type ModalAlertProps = {
   title: string
   description: string
   buttonTitle: string
+  secondButtonTitle?: string
   open: boolean
   onClose: () => void
-  alertAction: () => void
+  secondAlertAction?: () => void
+  alertAction?: () => void
 }
 
 function ModalAlert({
@@ -22,9 +24,18 @@ function ModalAlert({
   description,
   buttonTitle,
   open,
+  secondButtonTitle,
+  secondAlertAction,
   onClose,
   alertAction,
 }: ModalAlertProps) {
+  const secondButtonClose = async () => {
+    if (secondAlertAction) {
+      secondAlertAction()
+    }
+    onClose()
+  }
+
   return (
     <AlertDialog open={open} onOpenChange={() => onClose()}>
       <AlertDialogContent className="max-w-md px-5">
@@ -33,12 +44,23 @@ function ModalAlert({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <Button
-            onClick={alertAction}
-            className="mt-4 w-full py-6 font-semibold"
-          >
-            {buttonTitle}
-          </Button>
+          <div className="flex w-full gap-8">
+            <Button
+              onClick={alertAction}
+              className="mt-4 w-full py-6 font-semibold"
+            >
+              {buttonTitle}
+            </Button>
+            {secondButtonTitle && (
+              <Button
+                variant="destructive"
+                onClick={secondButtonClose}
+                className="mt-4 w-full py-6 font-semibold"
+              >
+                {secondButtonTitle}
+              </Button>
+            )}
+          </div>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { Send } from 'lucide-react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 
 import defaultProfile from '~/assets/svgs/default-profile.svg'
 import { Button } from '~/components/ui/button'
@@ -62,6 +63,7 @@ function SurveyCommentInput({ postId }: SurveyCommentInputProp) {
 
       setTimeout(() => {
         form.reset()
+        toast.success('The comment has been successfully added.')
         setIsSubmitting(false)
       }, 500)
 

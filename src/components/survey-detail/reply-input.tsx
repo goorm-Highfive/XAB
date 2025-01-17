@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from '~/components/ui/form'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 const replySchema = z.object({
   replyContent: z
@@ -60,6 +61,7 @@ function ReplyInput({ username, postId, replyId, dept }: ReplyInputProps) {
 
       setTimeout(() => {
         form.reset()
+        toast.success('The comment has been successfully added.')
         setIsSubmitting(false)
       }, 500)
     }
