@@ -262,10 +262,10 @@ function SurveyCard({
           )}
           {formatLikeCount(initLikeCount)}
         </button>
-        <button className="flex items-center">
+        <Link href={`/survey-detail/${postId}`} className="flex items-center">
           <MessageSquare size={18} className="mr-1" />
           {commentsCount}
-        </button>
+        </Link>
         <button className="flex items-center">
           <Share2 size={18} className="mr-1" />
           Share
