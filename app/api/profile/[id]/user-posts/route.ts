@@ -10,8 +10,6 @@ export async function GET(
 
   console.log('API 호출 시작')
   try {
-    // 1) Supabase Auth 세션 확인
-
     const { data: posts, error: postsError } = await supabase
       .from('posts')
       .select(
