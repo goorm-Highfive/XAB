@@ -9,6 +9,7 @@ import { SurveyCommentInput } from '~/components/survey-detail/survey-comment-in
 import { Comment } from '~/types/comment'
 import { toggleLikeAPI } from '~/utils/toggleLikeAPI'
 import { voteSubmitAPI } from '~/utils/voteSubmitAPI'
+import { Skeleton } from '~/components/ui/skeleton'
 
 function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [postData, setPostData] = useState<SurveyCardProps>()
@@ -180,10 +181,60 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     }
   }
 
-  if (loading) return <div>Loading...</div>
   if (error) return <div>Error: {error}</div>
-  if (!postData) return <div>No data found</div>
+  if (loading || !postData) {
+    return (
+      <div className="container mx-auto space-y-6 py-8">
+        {/* SurveyCard Skeleton */}
+        <div className="rounded-lg border bg-white p-4 shadow-sm">
+          <div className="mb-4 flex items-center gap-3">
+            {/* User Avatar */}
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="flex flex-col space-y-1">
+              <Skeleton className="h-4 w-32" /> {/* Username */}
+              <Skeleton className="h-3 w-24" /> {/* Date */}
+            </div>
+          </div>
+          <Skeleton className="mb-4 h-6 w-2/3" /> {/* Question */}
+          {/* Post Image */}
+          <div className="flex justify-between gap-4">
+            {/* Option A */}
+            <Skeleton className="mb-2 h-64 w-full rounded-md" />
 
+            {/* Option B */}
+            <Skeleton className="mb-2 h-64 w-full rounded-md" />
+          </div>
+        </div>
+
+        {/* Comments Section Skeleton */}
+        <div className="rounded-lg border bg-white p-4 shadow-sm">
+          <div className="mb-4">
+            <Skeleton className="h-6 w-1/3" /> {/* "Comments (X)" */}
+          </div>
+
+          {/* Comment List Skeleton */}
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <div key={idx} className="flex gap-3">
+                {/* Comment Avatar */}
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <div className="flex flex-1 flex-col space-y-1">
+                  <Skeleton className="h-4 w-1/4" /> {/* Comment Username */}
+                  <Skeleton className="h-4 w-full" /> {/* Comment Content */}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Comment Input Skeleton */}
+          <div className="mt-4 flex items-center gap-3">
+            <Skeleton className="h-8 w-8 rounded-full" /> {/* User Avatar */}
+            <Skeleton className="h-8 w-full rounded-md" /> {/* Input Field */}
+          </div>
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="p-6">
