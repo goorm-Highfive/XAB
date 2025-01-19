@@ -1,5 +1,7 @@
 'use client'
 
+import { createClient } from '~/utils/supabase/client'
+import { useState, useEffect } from 'react'
 import { SurveyCard } from '~/components/common/survey-card'
 import { SurveyCardSkeleton } from '~/components/common/surveycard-skeleton'
 
@@ -17,7 +19,26 @@ export default function SurveyList({
   onVoteSubmit,
 }: SurveyListProps) {
   const loading = posts.length === 0 // posts가 비어 있으면 로딩 상태로 간주
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const supabase = await createClient()
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser()
+
+      if (error) {
+        console.error('사용자 정보를 가져오는 데 실패했습니다:', error.message)
+        return
+      }
+
+      setCurrentUserId(user?.id || null) // 사용자 ID를 상태에 저장
+    }
+
+    fetchUserId()
+  }, [])
   if (loading) {
     return (
       <div className="space-y-4">
@@ -34,6 +55,7 @@ export default function SurveyList({
         <SurveyCard
           key={post.post_id}
           userId={post.post_user_id}
+          currentUserId={currentUserId}
           postId={post.post_id}
           ab_test_id={post.ab_test_id}
           date={post.post_created_at.split('T')[0] ?? 'Unknown date'}

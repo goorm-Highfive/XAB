@@ -3,14 +3,19 @@
 import { Card } from '~/components/ui/card'
 import { Progress } from '~/components/ui/progress'
 import { formatLikeCount } from '~/utils/like-formatters'
-import { Heart, MessageSquare, Share2 } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu'
+import { Heart, MessageSquare, Share2, Ellipsis } from 'lucide-react'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Tables } from '~/types/supabase'
 import { createClient } from '~/utils/supabase/client'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
-import { useRouter } from 'next/navigation'
 
 export type SurveyCardProps = {
   post?: Tables<'posts'>
@@ -35,6 +40,7 @@ export type SurveyCardProps = {
   onVoteSubmit?: (abTestId: number, option: 'A' | 'B') => void
   postId: number
   voteComplete: boolean // 추가된 부분
+  currentUserId: string | null
 }
 
 function SurveyCard({
@@ -57,15 +63,14 @@ function SurveyCard({
   userVote,
   ab_test_id,
   postId,
+  currentUserId,
 }: SurveyCardProps) {
-  const router = useRouter()
   const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
-  //const [error, setError] = useState<string | null>(null)
+
   useEffect(() => {
-    const supabase = createClient()
     const fetchProfileImage = async () => {
       // 게시글 ID로 작성자의 프로필 이미지 가져오기
-      const { data } = await supabase
+      const { data } = await createClient()
         .from('posts')
         .select(
           `
@@ -111,18 +116,11 @@ function SurveyCard({
     }
   }
 
-  const moveDetailPage = () => {
-    router.push(`/survey-detail/${postId}`)
-  }
-
   return (
-    <Card
-      className="mb-4 cursor-pointer p-6 shadow-sm"
-      onClick={moveDetailPage}
-    >
-      <div className="mb-4 flex items-center gap-4">
+    <Card className="mb-4 p-6 shadow-sm">
+      <div className="mb-4 flex items-center justify-between gap-4">
         <Link href={`/profile/${userId}`} className="flex items-center gap-4">
-          <div className="relative mr-4 h-[40px] w-[40px] overflow-hidden rounded-full">
+          <div className="relative h-[40px] w-[40px] overflow-hidden rounded-full">
             <Image
               fill
               className="object-cover"
@@ -137,7 +135,31 @@ function SurveyCard({
             <p className="text-xs text-gray-500">{date}</p>
           </div>
         </Link>
+        {userId === currentUserId ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="rounded p-1 hover:bg-gray-100">
+              <Ellipsis className="text-gray-500" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>
+                <Link
+                  href={{
+                    pathname: '/write',
+                    query: {
+                      postId: postId,
+                    },
+                  }}
+                  className="block w-full"
+                >
+                  편집
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>삭제</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
       </div>
+
       {voteError && (
         <div
           className="relative mb-4 rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700"
@@ -148,7 +170,9 @@ function SurveyCard({
         </div>
       )}
       <Link href={`/survey-detail/${postId}`} className="block">
-        <p className="mb-4 text-gray-800">{question}</p>
+        <p className="mb-4 min-h-20 rounded-lg bg-gray-50 p-4 text-gray-800">
+          {question}
+        </p>
         {post_image_url && (
           <Image
             src={post_image_url}
