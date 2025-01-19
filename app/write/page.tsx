@@ -174,7 +174,6 @@ export default function Write() {
 
             if (textError) {
               toast.error('게시물 업로드에 실패했습니다. 다시 시도해주세요.')
-              throw new Error(textError.message)
             }
             break
           }
@@ -182,9 +181,6 @@ export default function Write() {
           case 'image': {
             if (!values.imageA || !values.imageB) {
               toast.error('이미지 A와 B 모두 업로드해야 합니다.')
-              throw new Error(
-                'Both imageA and imageB are required for new posts.',
-              )
             }
 
             const imageAPath = `images/${newPostId}/option-A${Date.now()}`
@@ -210,7 +206,6 @@ export default function Write() {
 
             if (imageError) {
               toast.error('게시물 업로드에 실패했습니다. 다시 시도해주세요.')
-              throw new Error(imageError.message)
             }
             break
           }
@@ -249,8 +244,6 @@ export default function Write() {
         }
 
         const abTest = postData.ab_tests?.[0] || {}
-        const currentImageAUrl = abTest.variant_a_url
-        const currentImageBUrl = abTest.variant_b_url
 
         const { error: postUpdateError } = await supabase
           .from('posts')
@@ -282,19 +275,27 @@ export default function Write() {
           }
 
           case 'image': {
+            // 기존 URL 가져오기
+            const currentImageAUrl = abTest?.variant_a_url
+            const currentImageBUrl = abTest?.variant_b_url
+
+            // 새로운 이미지 업로드 경로 생성
             const imageAPath = `images/${postId}/option-A${Date.now()}`
             const imageBPath = `images/${postId}/option-B${Date.now()}`
 
+            // 이미지 A 처리
             const imageAurl =
               values.imageA instanceof File
-                ? await uploadImage(values.imageA, imageAPath) // File 타입인 경우 업로드
-                : currentImageAUrl // 수정되지 않은 경우 기존 URL 유지
+                ? await uploadImage(values.imageA, imageAPath) // 새 이미지 업로드
+                : currentImageAUrl // 기존 URL 유지
 
+            // 이미지 B 처리
             const imageBurl =
               values.imageB instanceof File
-                ? await uploadImage(values.imageB, imageBPath) // File 타입인 경우 업로드
-                : currentImageBUrl // 수정되지 않은 경우 기존 URL 유지
+                ? await uploadImage(values.imageB, imageBPath) // 새 이미지 업로드
+                : currentImageBUrl // 기존 URL 유지
 
+            // A/B 테스트 업데이트
             const { error: imageError } = await supabase
               .from('ab_tests')
               .update({
@@ -319,15 +320,9 @@ export default function Write() {
 
       router.push('/')
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('오류 발생:', error.message)
-        toast.error(
-          error.message || '게시물을 처리하는 중 오류가 발생했습니다.',
-        )
-      } else {
-        console.error('예기치 못한 오류가 발생했습니다:', error)
-        toast.error('예기치 못한 오류가 발생했습니다.')
-      }
+      const errorMessage = '예기치 못한 오류가 발생했습니다.'
+      console.log(error)
+      toast.error(errorMessage)
     }
   }
 
