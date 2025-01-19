@@ -320,9 +320,7 @@ export default function Write() {
 
       router.push('/')
     } catch (error: unknown) {
-      const errorMessage = '예기치 못한 오류가 발생했습니다.'
       console.log(error)
-      toast.error(errorMessage)
     }
   }
 
