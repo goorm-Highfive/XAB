@@ -17,18 +17,7 @@ export async function GET(
   }
 
   try {
-    // 현재 사용자 정보 확인
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: '인증되지 않은 사용자' },
-        { status: 401 },
-      )
-    }
+    const currentUserId = id
 
     // 나를 팔로우하는 사용자 가져오기
     const { data: followers, error: followersError } = await supabase
@@ -42,7 +31,7 @@ export async function GET(
         )
       `,
       )
-      .eq('following_id', id)
+      .eq('following_id', currentUserId)
 
     if (followersError) {
       throw new Error(followersError.message)
@@ -55,7 +44,7 @@ export async function GET(
           await supabase
             .from('follows')
             .select('id') // 확인용 필드만 가져옴
-            .eq('follower_id', user.id)
+            .eq('follower_id', currentUserId)
             .eq('following_id', follow.follower_id)
             .single()
 
