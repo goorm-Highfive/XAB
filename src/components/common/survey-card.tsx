@@ -16,6 +16,7 @@ import Link from 'next/link'
 import { Tables } from '~/types/supabase'
 import { createClient } from '~/utils/supabase/client'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
+import { useRouter } from 'next/navigation'
 
 export type SurveyCardProps = {
   post?: Tables<'posts'>
@@ -66,6 +67,9 @@ function SurveyCard({
   currentUserId,
 }: SurveyCardProps) {
   const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
+  const router = useRouter()
+
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     const fetchProfileImage = async () => {
@@ -116,6 +120,38 @@ function SurveyCard({
     }
   }
 
+  const handleDelete = async () => {
+    if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) return
+
+    setIsDeleting(true)
+
+    try {
+      const response = await fetch(`/api/posts/${postId}`, {
+        method: 'DELETE',
+        cache: 'no-store', // 캐싱 비활성화
+      })
+
+      if (!response.ok) {
+        const { error } = await response.json()
+        throw new Error(error || '게시글 삭제 실패')
+      }
+
+      await response.json()
+      alert('게시글이 삭제되었습니다.')
+      router.push('/')
+      router.refresh()
+    } catch (error: unknown) {
+      console.error('게시글 삭제 오류:', error)
+      alert(
+        error instanceof Error
+          ? error.message
+          : '게시글 삭제 중 문제가 발생했습니다.',
+      )
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <Card className="mb-4 p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between gap-4">
@@ -154,7 +190,9 @@ function SurveyCard({
                   편집
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>삭제</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDelete} disabled={isDeleting}>
+                {isDeleting ? '삭제 중...' : '삭제'}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : null}
