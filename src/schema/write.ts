@@ -33,8 +33,7 @@ export const writeSchema = z
 
     // type이 image일 때
     if (data.type === 'image') {
-      if (isEdit) {
-      } else {
+      if (!isEdit) {
         // 새로 작성 모드: imageA와 imageB 모두 필수
         if (!data.imageA) {
           ctx.addIssue({
