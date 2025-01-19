@@ -320,7 +320,15 @@ export default function Write() {
 
       router.push('/')
     } catch (error: unknown) {
-      console.log(error)
+      if (error instanceof Error) {
+        console.error('오류 발생:', error.message)
+        toast.error(
+          error.message || '게시물을 처리하는 중 오류가 발생했습니다.',
+        )
+      } else {
+        console.error('예기치 못한 오류가 발생했습니다:', error)
+        toast.error('예기치 못한 오류가 발생했습니다.')
+      }
     }
   }
 
