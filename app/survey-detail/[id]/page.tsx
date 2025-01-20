@@ -13,9 +13,9 @@ import { Skeleton } from '~/components/ui/skeleton'
 import { SurveyCardSkeleton } from '~/components/common/surveycard-skeleton'
 
 function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const [userId, setUserId] = useState<string>()
+  const [userInfo, setUserInfo] = useState({ userId: '', userName: '' })
   const [postData, setPostData] = useState<SurveyCardProps>()
-  const [comments, setComments] = useState<Comment[]>()
+  const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -58,7 +58,10 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           voteComplete: data.voteComplete,
         })
         setComments(data.comments)
-        setUserId(data.currentUserId)
+        setUserInfo({
+          userId: data.currentUserId,
+          userName: data.currentUserName.username,
+        })
 
         setError(null) // 에러 초기화
       } catch (err) {
@@ -241,8 +244,9 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
                   <SurveyComment
                     key={comment.id}
                     comment={comment}
-                    currentUserId={userId}
+                    currentUserId={userInfo.userId}
                     postId={postData.postId}
+                    setComments={setComments}
                     handleCommentLikeToggle={handleCommentLikeToggle}
                   />
                 ))
@@ -251,7 +255,11 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
                   <p>Noting Comments</p>
                 </div>
               )}
-              <SurveyCommentInput postId={postData.postId} />
+              <SurveyCommentInput
+                postId={postData.postId}
+                setComments={setComments}
+                currentUserName={userInfo.userName}
+              />
             </CardContent>
           </Card>
         </div>

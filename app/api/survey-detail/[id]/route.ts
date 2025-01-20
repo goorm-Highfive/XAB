@@ -49,6 +49,15 @@ export async function GET(
       .single()
     if (userError) throw new Error(userError.message)
 
+    // UserName 데이터 -> 현재 접속중인 사용자의 이름을 반환
+    const { data: currentUserName, error: currentUserNameError } =
+      await supabase
+        .from('users')
+        .select('username')
+        .eq('id', currentUserId || 'undefined')
+        .single()
+    if (currentUserNameError) throw new Error(currentUserNameError.message)
+
     // UserLiked 여부
     const { data: userLikedData } = await supabase
       .from('likes')
@@ -168,6 +177,7 @@ export async function GET(
       initLikeCount,
       comments: roots,
       currentUserId,
+      currentUserName,
     })
   } catch (error) {
     console.error('Unexpected Error:', error)

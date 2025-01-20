@@ -18,6 +18,7 @@ import {
   FormControl,
   FormMessage,
 } from '~/components/ui/form'
+import { Comment } from '~/types/comment'
 
 // 댓글 입력 스키마 정의
 const commentSchema = z.object({
@@ -31,9 +32,17 @@ type CommentFormValues = z.infer<typeof commentSchema>
 
 type SurveyCommentInputProp = {
   postId: number
+  setComments: React.Dispatch<React.SetStateAction<Comment[]>>
+  currentUserName: string
 }
 
-function SurveyCommentInput({ postId }: SurveyCommentInputProp) {
+function SurveyCommentInput({
+  postId,
+  setComments,
+  currentUserName,
+}: SurveyCommentInputProp) {
+  console.log('currentUserName:', currentUserName)
+
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<CommentFormValues>({
@@ -45,6 +54,7 @@ function SurveyCommentInput({ postId }: SurveyCommentInputProp) {
     if (!isSubmitting) {
       setIsSubmitting(true)
 
+      // 서버에 추가
       const response = await fetch('/api/comments/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -59,7 +69,18 @@ function SurveyCommentInput({ postId }: SurveyCommentInputProp) {
       const result = await response.json()
       if (!result.success) throw new Error(result.error)
 
-      console.log(postId, data.comment)
+      console.log(result.data)
+
+      // 클라이언트에 추가
+      setComments((prev) => [
+        ...prev,
+        {
+          ...result.data[0],
+          username: currentUserName,
+          likeCount: 0,
+          replies: [],
+        },
+      ])
 
       setTimeout(() => {
         form.reset()

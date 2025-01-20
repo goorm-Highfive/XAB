@@ -20,12 +20,14 @@ type SurveyCommentProps = {
   postId?: number
   currentUserId?: string
   handleCommentLikeToggle: (id: number) => void
+  setComments: React.Dispatch<React.SetStateAction<Comment[]>>
 }
 
 function SurveyComment({
   comment,
   currentUserId,
   handleCommentLikeToggle,
+  setComments,
 }: SurveyCommentProps) {
   const {
     id,
@@ -86,6 +88,12 @@ function SurveyComment({
     const result = await response.json()
     if (!result.success) throw new Error(result.error)
 
+    setComments((prev) =>
+      prev.map((comment) =>
+        comment.id === id ? { ...comment, content: editContent } : comment,
+      ),
+    )
+
     setIsEditing(false)
     toast.success('The comment has been successfully updated')
   }
@@ -115,6 +123,19 @@ function SurveyComment({
       })
       const result = await response.json()
       if (!result.success) throw new Error(result.error)
+
+      setComments((prev) =>
+        prev.map((comment) =>
+          comment.id === id
+            ? {
+                ...comment,
+                is_delete: true,
+                content: 'The comment has been deleted',
+              }
+            : comment,
+        ),
+      )
+
       toast.success(`The comment has been successfully deleted.`)
     } catch {
       toast.error('An error occurred while deleting the comment.')
@@ -221,6 +242,7 @@ function SurveyComment({
             <SurveyComment
               comment={reply}
               currentUserId={currentUserId}
+              setComments={setComments}
               handleCommentLikeToggle={handleCommentLikeToggle}
             />
           </div>
