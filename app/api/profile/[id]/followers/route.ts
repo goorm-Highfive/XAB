@@ -19,8 +19,7 @@ export async function GET(
   try {
     const currentUserId = id
 
-    // 나를 팔로우하는 사용자 가져오기
-    const { data: followers, error: followersError } = await supabase
+    const { data: followers, error } = await supabase
       .from('follows')
       .select(
         `
@@ -33,8 +32,8 @@ export async function GET(
       )
       .eq('following_id', currentUserId)
 
-    if (followersError) {
-      throw new Error(followersError.message)
+    if (error) {
+      throw new Error(error.message)
     }
 
     // 내가 각 팔로워를 팔로우하는지 여부 확인
@@ -51,6 +50,7 @@ export async function GET(
         if (isFollowingError && isFollowingError.code !== 'PGRST116') {
           throw new Error(isFollowingError.message)
         }
+        console.log(followers)
 
         return {
           id: follow.follower_id,

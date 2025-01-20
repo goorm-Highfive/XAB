@@ -1,24 +1,25 @@
 'use client'
 
+import Link from 'next/link'
+import Image from 'next/image'
 import React, { useState } from 'react'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/utils/cn'
+import defaultProfile from '~/assets/svgs/default-profile.svg'
 
 interface UserListResponseItem {
   id: string
   name: string
   username: string
   isFollowing: boolean
-  image?: string
+  profile_image?: string
 }
 
 function UserFollowList({ users }: { users: UserListResponseItem[] }) {
-  // 사용자별 follow 상태를 관리하는 상태
   const [followStates, setFollowStates] = useState<Record<string, boolean>>(
-    users.reduce((acc, user) => ({ ...acc, [user.id]: user.isFollowing }), {}),
+    Object.fromEntries(users.map((user) => [user.id, user.isFollowing])),
   )
 
-  // follow/unfollow 처리 함수
   const toggleFollow = async (id: string) => {
     const isFollowing = followStates[id]
 
@@ -28,10 +29,11 @@ function UserFollowList({ users }: { users: UserListResponseItem[] }) {
 
       const response = await fetch(endpoint, { method })
       if (!response.ok) {
-        throw new Error('Follow 상태 업데이트 실패')
+        throw new Error(
+          `Follow 상태 업데이트 실패 (Endpoint: ${endpoint}, Status: ${response.status})`,
+        )
       }
 
-      // 상태 업데이트
       setFollowStates((prev) => ({
         ...prev,
         [id]: !isFollowing,
@@ -49,21 +51,33 @@ function UserFollowList({ users }: { users: UserListResponseItem[] }) {
             key={user.id}
             className="flex items-center justify-between border-b p-4 last:border-b-0"
           >
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-gray-200" />
-              <div>
-                <p className="font-medium">{user.name}</p>
-                <p className="text-sm text-gray-500">{user.username}</p>
+            <Link
+              href={`/profile/${user.id}`}
+              aria-label={`${user.name}의 프로필로 이동`}
+            >
+              <div className="flex items-center gap-4">
+                <div className="relative h-12 w-12 overflow-hidden rounded-full bg-gray-200">
+                  <Image
+                    src={user.profile_image || defaultProfile.src}
+                    alt={`${user.name}'s profile`}
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                </div>
+                <div>
+                  <p className="font-medium">{user.name}</p>
+                  <p className="text-sm text-gray-500">{user.username}</p>
+                </div>
               </div>
-            </div>
+            </Link>
+
             <Button
               variant={followStates[user.id] ? 'outline' : 'default'}
-              className={cn(
-                'w-24',
-                followStates[user.id]
-                  ? 'border-gray-300 text-black hover:text-gray-700'
-                  : 'bg-black text-white',
-              )}
+              className={cn('w-24', {
+                'border-gray-300 text-black hover:text-gray-700':
+                  followStates[user.id],
+                'bg-black text-white': !followStates[user.id],
+              })}
               onClick={() => toggleFollow(user.id)}
             >
               {followStates[user.id] ? 'Following' : 'Follow'}
