@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const writeSchema = z
   .object({
+    postId: z.string().optional(),
     body: z.string().optional(),
     type: z.enum(['text', 'image', '']).optional(),
     textA: z.string().optional(),
@@ -10,15 +11,7 @@ export const writeSchema = z
     imageB: z.instanceof(File).optional(),
   })
   .superRefine((data, ctx) => {
-    // type이 없는 경우, body 필수
-    if (!data.type && !((data.body?.trim().length ?? 0) > 0)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          'If you do not choose a survey option type, you must write the text',
-        path: ['body'],
-      })
-    }
+    const isEdit = !data.postId // postId가 존재하면 편집 모드
 
     // type이 text일 때 textA와 textB 필수
     if (data.type === 'text') {
@@ -38,21 +31,24 @@ export const writeSchema = z
       }
     }
 
-    // type이 image -> imageA, imageB 필수
+    // type이 image일 때
     if (data.type === 'image') {
-      if (!data.imageA) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'imageA is required when type is "image"',
-          path: ['imageA'],
-        })
-      }
-      if (!data.imageB) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'imageB is required when type is "image"',
-          path: ['imageB'],
-        })
+      if (!isEdit) {
+        // 새로 작성 모드: imageA와 imageB 모두 필수
+        if (!data.imageA) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'imageA is required when type is "image"',
+            path: ['imageA'],
+          })
+        }
+        if (!data.imageB) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'imageB is required when type is "image"',
+            path: ['imageB'],
+          })
+        }
       }
     }
   })

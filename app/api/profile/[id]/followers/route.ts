@@ -17,17 +17,7 @@ export async function GET(
   }
 
   try {
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: '인증되지 않은 사용자' },
-        { status: 401 },
-      )
-    }
+    const currentUserId = id
 
     const { data: followers, error } = await supabase
       .from('follows')
@@ -40,18 +30,36 @@ export async function GET(
         )
       `,
       )
-      .eq('following_id', id)
+      .eq('following_id', currentUserId)
 
     if (error) {
       throw new Error(error.message)
     }
 
-    const response = followers.map((follow) => ({
-      id: follow.follower_id,
-      username: follow.users.username,
-      profile_image: follow.users.profile_image || undefined,
-      isFollowing: id === follow.follower_id, // 현재 사용자와 팔로워 ID 비교
-    }))
+    // 내가 각 팔로워를 팔로우하는지 여부 확인
+    const response = await Promise.all(
+      followers.map(async (follow) => {
+        const { data: isFollowingData, error: isFollowingError } =
+          await supabase
+            .from('follows')
+            .select('id') // 확인용 필드만 가져옴
+            .eq('follower_id', currentUserId)
+            .eq('following_id', follow.follower_id)
+            .single()
+
+        if (isFollowingError && isFollowingError.code !== 'PGRST116') {
+          throw new Error(isFollowingError.message)
+        }
+        console.log(followers)
+
+        return {
+          id: follow.follower_id,
+          username: follow.users.username,
+          profile_image: follow.users.profile_image || undefined,
+          isFollowing: !!isFollowingData, // 데이터 존재 여부로 판단
+        }
+      }),
+    )
 
     return NextResponse.json(response, { status: 200 })
   } catch (err) {

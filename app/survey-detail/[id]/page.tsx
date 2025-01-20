@@ -56,6 +56,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           ab_test_id: data.abTest?.id,
           postId: data.post.id,
           voteComplete: data.voteComplete,
+          currentUserId: data.currentUserId,
         })
         setComments(data.comments)
         setUserInfo({
@@ -225,6 +226,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
       </div>
     )
   }
+  console.log(postData)
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="p-6">

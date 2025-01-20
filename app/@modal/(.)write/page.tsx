@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-
 import Write from '#/write/page'
 
 import {
@@ -10,9 +9,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog'
+import { useState, useEffect } from 'react'
 
 export default function WriteModal() {
   const router = useRouter()
+  const [postId, setPostId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const postIdParam = urlParams.get('postId')
+
+    if (postIdParam) setPostId(postIdParam)
+  }, [])
 
   const handleClose = () => {
     router.back()
@@ -22,7 +30,11 @@ export default function WriteModal() {
     <Dialog open onOpenChange={handleClose}>
       <DialogContent className="mx-auto max-h-[85%] max-w-lg overflow-y-scroll rounded-lg bg-white p-6 shadow-lg">
         <DialogHeader>
-          <DialogTitle>Create Post with A/B Testing</DialogTitle>
+          <DialogTitle>
+            {postId
+              ? 'Edit Post with A/B Testing'
+              : 'Create Post with A/B Testing'}
+          </DialogTitle>
         </DialogHeader>
         <Write />
       </DialogContent>
