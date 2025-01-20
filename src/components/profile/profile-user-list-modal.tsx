@@ -10,7 +10,7 @@ import {
 } from '~/components/ui/dialog'
 import { SearchBar } from '~/components/profile/profile-search-bar'
 import { UserFollowList } from '~/components/profile/profile-user-follow-list'
-
+import { UserFollowListSkeleton } from '~/components/profile/profile-follow-list-skeleton'
 interface UserListResponseItem {
   id: string
   name: string
@@ -22,10 +22,6 @@ interface UserListResponseItem {
 interface UserListModalProps {
   title: string
   apiEndpoint: string
-}
-
-function LoadingIndicator() {
-  return <p className="text-center">Loading...</p>
 }
 
 function ErrorIndicator({ message }: { message: string }) {
@@ -46,6 +42,8 @@ function UserListModal({ title, apiEndpoint }: UserListModalProps) {
         if (!response.ok) throw new Error('Failed to fetch data')
 
         const data: UserListResponseItem[] = await response.json()
+        console.log(data)
+
         setUsers(data)
         setFilteredUsers(data)
       } catch (err) {
@@ -77,13 +75,13 @@ function UserListModal({ title, apiEndpoint }: UserListModalProps) {
         </DialogHeader>
 
         {loading ? (
-          <LoadingIndicator />
+          <UserFollowListSkeleton />
         ) : error ? (
           <ErrorIndicator message={error} />
         ) : (
           <>
             <SearchBar onSearch={handleSearch} />
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 max-h-80 space-y-4 overflow-y-auto">
               <UserFollowList users={filteredUsers} />
             </div>
           </>

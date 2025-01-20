@@ -131,16 +131,16 @@ function ProfileSection() {
       </CardHeader>
       <CardContent className="grid grid-cols-3 gap-4">
         <div className="flex flex-col items-center gap-1 text-center">
-          <span className="font-bold">{user.postCount}</span>
-          <span className="text-sm text-muted-foreground">Posts</span>
+          <span className="font-bold">{user.followingCount}</span>
+          <span className="text-sm text-muted-foreground">Following</span>
         </div>
         <div className="flex flex-col items-center gap-1 text-center">
           <span className="font-bold">{user.followerCount}</span>
           <span className="text-sm text-muted-foreground">Followers</span>
         </div>
         <div className="flex flex-col items-center gap-1 text-center">
-          <span className="font-bold">{user.followingCount}</span>
-          <span className="text-sm text-muted-foreground">Following</span>
+          <span className="font-bold">{user.postCount}</span>
+          <span className="text-sm text-muted-foreground">Posts</span>
         </div>
       </CardContent>
     </Card>
