@@ -13,6 +13,7 @@ import { Skeleton } from '~/components/ui/skeleton'
 import { SurveyCardSkeleton } from '~/components/common/surveycard-skeleton'
 
 function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const [userId, setUserId] = useState<string>()
   const [postData, setPostData] = useState<SurveyCardProps>()
   const [comments, setComments] = useState<Comment[]>()
   const [loading, setLoading] = useState(true)
@@ -57,6 +58,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           voteComplete: data.voteComplete,
         })
         setComments(data.comments)
+        setUserId(data.currentUserId)
 
         setError(null) // 에러 초기화
       } catch (err) {
@@ -239,7 +241,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
                   <SurveyComment
                     key={comment.id}
                     comment={comment}
-                    currentUserId={postData.userId}
+                    currentUserId={userId}
                     postId={postData.postId}
                     handleCommentLikeToggle={handleCommentLikeToggle}
                   />
