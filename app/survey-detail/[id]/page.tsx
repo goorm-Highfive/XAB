@@ -241,7 +241,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
               <CardTitle>Comments ({postData.commentsCount})</CardTitle>
             </CardHeader>
             <CardContent>
-              {comments ? (
+              {comments.length > 0 ? (
                 comments.map((comment) => (
                   <SurveyComment
                     key={comment.id}
@@ -253,7 +253,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
                   />
                 ))
               ) : (
-                <div>
+                <div className="flex items-center rounded-lg bg-gray-50 p-4 py-4 text-gray-600">
                   <p>Noting Comments</p>
                 </div>
               )}
