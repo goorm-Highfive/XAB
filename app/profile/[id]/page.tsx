@@ -8,12 +8,32 @@ import { SurveyCard } from '~/components/common/survey-card'
 import { Skeleton } from '~/components/ui/skeleton'
 import { Post } from '~/types/post'
 import { SurveyCardSkeleton } from '~/components/common/surveycard-skeleton'
+import { createClient } from '~/utils/supabase/client'
 
 function ProfilePage() {
   const [posts, setPosts] = useState<Post[]>([])
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true) // 로딩 상태 추가
   const { id } = useParams() // URL에서 id 추출
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const {
+        data: { user },
+        error,
+      } = await createClient().auth.getUser()
+
+      if (error) {
+        console.error('사용자 정보를 가져오지 못했습니다:', error.message)
+        return
+      }
+
+      setCurrentUserId(user?.id || null)
+    }
+
+    fetchCurrentUser()
+  }, []) // 종속성 배열 비워도 안전
 
   useEffect(() => {
     async function fetchPosts() {
@@ -188,8 +208,9 @@ function ProfilePage() {
           <ProfileHeader />
           {posts.map((post) => (
             <SurveyCard
-              key={post.post_id}
               userId={post.post_user_id}
+              currentUserId={currentUserId}
+              key={post.post_id}
               postId={post.post_id}
               ab_test_id={post.ab_test_id}
               date={post.post_created_at.split('T')[0] ?? 'Unknown date'}

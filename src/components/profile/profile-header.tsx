@@ -140,9 +140,12 @@ function ProfileHeader() {
         {/* 버튼 그룹 */}
         <div className="flex gap-2">
           {authUserId === id ? (
-            <Link href="/settings/personal-information" passHref>
-              <Button variant="default">Edit Profile</Button>
-            </Link>
+            <>
+              <Link href="/settings/personal-information" passHref>
+                <Button variant="default">Edit Profile</Button>
+              </Link>
+              <SettingButton />
+            </>
           ) : (
             <Button
               onClick={toggleFollow}
@@ -151,7 +154,6 @@ function ProfileHeader() {
               {isFollowing ? 'Following' : 'Follow'}
             </Button>
           )}
-          <SettingButton />
         </div>
       </div>
 
