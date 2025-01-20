@@ -238,7 +238,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           />
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Comments ({comments?.length})</CardTitle>
+              <CardTitle>Comments ({postData.commentsCount})</CardTitle>
             </CardHeader>
             <CardContent>
               {comments ? (

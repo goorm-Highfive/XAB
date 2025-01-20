@@ -104,6 +104,8 @@ export async function GET(
       .eq('post_id', postId)
     if (commentsError) throw new Error(commentsError.message)
 
+    const commentsCount = data ? data.length : 0
+
     const comments = data.map(({ users, ...comment }) => ({
       username: users.username,
       ...comment,
@@ -171,7 +173,7 @@ export async function GET(
       votesA,
       votesB,
       userLiked,
-      commentsCount: comments.length,
+      commentsCount,
       userVote,
       voteComplete,
       initLikeCount,
