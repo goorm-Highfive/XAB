@@ -69,8 +69,6 @@ function SurveyCard({
   const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
   const router = useRouter()
 
-  const [isDeleting, setIsDeleting] = useState(false)
-
   useEffect(() => {
     const fetchProfileImage = async () => {
       // 게시글 ID로 작성자의 프로필 이미지 가져오기
@@ -123,8 +121,6 @@ function SurveyCard({
   const handleDelete = async () => {
     if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) return
 
-    setIsDeleting(true)
-
     try {
       const response = await fetch(`/api/posts/${postId}`, {
         method: 'DELETE',
@@ -147,8 +143,6 @@ function SurveyCard({
           ? error.message
           : '게시글 삭제 중 문제가 발생했습니다.',
       )
-    } finally {
-      setIsDeleting(false)
     }
   }
 
@@ -190,9 +184,7 @@ function SurveyCard({
                   편집
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDelete} disabled={isDeleting}>
-                {isDeleting ? '삭제 중...' : '삭제'}
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDelete}>삭제</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : null}
