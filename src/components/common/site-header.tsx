@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '~/components/ui/button'
 import { NotificationButton } from '~/components/common/notification-button'
 import { createClient } from '~/utils/supabase/client'
+import { SearchBar } from './site-header-search-bar'
 
 import Logo from '~/assets/svgs/logo.svg'
 
@@ -48,6 +49,8 @@ function SiteHeader() {
             <Image src={Logo} alt="Website Logo" className="size-8" />
           </Link>
         </h1>
+        {/* Search*/}
+        <SearchBar />
 
         {/* Navbar 메뉴 */}
         <nav className="flex items-center gap-4">
