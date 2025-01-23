@@ -31,6 +31,7 @@ type CommentFormValues = z.infer<typeof commentSchema>
 
 type SurveyCommentInputProp = {
   postId: number
+  currentUserName: string
 }
 
 function SurveyCommentInput({ postId }: SurveyCommentInputProp) {
@@ -45,6 +46,7 @@ function SurveyCommentInput({ postId }: SurveyCommentInputProp) {
     if (!isSubmitting) {
       setIsSubmitting(true)
 
+      // 서버에 추가
       const response = await fetch('/api/comments/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -59,7 +61,7 @@ function SurveyCommentInput({ postId }: SurveyCommentInputProp) {
       const result = await response.json()
       if (!result.success) throw new Error(result.error)
 
-      console.log(postId, data.comment)
+      console.log(result.data)
 
       setTimeout(() => {
         form.reset()

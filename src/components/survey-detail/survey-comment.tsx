@@ -17,7 +17,6 @@ import defaultProfile from '~/assets/svgs/default-profile.svg'
 
 type SurveyCommentProps = {
   comment: Comment
-  postId?: number
   currentUserId?: string
   handleCommentLikeToggle: (id: number) => void
 }
@@ -49,6 +48,8 @@ function SurveyComment({
 
   // 댓글을 단 유저랑 현재 로그인 한 유저가 같은가? 다르면 수정 및 삭제 불가
   const isAuthorized = () => {
+    console.log(`currentId: ${currentUserId}`)
+    console.log(`userId: ${user_id}`)
     if (currentUserId !== user_id) {
       toast.error(
         `You are not allowed to edit or delete other user's comments.`,
@@ -115,6 +116,7 @@ function SurveyComment({
       })
       const result = await response.json()
       if (!result.success) throw new Error(result.error)
+
       toast.success(`The comment has been successfully deleted.`)
     } catch {
       toast.error('An error occurred while deleting the comment.')
