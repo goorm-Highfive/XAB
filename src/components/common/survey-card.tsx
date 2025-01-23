@@ -85,7 +85,6 @@ function SurveyCard({
       setVoteError(null)
 
       try {
-        console.log('Selected option:', option)
         await onVoteSubmit(ab_test_id, option)
 
         // 투표 후 상태 업데이트
@@ -141,9 +140,8 @@ function SurveyCard({
       removePost(postId)
 
       alert('게시글이 삭제되었습니다.')
-      router.push('/') // 삭제 후 다른 페이지로 이동
+      router.push('/')
     } catch (error: unknown) {
-      console.error('게시글 삭제 오류:', error)
       alert(
         error instanceof Error
           ? error.message
@@ -160,7 +158,7 @@ function SurveyCard({
             <Image
               fill
               className="object-cover"
-              src={profile_image ? profile_image : defaultProfile} // 삼항 연산자 사용
+              src={profile_image ? profile_image : defaultProfile}
               alt={username}
               sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
               priority

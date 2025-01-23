@@ -21,19 +21,12 @@ function ProfilePage() {
     const fetchCurrentUser = async () => {
       const {
         data: { user },
-        error,
       } = await createClient().auth.getUser()
-
-      if (error) {
-        console.error('사용자 정보를 가져오지 못했습니다:', error.message)
-        return
-      }
 
       setCurrentUserId(user?.id || null)
     }
-
     fetchCurrentUser()
-  }, []) // 종속성 배열 비워도 안전
+  }, [])
 
   useEffect(() => {
     async function fetchPosts() {
@@ -196,7 +189,6 @@ function ProfilePage() {
       </div>
     )
   }
-
   if (error) {
     return <p className="text-red-500">Error: {error}</p>
   }
@@ -205,7 +197,7 @@ function ProfilePage() {
     <div className="min-h-screen bg-gray-100">
       <div className="p-6">
         <div className="mx-auto mt-6 max-w-3xl space-y-6">
-          <ProfileHeader />
+          <ProfileHeader currentUserId={currentUserId} />
           {posts.map((post) => (
             <SurveyCard
               userId={post.post_user_id}
