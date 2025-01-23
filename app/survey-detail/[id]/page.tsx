@@ -6,18 +6,21 @@ import { SurveyCard, SurveyCardProps } from '~/components/common/survey-card'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { SurveyComment } from '~/components/survey-detail/survey-comment'
 import { SurveyCommentInput } from '~/components/survey-detail/survey-comment-input'
-import { Comment } from '~/types/comment'
-import { toggleLikeAPI } from '~/utils/toggleLikeAPI'
-import { voteSubmitAPI } from '~/utils/voteSubmitAPI'
 import { Skeleton } from '~/components/ui/skeleton'
 import { SurveyCardSkeleton } from '~/components/common/surveycard-skeleton'
+import { toggleLikeAPI } from '~/utils/toggleLikeAPI'
+import { voteSubmitAPI } from '~/utils/voteSubmitAPI'
+import { useCommentsStore } from '~/stores/comment-store'
+import { createClient } from '~/utils/supabase/client'
+import { Tables } from '~/types/supabase'
 
 function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const [userId, setUserId] = useState<string>()
+  const [userInfo, setUserInfo] = useState({ userId: '', userName: '' })
   const [postData, setPostData] = useState<SurveyCardProps>()
-  const [comments, setComments] = useState<Comment[]>()
+  const [postId, setPostId] = useState<number>(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { comments, setComments, toggleLike } = useCommentsStore()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,8 +62,12 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           voteComplete: data.voteComplete,
           currentUserId: data.currentUserId,
         })
-        setComments(data.comments)
-        setUserId(data.currentUserId)
+        setPostId(data.post.id)
+        setComments(data.comments || [])
+        setUserInfo({
+          userId: data.currentUserId,
+          userName: data.currentUserName.username,
+        })
 
         setError(null) // 에러 초기화
       } catch (err) {
@@ -72,6 +79,51 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
 
     fetchData()
   }, [params])
+
+  const useRealtimeComments = (postId: number) => {
+    const { addComment, deleteComment, updateComment } = useCommentsStore()
+
+    useEffect(() => {
+      const supabase = createClient()
+      const channel = supabase
+        .channel('comments')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'comments',
+            filter: `post_id=eq.${postId}`,
+          },
+          (payload) => {
+            const { eventType } = payload
+            const newComment = payload.new as Tables<'comments'>
+            const oldComment = payload.old as Tables<'comments'>
+
+            switch (eventType) {
+              case 'INSERT':
+                addComment(newComment, userInfo.userName)
+                break
+              case 'UPDATE':
+                updateComment(newComment)
+                break
+              case 'DELETE':
+                deleteComment(oldComment.id)
+                break
+              default:
+                break
+            }
+          },
+        )
+        .subscribe()
+
+      return () => {
+        supabase.removeChannel(channel)
+      }
+    }, [postId, addComment, deleteComment, updateComment])
+  }
+
+  useRealtimeComments(postId)
 
   // 좋아요 토글
   const handleLikeToggle = async (postId: number) => {
@@ -122,21 +174,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
 
       if (!data) return
 
-      setComments((prev) => {
-        if (!prev) return prev
-
-        return prev.map((comment) =>
-          comment.id === commentId
-            ? {
-                ...comment,
-                userLiked: data.liked,
-                likeCount: data.liked
-                  ? comment.likeCount + 1
-                  : comment.likeCount - 1,
-              }
-            : comment,
-        )
-      })
+      toggleLike(commentId, data.liked)
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error(err.message)
@@ -224,7 +262,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
       </div>
     )
   }
-  console.log(postData)
+  console.log(comments)
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="p-6">
@@ -236,25 +274,27 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           />
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Comments ({comments?.length})</CardTitle>
+              <CardTitle>Comments ({postData.commentsCount})</CardTitle>
             </CardHeader>
             <CardContent>
-              {comments ? (
+              {comments.length > 0 ? (
                 comments.map((comment) => (
                   <SurveyComment
                     key={comment.id}
                     comment={comment}
-                    currentUserId={userId}
-                    postId={postData.postId}
+                    currentUserId={userInfo.userId}
                     handleCommentLikeToggle={handleCommentLikeToggle}
                   />
                 ))
               ) : (
-                <div>
+                <div className="flex items-center rounded-lg bg-gray-50 p-4 py-4 text-gray-600">
                   <p>Noting Comments</p>
                 </div>
               )}
-              <SurveyCommentInput postId={postData.postId} />
+              <SurveyCommentInput
+                postId={postData.postId}
+                currentUserName={userInfo.userName}
+              />
             </CardContent>
           </Card>
         </div>

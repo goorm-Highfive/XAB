@@ -1,22 +1,21 @@
 'use client'
 
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { Heart, MessageSquare, Share2, Ellipsis } from 'lucide-react'
 import { Card } from '~/components/ui/card'
 import { Progress } from '~/components/ui/progress'
-import { formatLikeCount } from '~/utils/like-formatters'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
-import { Heart, MessageSquare, Share2, Ellipsis } from 'lucide-react'
-import Image from 'next/image'
-import { useState } from 'react'
-import Link from 'next/link'
-import { Tables } from '~/types/supabase'
-
+import { formatLikeCount } from '~/utils/like-formatters'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
-import { useRouter } from 'next/navigation'
+import { Tables } from '~/types/supabase'
 import usePostStore from '~/stores/post-store'
 
 export type SurveyCardProps = {
@@ -207,9 +206,9 @@ function SurveyCard({
         </div>
       )}
       <Link href={`/survey-detail/${postId}`} className="block">
-        <p className="mb-4 min-h-20 rounded-lg bg-gray-50 p-4 text-gray-800">
-          {question}
-        </p>
+        <div className="mb-4 flex min-h-20 items-center rounded-lg bg-gray-50 p-4 text-gray-800">
+          <p> {question}</p>
+        </div>
         {post_image_url && (
           <Image
             src={post_image_url}
