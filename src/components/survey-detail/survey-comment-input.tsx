@@ -18,7 +18,6 @@ import {
   FormControl,
   FormMessage,
 } from '~/components/ui/form'
-import { Comment } from '~/types/comment'
 
 // 댓글 입력 스키마 정의
 const commentSchema = z.object({
@@ -32,17 +31,10 @@ type CommentFormValues = z.infer<typeof commentSchema>
 
 type SurveyCommentInputProp = {
   postId: number
-  setComments: React.Dispatch<React.SetStateAction<Comment[]>>
   currentUserName: string
 }
 
-function SurveyCommentInput({
-  postId,
-  setComments,
-  currentUserName,
-}: SurveyCommentInputProp) {
-  console.log('currentUserName:', currentUserName)
-
+function SurveyCommentInput({ postId }: SurveyCommentInputProp) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<CommentFormValues>({
@@ -70,17 +62,6 @@ function SurveyCommentInput({
       if (!result.success) throw new Error(result.error)
 
       console.log(result.data)
-
-      // 클라이언트에 추가
-      setComments((prev) => [
-        ...prev,
-        {
-          ...result.data[0],
-          username: currentUserName,
-          likeCount: 0,
-          replies: [],
-        },
-      ])
 
       setTimeout(() => {
         form.reset()

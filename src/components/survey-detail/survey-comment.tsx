@@ -17,17 +17,14 @@ import defaultProfile from '~/assets/svgs/default-profile.svg'
 
 type SurveyCommentProps = {
   comment: Comment
-  postId?: number
   currentUserId?: string
   handleCommentLikeToggle: (id: number) => void
-  setComments: React.Dispatch<React.SetStateAction<Comment[]>>
 }
 
 function SurveyComment({
   comment,
   currentUserId,
   handleCommentLikeToggle,
-  setComments,
 }: SurveyCommentProps) {
   const {
     id,
@@ -51,6 +48,8 @@ function SurveyComment({
 
   // 댓글을 단 유저랑 현재 로그인 한 유저가 같은가? 다르면 수정 및 삭제 불가
   const isAuthorized = () => {
+    console.log(`currentId: ${currentUserId}`)
+    console.log(`userId: ${user_id}`)
     if (currentUserId !== user_id) {
       toast.error(
         `You are not allowed to edit or delete other user's comments.`,
@@ -88,12 +87,6 @@ function SurveyComment({
     const result = await response.json()
     if (!result.success) throw new Error(result.error)
 
-    setComments((prev) =>
-      prev.map((comment) =>
-        comment.id === id ? { ...comment, content: editContent } : comment,
-      ),
-    )
-
     setIsEditing(false)
     toast.success('The comment has been successfully updated')
   }
@@ -123,18 +116,6 @@ function SurveyComment({
       })
       const result = await response.json()
       if (!result.success) throw new Error(result.error)
-
-      setComments((prev) =>
-        prev.map((comment) =>
-          comment.id === id
-            ? {
-                ...comment,
-                is_delete: true,
-                content: 'The comment has been deleted',
-              }
-            : comment,
-        ),
-      )
 
       toast.success(`The comment has been successfully deleted.`)
     } catch {
@@ -242,7 +223,6 @@ function SurveyComment({
             <SurveyComment
               comment={reply}
               currentUserId={currentUserId}
-              setComments={setComments}
               handleCommentLikeToggle={handleCommentLikeToggle}
             />
           </div>
