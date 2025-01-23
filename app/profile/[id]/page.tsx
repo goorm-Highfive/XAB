@@ -210,6 +210,7 @@ function ProfilePage() {
             <SurveyCard
               userId={post.post_user_id}
               currentUserId={currentUserId}
+              profile_image={post.profile_image}
               key={post.post_id}
               postId={post.post_id}
               ab_test_id={post.ab_test_id}

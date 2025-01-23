@@ -6,6 +6,7 @@ type PostStore = {
   setPosts: (posts: Post[]) => void
   addPost: (post: Post) => void
   updatePost: (postId: number, updater: (post: Post) => Post) => void
+  removePost: (postId: number) => void
 }
 
 const usePostStore = create<PostStore>((set) => ({
@@ -21,6 +22,11 @@ const usePostStore = create<PostStore>((set) => ({
         post.post_id === postId ? updater(post) : post,
       ),
     })),
+  removePost: (postId) =>
+    set((state) => {
+      const updatedPosts = state.posts.filter((post) => post.post_id !== postId)
+      return { posts: updatedPosts }
+    }),
 }))
 
 export default usePostStore

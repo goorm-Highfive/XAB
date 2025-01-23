@@ -1,5 +1,5 @@
-// src/components/common/survey-card.tsx
 'use client'
+
 import { Card } from '~/components/ui/card'
 import { Progress } from '~/components/ui/progress'
 import { formatLikeCount } from '~/utils/like-formatters'
@@ -11,12 +11,13 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { Heart, MessageSquare, Share2, Ellipsis } from 'lucide-react'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { Tables } from '~/types/supabase'
-import { createClient } from '~/utils/supabase/client'
+
 import defaultProfile from '~/assets/svgs/default-profile.svg'
 import { useRouter } from 'next/navigation'
+import usePostStore from '~/stores/post-store'
 
 export type SurveyCardProps = {
   post?: Tables<'posts'>
@@ -24,6 +25,7 @@ export type SurveyCardProps = {
   date: string
   userId: string
   username: string
+  profile_image: string | null
   question: string
   post_image_url: string | null
   optionA: string | null
@@ -48,6 +50,7 @@ function SurveyCard({
   date,
   userId,
   username,
+  profile_image,
   question,
   post_image_url,
   optionA,
@@ -66,31 +69,8 @@ function SurveyCard({
   postId,
   currentUserId,
 }: SurveyCardProps) {
-  const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
   const router = useRouter()
-
-  useEffect(() => {
-    const fetchProfileImage = async () => {
-      // 게시글 ID로 작성자의 프로필 이미지 가져오기
-      const { data } = await createClient()
-        .from('posts')
-        .select(
-          `
-            user_id,
-            users (
-              profile_image
-            )
-          `,
-        )
-        .eq('id', postId)
-        .single()
-
-      if (data?.users?.profile_image) {
-        setUserProfileImage(data.users.profile_image)
-      }
-    }
-    fetchProfileImage()
-  }, [postId])
+  const { removePost, updatePost } = usePostStore()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [voteError, setVoteError] = useState<string | null>(null)
@@ -106,8 +86,34 @@ function SurveyCard({
       setVoteError(null)
 
       try {
-        console.log('Selected option:', option) // 디버깅용
+        console.log('Selected option:', option)
         await onVoteSubmit(ab_test_id, option)
+
+        // 투표 후 상태 업데이트
+        updatePost(postId, (post) => {
+          const previousVote = post.userVote
+          let newVotesA = post.votesA
+          let newVotesB = post.votesB
+
+          if (previousVote === 'A') {
+            newVotesA -= 1
+          } else if (previousVote === 'B') {
+            newVotesB -= 1
+          }
+
+          if (option === 'A') {
+            newVotesA += 1
+          } else if (option === 'B') {
+            newVotesB += 1
+          }
+
+          return {
+            ...post,
+            userVote: option,
+            votesA: newVotesA,
+            votesB: newVotesB,
+          }
+        })
       } catch (error: unknown) {
         setVoteError(
           error instanceof Error ? error.message : 'Failed to submit vote',
@@ -132,9 +138,11 @@ function SurveyCard({
         throw new Error(error || '게시글 삭제 실패')
       }
 
-      await response.json()
+      // 상태에서 게시글 제거
+      removePost(postId)
+
       alert('게시글이 삭제되었습니다.')
-      router.push('/')
+      router.push('/') // 삭제 후 다른 페이지로 이동
     } catch (error: unknown) {
       console.error('게시글 삭제 오류:', error)
       alert(
@@ -153,7 +161,7 @@ function SurveyCard({
             <Image
               fill
               className="object-cover"
-              src={userProfileImage || defaultProfile}
+              src={profile_image ? profile_image : defaultProfile} // 삼항 연산자 사용
               alt={username}
               sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
               priority

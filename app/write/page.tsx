@@ -153,7 +153,7 @@ export default function Write() {
         // 사용자 테이블에서 추가 정보를 가져오기
         const { data: userProfile, error: userError } = await supabase
           .from('users')
-          .select('username')
+          .select('username, profile_image')
           .eq('id', userData.user.id)
           .single()
 
@@ -209,6 +209,7 @@ export default function Write() {
           post_user_id: postsData.user_id,
           currentUserId: null,
           username: userProfile?.username || 'Unknown',
+          profile_image: userProfile?.profile_image || '',
           post_image_url: postsData.image_url || null,
           post_caption: postsData.caption || null,
           post_created_at: postsData.created_at,

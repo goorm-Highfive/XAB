@@ -41,6 +41,7 @@ function SurveyDetailPage({ params }: { params: Promise<{ id: string }> }) {
           date: new Date(data.post.created_at).toLocaleDateString(),
           username: data.username || '',
           userId: data.userId,
+          profile_image: data.profile_image,
           question: data.post.caption || 'Which option do you prefer?',
           post_image_url: data.post.image_url,
           optionA: data.abTest?.description_a,

@@ -17,19 +17,6 @@ const useSubscribeToPosts = () => {
           const newPostData = payload.new
 
           try {
-            //console.log('New post received:', newPostData);
-
-            // 작성자 이름 가져오기
-            const { error: userError } = await supabase
-              .from('users')
-              .select('username')
-              .eq('id', newPostData.user_id)
-              .single()
-
-            if (userError) {
-              console.error('작성자 이름 가져오기 실패:', userError.message)
-              throw userError
-            }
             const { data: abTestData, error: abTestError } = await supabase
               .from('ab_tests')
               .select(

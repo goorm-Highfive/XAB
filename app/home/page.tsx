@@ -75,6 +75,8 @@ export default function HomePage() {
       const data = await voteSubmitAPI(abTestId, option)
 
       if (data.voted) {
+        console.log('Vote submitted:', data)
+
         // Zustand 상태 업데이트
         updatePost(abTestId, (post) => {
           const previousVote = post.userVote
@@ -100,6 +102,8 @@ export default function HomePage() {
             votesB: newVotesB,
           }
         })
+
+        console.log('Post updated:', posts)
       }
     } catch (err) {
       console.error('Error submitting vote:', err)
