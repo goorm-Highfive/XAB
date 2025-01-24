@@ -3,9 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Heart, MessageSquare, Share2, Ellipsis } from 'lucide-react'
-
 import { Card } from '~/components/ui/card'
 import { Progress } from '~/components/ui/progress'
 import {
@@ -15,9 +14,9 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { formatLikeCount } from '~/utils/like-formatters'
-import { createClient } from '~/utils/supabase/client'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
 import { Tables } from '~/types/supabase'
+import usePostStore from '~/stores/post-store'
 
 export type SurveyCardProps = {
   post?: Tables<'posts'>
@@ -25,6 +24,7 @@ export type SurveyCardProps = {
   date: string
   userId: string
   username: string
+  profile_image: string | null
   question: string
   post_image_url: string | null
   optionA: string | null
@@ -49,6 +49,7 @@ function SurveyCard({
   date,
   userId,
   username,
+  profile_image,
   question,
   post_image_url,
   optionA,
@@ -67,33 +68,8 @@ function SurveyCard({
   postId,
   currentUserId,
 }: SurveyCardProps) {
-  const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
   const router = useRouter()
-
-  const [isDeleting, setIsDeleting] = useState(false)
-
-  useEffect(() => {
-    const fetchProfileImage = async () => {
-      // 게시글 ID로 작성자의 프로필 이미지 가져오기
-      const { data } = await createClient()
-        .from('posts')
-        .select(
-          `
-            user_id,
-            users (
-              profile_image
-            )
-          `,
-        )
-        .eq('id', postId)
-        .single()
-
-      if (data?.users?.profile_image) {
-        setUserProfileImage(data.users.profile_image)
-      }
-    }
-    fetchProfileImage()
-  }, [postId])
+  const { removePost, updatePost } = usePostStore()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [voteError, setVoteError] = useState<string | null>(null)
@@ -109,8 +85,33 @@ function SurveyCard({
       setVoteError(null)
 
       try {
-        console.log('Selected option:', option) // 디버깅용
         await onVoteSubmit(ab_test_id, option)
+
+        // 투표 후 상태 업데이트
+        updatePost(postId, (post) => {
+          const previousVote = post.userVote
+          let newVotesA = post.votesA
+          let newVotesB = post.votesB
+
+          if (previousVote === 'A') {
+            newVotesA -= 1
+          } else if (previousVote === 'B') {
+            newVotesB -= 1
+          }
+
+          if (option === 'A') {
+            newVotesA += 1
+          } else if (option === 'B') {
+            newVotesB += 1
+          }
+
+          return {
+            ...post,
+            userVote: option,
+            votesA: newVotesA,
+            votesB: newVotesB,
+          }
+        })
       } catch (error: unknown) {
         setVoteError(
           error instanceof Error ? error.message : 'Failed to submit vote',
@@ -124,8 +125,6 @@ function SurveyCard({
   const handleDelete = async () => {
     if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) return
 
-    setIsDeleting(true)
-
     try {
       const response = await fetch(`/api/posts/${postId}`, {
         method: 'DELETE',
@@ -137,19 +136,17 @@ function SurveyCard({
         throw new Error(error || '게시글 삭제 실패')
       }
 
-      await response.json()
+      // 상태에서 게시글 제거
+      removePost(postId)
+
       alert('게시글이 삭제되었습니다.')
       router.push('/')
-      router.refresh()
     } catch (error: unknown) {
-      console.error('게시글 삭제 오류:', error)
       alert(
         error instanceof Error
           ? error.message
           : '게시글 삭제 중 문제가 발생했습니다.',
       )
-    } finally {
-      setIsDeleting(false)
     }
   }
 
@@ -161,7 +158,7 @@ function SurveyCard({
             <Image
               fill
               className="object-cover"
-              src={userProfileImage || defaultProfile}
+              src={profile_image ? profile_image : defaultProfile}
               alt={username}
               sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
               priority
@@ -191,9 +188,7 @@ function SurveyCard({
                   편집
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDelete} disabled={isDeleting}>
-                {isDeleting ? '삭제 중...' : '삭제'}
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDelete}>삭제</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : null}

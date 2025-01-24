@@ -69,7 +69,10 @@ export async function GET() {
         ),
         comments (id),
         likes (user_id),
-        users (username)
+        users (
+          username,
+          profile_image
+        )
       `,
       )
       .in('user_id', followingIds) // 본인과 팔로우한 사용자의 포스트 가져오기
@@ -125,6 +128,7 @@ export async function GET() {
           post_id: post.id,
           post_user_id: post.user_id,
           username: post.users.username,
+          profile_image: post.users.profile_image || null,
           post_image_url: post.image_url,
           post_caption: post.caption,
           post_created_at: post.created_at,

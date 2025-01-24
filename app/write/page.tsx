@@ -24,6 +24,8 @@ import { AspectRatio } from '~/components/ui/aspect-ratio'
 import { createClient } from '~/utils/supabase/client'
 import { WritePayload, writeSchema } from '~/schema/write'
 import { useRouter } from 'next/navigation'
+import usePostStore from '~/stores/post-store'
+import { Post } from '~/types/post'
 
 export default function Write() {
   const supabase = createClient()
@@ -62,6 +64,7 @@ export default function Write() {
     },
   })
 
+  // 폼 데이터 불러오기
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     const postIdParam = urlParams.get('postId')
@@ -96,18 +99,6 @@ export default function Write() {
 
           const abTest = postData.ab_tests?.[0] || {}
 
-          // 이미지 URL에서 파일 이름 추출
-          // const extractFileName = (url: string | undefined) => {
-          //   if (!url) return ''
-          //   const parts = url.split('/')
-          //   return parts[parts.length - 1]
-          // }
-
-          // const imageAName = extractFileName(abTest?.variant_a_url || '')
-          // const imageBName = extractFileName(abTest?.variant_b_url || '')
-
-          // console.log('Image A:', imageAName, 'Image B:', imageBName)
-
           // 폼 데이터 초기화
           form.reset({
             body: postData.caption || '',
@@ -134,6 +125,8 @@ export default function Write() {
     }
   }, [form])
 
+  const addPost = usePostStore((state) => state.addPost)
+
   const onSubmit = async (values: WritePayload) => {
     try {
       const { data: userData } = await supabase.auth.getUser()
@@ -143,76 +136,104 @@ export default function Write() {
         return
       }
 
-      const userId = userData.user.id
-
       if (!postId) {
         if (!values.body || !(values.body.trim().length > 0)) {
           toast.error('제목은 필수입니다. 제목을 작성해주세요.')
           return
         }
 
-        // 새로운 게시물 추가
+        const userId = userData.user.id
+
+        // 게시글 데이터 생성
+        const newPost = {
+          user_id: userId,
+          caption: values.body,
+        }
+
+        // 사용자 테이블에서 추가 정보를 가져오기
+        const { data: userProfile, error: userError } = await supabase
+          .from('users')
+          .select('username, profile_image')
+          .eq('id', userData.user.id)
+          .single()
+
+        if (userError) {
+          console.error('사용자 정보 가져오기 실패:', userError.message)
+        }
+
         const { data: postsData, error: postError } = await supabase
           .from('posts')
-          .insert({ user_id: userId, caption: values.body })
-          .select('id')
+          .insert(newPost)
+          .select('id, created_at, updated_at, user_id, image_url, caption')
+          .single()
 
         if (postError) throw new Error(postError.message)
 
-        const newPostId = postsData[0].id
+        const newPostId = postsData.id
 
-        // A/B 테스트 관련 로직
-        switch (values.type) {
-          case 'text': {
-            const { error: textError } = await supabase
-              .from('ab_tests')
-              .insert({
-                post_id: newPostId,
-                description_a: values.textA,
-                description_b: values.textB,
-              })
+        let abTestData = null
 
-            if (textError) {
-              toast.error('게시물 업로드에 실패했습니다. 다시 시도해주세요.')
-            }
-            break
-          }
+        if (values.type === 'text' || values.type === 'image') {
+          const { data: abTestResult, error: abTestError } = await supabase
+            .from('ab_tests')
+            .insert({
+              post_id: newPostId,
+              description_a: values.textA || null,
+              description_b: values.textB || null,
+              variant_a_url: values.imageA
+                ? await uploadImage(
+                    values.imageA,
+                    `images/${newPostId}/option-A${Date.now()}`,
+                  )
+                : null,
+              variant_b_url: values.imageB
+                ? await uploadImage(
+                    values.imageB,
+                    `images/${newPostId}/option-B${Date.now()}`,
+                  )
+                : null,
+            })
+            .select(
+              'id, post_id, description_a, description_b, variant_a_url, variant_b_url',
+            )
+            .single()
 
-          case 'image': {
-            if (!values.imageA || !values.imageB) {
-              toast.error('이미지 A와 B 모두 업로드해야 합니다.')
-            }
+          if (abTestError) throw new Error(abTestError.message)
 
-            const imageAPath = `images/${newPostId}/option-A${Date.now()}`
-            const imageBPath = `images/${newPostId}/option-B${Date.now()}`
-
-            if (
-              !(values.imageA instanceof File) ||
-              !(values.imageB instanceof File)
-            ) {
-              throw new Error('Both imageA and imageB must be files.')
-            }
-
-            const imageAurl = await uploadImage(values.imageA, imageAPath)
-            const imageBurl = await uploadImage(values.imageB, imageBPath)
-
-            const { error: imageError } = await supabase
-              .from('ab_tests')
-              .insert({
-                post_id: newPostId,
-                variant_a_url: imageAurl,
-                variant_b_url: imageBurl,
-              })
-
-            if (imageError) {
-              toast.error('게시물 업로드에 실패했습니다. 다시 시도해주세요.')
-            }
-            break
-          }
-
-          default:
-            console.log('유효한 A/B 테스트 유형이 선택되지 않았습니다.')
+          abTestData = abTestResult
         }
+
+        // 포맷팅
+        const formattedPost: Post = {
+          post_id: postsData.id,
+          post_user_id: postsData.user_id,
+          currentUserId: null,
+          username: userProfile?.username || 'Unknown',
+          profile_image: userProfile?.profile_image || '',
+          post_image_url: postsData.image_url || null,
+          post_caption: postsData.caption || null,
+          post_created_at: postsData.created_at,
+          post_updated_at: postsData.updated_at || '',
+          ab_test_id: abTestData?.id || null,
+          variant_a_url: abTestData?.variant_a_url || null,
+          variant_b_url: abTestData?.variant_b_url || null,
+          description_a: abTestData?.description_a || null,
+          description_b: abTestData?.description_b || null,
+          ab_test_created_at: postsData.created_at || null,
+          ab_test_updated_at: postsData.updated_at || null,
+          ab_test_votes: [],
+          comments: [],
+          likes: [],
+          comments_count: 0,
+          voteComplete: false,
+          likes_count: 0,
+          userLiked: false,
+          userVote: null,
+          votesA: 0,
+          votesB: 0,
+        }
+
+        addPost(formattedPost)
 
         toast.success('게시물이 성공적으로 업로드되었습니다.')
         router.back()

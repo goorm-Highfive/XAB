@@ -38,7 +38,7 @@ export async function GET(
       ),
       comments (id),
       likes (user_id),
-      users: user_id (username)
+      users: user_id (username, profile_image)
       `,
       )
       .eq('user_id', id)
@@ -92,14 +92,13 @@ export async function GET(
           post_user_id: post.user_id,
           username: post.users.username,
           post_image_url: post.image_url,
-
+          profile_image: post.users.profile_image,
           post_caption: post.caption,
           post_created_at: post.created_at,
           post_updated_at: post.updated_at,
           ab_test_id: post.ab_tests?.[0]?.id || null,
           variant_a_url: post.ab_tests?.[0]?.variant_a_url || null,
           variant_b_url: post.ab_tests?.[0]?.variant_b_url || null,
-
           description_a: post.ab_tests?.[0]?.description_a || null,
           description_b: post.ab_tests?.[0]?.description_b || null,
           ab_test_created_at: post.ab_tests?.[0]?.created_at || null,

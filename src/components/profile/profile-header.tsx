@@ -6,11 +6,10 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { SettingButton } from '~/components/profile/profile-setting-button'
 import { Button } from '~/components/ui/button'
-import { createClient } from '~/utils/supabase/client'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
 import { Skeleton } from '~/components/ui/skeleton'
 
-function ProfileHeader() {
+function ProfileHeader({ currentUserId }: { currentUserId: string | null }) {
   const [isFollowing, setIsFollowing] = useState(true)
   const [userData, setUserData] = useState<{
     username: string
@@ -20,29 +19,9 @@ function ProfileHeader() {
     followingCount: number
     postCount: number
   } | null>(null)
-
-  const [authUserId, setAuthUserId] = useState<string | null>(null) // 인증된 사용자 ID 저장
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { id } = useParams() // URL에서 userId 추출
-
-  useEffect(() => {
-    const fetchAuthUser = async () => {
-      const supabase = createClient()
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser()
-
-      if (error) {
-        console.error('Failed to fetch authenticated user:', error.message)
-      } else if (user) {
-        setAuthUserId(user.id) // 인증된 사용자 ID 설정
-      }
-    }
-
-    fetchAuthUser()
-  }, [])
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -139,7 +118,7 @@ function ProfileHeader() {
 
         {/* 버튼 그룹 */}
         <div className="flex gap-2">
-          {authUserId === id ? (
+          {currentUserId === id ? (
             <>
               <Link href="/settings/personal-information" passHref>
                 <Button variant="default">Edit Profile</Button>

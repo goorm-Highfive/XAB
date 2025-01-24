@@ -22,6 +22,7 @@ export interface ABTest {
 export interface Post {
   post_id: number
   post_user_id: string
+  profile_image: string
   currentUserId: string | null
   username: string // 사용자 이름 추가
   post_image_url: string | null

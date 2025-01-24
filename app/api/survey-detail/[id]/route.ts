@@ -44,7 +44,7 @@ export async function GET(
     const { user_id: userId } = post
     const { data: user, error: userError } = await supabase
       .from('users')
-      .select('username')
+      .select('username, profile_image')
       .eq('id', userId)
       .single()
     if (userError) throw new Error(userError.message)
@@ -169,6 +169,7 @@ export async function GET(
       post,
       abTest,
       username: user.username,
+      profile_image: user.profile_image,
       userId,
       votesA,
       votesB,

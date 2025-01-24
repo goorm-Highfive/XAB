@@ -8,20 +8,25 @@ import { SuggestSection } from '~/components/home/suggest-section'
 import { NewSurveyButton } from '~/components/home/new-survey-button'
 import { toggleLikeAPI } from '~/utils/toggleLikeAPI'
 import { voteSubmitAPI } from '~/utils/voteSubmitAPI'
-import { Post } from '~/types/post'
+import useSubscribeToPosts from '~/hooks/subscribe-posts'
+import usePostStore from '~/stores/post-store'
 
 export default function HomePage() {
-  const [posts, setPosts] = useState<Post[]>([])
+  const posts = usePostStore((state) => state.posts)
+  const setPosts = usePostStore((state) => state.setPosts)
+  const updatePost = usePostStore((state) => state.updatePost)
   const [error, setError] = useState<string | null>(null)
+
+  // 실시간 게시글 구독 활성화
+  useSubscribeToPosts()
 
   useEffect(() => {
     async function fetchPosts() {
-      const apiUrl = `/api/posts/feed` // 상대 경로 사용
+      setError(null) // 에러 초기화
+      const apiUrl = `/api/posts/feed`
 
       try {
-        const res = await fetch(apiUrl, {
-          cache: 'no-store',
-        })
+        const res = await fetch(apiUrl, { cache: 'no-store' })
 
         if (!res.ok) {
           const errJson = await res.json().catch(() => ({}))
@@ -29,7 +34,7 @@ export default function HomePage() {
         }
 
         const json = await res.json()
-        setPosts(json.data ?? [])
+        setPosts(json.data ?? []) // 초기 데이터 설정
       } catch (err: unknown) {
         if (err instanceof Error) {
           setError(err.message)
@@ -40,90 +45,69 @@ export default function HomePage() {
     }
 
     fetchPosts()
-  }, [])
+  }, [setPosts])
+
+  if (error) {
+    console.error('Error fetching user data:', error)
+  }
 
   const handleLikeToggle = async (postId: number) => {
     try {
-      // 서버에 좋아요 토글 요청
       const data = await toggleLikeAPI(postId)
 
-      // 서버 응답에 따라 로컬 상태 업데이트
-      const updatedPosts = posts.map((post: Post) => {
-        if (post.post_id === postId) {
-          return {
-            ...post,
-            userLiked: data.liked,
-            likes_count: data.liked
-              ? post.likes_count + 1
-              : post.likes_count - 1,
-          }
-        }
-        return post
-      })
-
-      setPosts(updatedPosts)
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error(err.message)
-        // 사용자에게 에러를 표시할 수 있는 로직 추가 (예: 알림)
-      } else {
-        console.error('An unexpected error occurred')
-      }
+      // Zustand 상태 업데이트
+      updatePost(postId, (post) => ({
+        ...post,
+        userLiked: data.liked,
+        likes_count: data.liked ? post.likes_count + 1 : post.likes_count - 1,
+      }))
+    } catch (err) {
+      console.error('Error toggling like:', err)
     }
   }
 
   const handleVoteSubmit = async (abTestId: number, option: 'A' | 'B') => {
     try {
-      console.log('Submitting vote for abTestId:', abTestId)
-      console.log('Option selected:', option)
-
       if (option !== 'A' && option !== 'B') {
         throw new Error('Invalid option type')
       }
 
       const data = await voteSubmitAPI(abTestId, option)
-      console.log('Vote response:', data)
 
-      // 상태 업데이트 로직
       if (data.voted) {
-        const updatedPosts = posts.map((post: Post) => {
-          if (post.ab_test_id === abTestId) {
-            // 이전 투표를 취소하고 새로운 투표를 반영
-            const previousVote = post.userVote
-            let newVotesA = post.votesA
-            let newVotesB = post.votesB
+        console.log('Vote submitted:', data)
 
-            if (previousVote === 'A') {
-              newVotesA -= 1
-            } else if (previousVote === 'B') {
-              newVotesB -= 1
-            }
+        // Zustand 상태 업데이트
+        updatePost(abTestId, (post) => {
+          const previousVote = post.userVote
+          let newVotesA = post.votesA
+          let newVotesB = post.votesB
 
-            if (option === 'A') {
-              newVotesA += 1
-            } else if (option === 'B') {
-              newVotesB += 1
-            }
-
-            return {
-              ...post,
-              userVote: option,
-              votesA: newVotesA,
-              votesB: newVotesB,
-            }
+          if (previousVote === 'A') {
+            newVotesA -= 1
+          } else if (previousVote === 'B') {
+            newVotesB -= 1
           }
-          return post
+
+          if (option === 'A') {
+            newVotesA += 1
+          } else if (option === 'B') {
+            newVotesB += 1
+          }
+
+          return {
+            ...post,
+            userVote: option,
+            votesA: newVotesA,
+            votesB: newVotesB,
+          }
         })
 
-        setPosts(updatedPosts)
+        console.log('Post updated:', posts)
       }
     } catch (err) {
-      console.error('Vote submission error:', err)
+      console.error('Error submitting vote:', err)
     }
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>
   }
 
   return (

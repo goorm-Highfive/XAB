@@ -54,6 +54,7 @@ export default function SurveyList({
       {posts.map((post) => (
         <SurveyCard
           key={post.post_id}
+          profile_image={post.profile_image}
           userId={post.post_user_id}
           currentUserId={currentUserId}
           postId={post.post_id}
