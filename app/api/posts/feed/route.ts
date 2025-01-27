@@ -3,6 +3,7 @@ import { createClient } from '~/utils/supabase/server' // 서버용 클라이언
 
 export async function GET() {
   const supabase = await createClient() // 서버용 클라이언트 초기화
+
   console.log('API 호출 시작')
 
   try {
@@ -99,7 +100,6 @@ export async function GET() {
     const userLikedPostIds = userLikes?.map((like) => like.post_id) || []
 
     // 5) 포스트별로 댓글 수와 좋아요 수, userLiked, userVote 설정
-
     const formattedPosts = await Promise.all(
       posts.map(async (post) => {
         console.log(post.ab_tests)
@@ -127,15 +127,17 @@ export async function GET() {
           username: post.users.username,
           post_image_url: post.image_url,
           post_caption: post.caption,
-          post_created_at: post.created_at,
-          post_updated_at: post.updated_at,
+          post_created_at: post.created_at.split('T')[0], // T 이후 제거
+          post_updated_at: post.updated_at.split('T')[0], // T 이후 제거
           ab_test_id: post.ab_tests?.[0]?.id || null,
           variant_a_url: post.ab_tests?.[0]?.variant_a_url || null,
           variant_b_url: post.ab_tests?.[0]?.variant_b_url || null,
           description_a: post.ab_tests?.[0]?.description_a || null,
           description_b: post.ab_tests?.[0]?.description_b || null,
-          ab_test_created_at: post.ab_tests?.[0]?.created_at || null,
-          ab_test_updated_at: post.ab_tests?.[0]?.updated_at || null,
+          ab_test_created_at:
+            post.ab_tests?.[0]?.created_at.split('T')[0] || null, // T 이후 제거
+          ab_test_updated_at:
+            post.ab_tests?.[0]?.updated_at.split('T')[0] || null, // T 이후 제거
           comments: post.comments || [],
           likes: post.likes || [],
           comments_count: post.comments ? post.comments.length : 0,
