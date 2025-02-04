@@ -80,7 +80,7 @@ export function SurveyCardHeader({
         </div>
         <div>
           <p className="text-sm font-medium">{username}</p>
-          <p className="text-xs text-gray-500">{date}</p>
+          <p className="text-xs text-gray-500">{date.split('T')[0]}</p>
         </div>
       </Link>
 
