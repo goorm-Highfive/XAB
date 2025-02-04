@@ -15,7 +15,7 @@ export default function HomePage() {
         <div className="flex-1 space-y-6">
           <NewSurveyButton />
           <Suspense fallback={<SurveyCardSkeleton />}>
-            <SurveyList type="feed" />
+            <SurveyList type="feed" id={null} />
           </Suspense>
         </div>
         <SuggestSection />
