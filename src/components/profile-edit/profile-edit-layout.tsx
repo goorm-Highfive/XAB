@@ -1,4 +1,5 @@
-// 개인정보 페이지 : 콘텐츠 공통 레이아웃 설정
+import { Card } from '~/components/ui/card'
+
 function ProfileEditLayout({
   contentTitle,
   children,
@@ -11,7 +12,7 @@ function ProfileEditLayout({
       <h2 className="mb-5 mt-8 text-lg">
         <b>{contentTitle}</b>
       </h2>
-      {children}
+      <Card className="p-6">{children}</Card>
     </section>
   )
 }

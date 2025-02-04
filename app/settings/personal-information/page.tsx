@@ -1,14 +1,7 @@
 import { ProfileEditLayout } from '~/components/profile-edit/profile-edit-layout'
 import { ProfileInfo } from '~/components/profile-edit/profile-info'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '~/components/ui/card'
-import { CustomAlertDialogWrapper } from '~/components/common/custom-alert-dialog-wrapper' // 클라이언트 컴포넌트 가져오기
-
+import { ProfileImageUpload } from '~/components/profile-edit/profile-image-upload'
+import { CustomAlertDialogWrapper } from '~/components/common/custom-alert-dialog-wrapper'
 import { fetchUserProfile } from '~/utils/fetch-user'
 
 async function ProfileInfoPage() {
@@ -17,21 +10,16 @@ async function ProfileInfoPage() {
   return (
     <div className="mx-auto max-w-xl">
       <ProfileEditLayout contentTitle="Profile Settings">
+        <ProfileImageUpload user={user} />
         <ProfileInfo user={user} />
       </ProfileEditLayout>
       <ProfileEditLayout contentTitle="Danger Zone">
-        <Card>
-          <CardHeader>
-            <CardTitle>Delete Account</CardTitle>
-            <CardDescription>
-              Once you delete your account, there is no going back. Please be
-              certain.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CustomAlertDialogWrapper />
-          </CardContent>
-        </Card>
+        <h3>Delete Account</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Once you delete your account, there is no going back. Please be
+          certain.
+        </p>
+        <CustomAlertDialogWrapper />
       </ProfileEditLayout>
     </div>
   )

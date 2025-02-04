@@ -35,7 +35,7 @@ export function CustomAlertDialog({
   }
 
   return (
-    <div>
+    <div className="mt-4">
       <button
         className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
         onClick={() => setIsOpen(true)}

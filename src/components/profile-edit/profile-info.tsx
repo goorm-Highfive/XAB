@@ -1,17 +1,14 @@
 'use client'
 
-import Image from 'next/image'
 import { toast } from 'sonner'
-import { useState, useRef } from 'react'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '~/utils/supabase/client'
+import { fetchUserProfile } from '~/utils/fetch-user'
 import { Label } from '~/components/ui/label'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
 import { Button } from '~/components/ui/button'
-import { Card, CardContent, CardHeader } from '~/components/ui/card'
-import { fetchUserProfile } from '~/utils/fetch-user'
-import defaultProfile from '~/assets/svgs/default-profile.svg'
-import { useRouter } from 'next/navigation'
 
 interface ProfileInfoProps {
   user: Awaited<ReturnType<typeof fetchUserProfile>>
@@ -19,84 +16,29 @@ interface ProfileInfoProps {
 
 function ProfileInfo({ user }: ProfileInfoProps) {
   const router = useRouter()
-  const [avatarUrl, setAvatarUrl] = useState(user?.profile_image || null)
-  const [username, setUsername] = useState(user?.username || '')
-  const [bio, setBio] = useState(user?.bio || '')
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
   const supabase = createClient()
 
-  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+  const [formData, setFormData] = useState({
+    username: user?.username || '',
+    bio: user?.bio || '',
+  })
 
-    try {
-      // 파일 이름 안전하게 처리
-      const sanitizeFileName = (fileName: string): string =>
-        fileName.replace(/[^a-zA-Z0-9_.-]/g, '_').replace(/\s+/g, '_')
-
-      const safeFileName = sanitizeFileName(file.name)
-      const fileName = `${user!.id}/${Date.now()}-${safeFileName}`
-
-      // 파일 업로드
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('user_images')
-        .upload(fileName, file)
-
-      if (uploadError) throw new Error('이미지 업로드 실패')
-
-      const { data: publicUrlData } = supabase.storage
-        .from('user_images')
-        .getPublicUrl(uploadData.path)
-
-      if (!publicUrlData || !publicUrlData.publicUrl)
-        throw new Error('이미지 URL 생성 실패')
-
-      const imageUrl = publicUrlData.publicUrl
-
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ profile_image: imageUrl })
-        .eq('id', user!.id)
-
-      if (updateError) throw new Error('프로필 업데이트 실패')
-
-      setAvatarUrl(imageUrl)
-      toast.success('프로필 사진이 성공적으로 업데이트되었습니다!')
-      router.refresh()
-    } catch (error: unknown) {
-      if (error instanceof Error) toast.error(error.message)
-      console.error('Upload error:', error)
-    }
-  }
-
-  const handleSetDefaultImage = async () => {
-    try {
-      const { error } = await supabase
-        .from('users')
-        .update({ profile_image: null }) // 프로필 이미지를 null로 업데이트
-        .eq('id', user!.id)
-
-      if (error) throw new Error('프로필 기본 이미지로 변경 실패')
-
-      setAvatarUrl(null) // UI 상태 업데이트
-      toast.success('기본 이미지로 성공적으로 변경되었습니다!')
-      router.refresh()
-    } catch (error: unknown) {
-      if (error instanceof Error) toast.error(error.message)
-    }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
   const handleSave = async () => {
-    try {
-      if (!username.trim()) {
-        toast.error('username은 필수 입력 항목입니다.')
-        return
-      }
+    if (!formData.username.trim()) {
+      toast.error('username은 필수 입력 항목입니다.')
+      return
+    }
 
+    try {
       const { error } = await supabase
         .from('users')
-        .update({ username, bio })
+        .update({ username: formData.username.trim(), bio: formData.bio })
         .eq('id', user!.id)
 
       if (error) throw new Error('프로필 업데이트 실패')
@@ -110,54 +52,26 @@ function ProfileInfo({ user }: ProfileInfoProps) {
 
   return (
     <>
-      <Card>
-        <CardHeader className="flex">
-          <div className="relative mb-4 h-20 w-20 overflow-hidden rounded-full">
-            <Image
-              fill
-              className="object-cover"
-              src={avatarUrl || defaultProfile}
-              sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
-              alt=""
-            />
-          </div>
-          <div>
-            <Button
-              variant="outline"
-              className="mr-4"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              프로필 이미지 변경
-            </Button>
-            <Button variant="outline" onClick={handleSetDefaultImage}>
-              기본 이미지로 변경
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleUpload}
-            />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Label className="mb-2 block">username</Label>
-          <Input
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <Label className="mb-2 mt-6 block">bio</Label>
-          <Textarea
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            className="max-h-40"
-          />
-          <Button onClick={handleSave} className="mt-4 w-full">
-            저장
-          </Button>
-        </CardContent>
-      </Card>
+      <div className="mb-4">
+        <Label className="mb-2 block">username</Label>
+        <Input
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="mb-4">
+        <Label className="mb-2 block">bio</Label>
+        <Textarea
+          name="bio"
+          value={formData.bio}
+          onChange={handleChange}
+          className="max-h-40"
+        />
+      </div>
+      <Button onClick={handleSave} className="mt-4 w-full">
+        저장
+      </Button>
     </>
   )
 }
