@@ -11,19 +11,21 @@ import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader } from '~/components/ui/card'
 import { fetchUserProfile } from '~/utils/fetch-user'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
+import { useRouter } from 'next/navigation'
 
 interface ProfileInfoProps {
   user: Awaited<ReturnType<typeof fetchUserProfile>>
 }
 
 function ProfileInfo({ user }: ProfileInfoProps) {
-  const [avatarUrl, setAvatarUrl] = useState(user?.profileImage || null)
+  const router = useRouter()
+  const [avatarUrl, setAvatarUrl] = useState(user?.profile_image || null)
   const [username, setUsername] = useState(user?.username || '')
   const [bio, setBio] = useState(user?.bio || '')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const supabase = createClient()
-  //console.log('fetchUserProfile result:', user)
+
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -61,6 +63,7 @@ function ProfileInfo({ user }: ProfileInfoProps) {
 
       setAvatarUrl(imageUrl)
       toast.success('프로필 사진이 성공적으로 업데이트되었습니다!')
+      router.refresh()
     } catch (error: unknown) {
       if (error instanceof Error) toast.error(error.message)
       console.error('Upload error:', error)
@@ -78,6 +81,7 @@ function ProfileInfo({ user }: ProfileInfoProps) {
 
       setAvatarUrl(null) // UI 상태 업데이트
       toast.success('기본 이미지로 성공적으로 변경되었습니다!')
+      router.refresh()
     } catch (error: unknown) {
       if (error instanceof Error) toast.error(error.message)
     }
@@ -85,6 +89,11 @@ function ProfileInfo({ user }: ProfileInfoProps) {
 
   const handleSave = async () => {
     try {
+      if (!username.trim()) {
+        toast.error('username은 필수 입력 항목입니다.')
+        return
+      }
+
       const { error } = await supabase
         .from('users')
         .update({ username, bio })
@@ -93,6 +102,7 @@ function ProfileInfo({ user }: ProfileInfoProps) {
       if (error) throw new Error('프로필 업데이트 실패')
 
       toast.success('프로필 정보가 성공적으로 업데이트되었습니다!')
+      router.refresh()
     } catch (error: unknown) {
       if (error instanceof Error) toast.error(error.message)
     }
@@ -103,23 +113,13 @@ function ProfileInfo({ user }: ProfileInfoProps) {
       <Card>
         <CardHeader className="flex">
           <div className="relative mb-4 h-20 w-20 overflow-hidden rounded-full">
-            {avatarUrl ? (
-              <Image
-                fill
-                className="object-cover"
-                src={avatarUrl}
-                sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
-                alt=""
-              />
-            ) : (
-              <Image
-                fill
-                className="object-cover"
-                src={defaultProfile}
-                sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
-                alt=""
-              />
-            )}
+            <Image
+              fill
+              className="object-cover"
+              src={avatarUrl || defaultProfile}
+              sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
+              alt=""
+            />
           </div>
           <div>
             <Button

@@ -3,8 +3,8 @@ import { createClient } from '~/utils/supabase/server'
 interface UserData {
   id: string
   username: string
-  bio: string
-  profileImage?: string
+  bio: string | null
+  profile_image: string | null
 }
 
 export async function fetchUserProfile(): Promise<UserData | null> {
@@ -24,7 +24,7 @@ export async function fetchUserProfile(): Promise<UserData | null> {
 
   const { data, error } = await supabase
     .from('users')
-    .select('profile_image, username, bio')
+    .select('id, profile_image, username, bio')
     .eq('id', userId)
     .single()
 
@@ -36,10 +36,5 @@ export async function fetchUserProfile(): Promise<UserData | null> {
     return null
   }
 
-  return {
-    id: userId,
-    profileImage: data.profile_image || undefined,
-    username: data.username || '',
-    bio: data.bio || '',
-  }
+  return data
 }
