@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useRef } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
