@@ -7,6 +7,7 @@ import { useState, useRef } from 'react'
 import { createClient } from '~/utils/supabase/client'
 import { Button } from '~/components/ui/button'
 import { fetchUserProfile } from '~/utils/fetch-user'
+import { cleanFilename } from '~/utils/clean-filename'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
 
 interface ProfileInfoProps {
@@ -25,14 +26,8 @@ function ProfileImageUpload({ user }: ProfileInfoProps) {
     if (!file) return
 
     try {
-      // 파일 이름 안전하게 처리
-      const sanitizeFileName = (fileName: string): string =>
-        fileName.replace(/[^a-zA-Z0-9_.-]/g, '_').replace(/\s+/g, '_')
+      const fileName = cleanFilename(`${user!.id}/${Date.now()}-${file.name}`)
 
-      const safeFileName = sanitizeFileName(file.name)
-      const fileName = `${user!.id}/${Date.now()}-${safeFileName}`
-
-      // 파일 업로드
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('user_images')
         .upload(fileName, file)
