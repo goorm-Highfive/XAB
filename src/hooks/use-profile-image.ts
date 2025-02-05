@@ -19,9 +19,9 @@ export function useProfileImage({ user }: ProfileInfoProps) {
   const [avatarUrl, setAvatarUrl] = useState<string>(
     user?.profile_image || defaultProfile,
   )
+  const [isUploading, setIsUploading] = useState<boolean>(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // 공통 함수
   const updateProfileImage = async (imageUrl: string | null) => {
     if (!user) return
 
@@ -48,10 +48,19 @@ export function useProfileImage({ user }: ProfileInfoProps) {
     }
   }
 
-  // 파일 업로드
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file || !user) return
+
+    setIsUploading(true)
+
+    const fileReader = new FileReader()
+    fileReader.onload = (e) => {
+      if (e.target?.result) {
+        setAvatarUrl(e.target.result as string)
+      }
+    }
+    fileReader.readAsDataURL(file)
 
     try {
       const filePath = `${user.id}/${Date.now()}-${cleanFilename(file.name)}`
@@ -68,15 +77,17 @@ export function useProfileImage({ user }: ProfileInfoProps) {
 
       if (!publicUrlData?.publicUrl) throw new Error('이미지 URL 생성 실패')
 
-      // 공통 함수 -> 프로필 업데이트
-      updateProfileImage(publicUrlData.publicUrl)
+      await updateProfileImage(publicUrlData.publicUrl)
     } catch (error: unknown) {
-      if (error instanceof Error) toast.error(error.message)
-      console.error('Upload error:', error)
+      if (error instanceof Error) {
+        toast.error(error.message)
+        setAvatarUrl(user.profile_image || defaultProfile)
+      }
+    } finally {
+      setIsUploading(false)
     }
   }
 
-  // 기본 이미지로 변경
   const handleSetDefaultImage = () => {
     updateProfileImage(null)
   }
@@ -84,6 +95,7 @@ export function useProfileImage({ user }: ProfileInfoProps) {
   return {
     avatarUrl,
     fileInputRef,
+    isUploading,
     handleUpload,
     handleSetDefaultImage,
   }
