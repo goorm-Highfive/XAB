@@ -10,8 +10,13 @@ interface ProfileInfoProps {
 }
 
 function ProfileImageUpload({ user }: ProfileInfoProps) {
-  const { avatarUrl, fileInputRef, handleUpload, handleSetDefaultImage } =
-    useProfileImage({ user })
+  const {
+    avatarUrl,
+    fileInputRef,
+    isUploading,
+    handleUpload,
+    handleSetDefaultImage,
+  } = useProfileImage({ user })
 
   return (
     <div className="mb-6 flex flex-col">
@@ -31,10 +36,15 @@ function ProfileImageUpload({ user }: ProfileInfoProps) {
           variant="outline"
           className="mr-4"
           onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
         >
-          프로필 이미지 변경
+          {isUploading ? '변경 중...' : '프로필 이미지 변경'}
         </Button>
-        <Button variant="outline" onClick={handleSetDefaultImage}>
+        <Button
+          variant="outline"
+          onClick={handleSetDefaultImage}
+          disabled={isUploading}
+        >
           기본 이미지로 변경
         </Button>
         <input

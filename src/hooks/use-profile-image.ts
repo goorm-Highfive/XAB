@@ -47,6 +47,11 @@ export function useProfileImage({ user }: ProfileInfoProps) {
 
     setIsUploading(true)
 
+    // 기존 파일을 다시 선택할 때 이벤트가 동작하도록 초기화
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+
     // 미리보기 기능
     if (typeof window !== 'undefined') {
       const fileReader = new FileReader()
@@ -98,6 +103,7 @@ export function useProfileImage({ user }: ProfileInfoProps) {
   }
 
   const handleSetDefaultImage = () => {
+    if (avatarUrl === defaultProfile) return
     updateProfileImage(null)
   }
 
