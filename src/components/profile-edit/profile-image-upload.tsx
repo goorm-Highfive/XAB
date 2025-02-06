@@ -22,6 +22,8 @@ function ProfileImageUpload({ user }: ProfileInfoProps) {
           src={avatarUrl}
           sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
           alt="프로필 이미지"
+          quality={85}
+          priority
         />
       </div>
       <div>

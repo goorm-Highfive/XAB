@@ -4,9 +4,9 @@ import { useState, useRef } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { createClient } from '~/utils/supabase/client'
-import { cleanFilename } from '~/utils/clean-filename'
 import defaultProfile from '~/assets/svgs/default-profile.svg'
 import { fetchUserProfile } from '~/utils/fetch-user'
+import imageCompression from 'browser-image-compression'
 
 interface ProfileInfoProps {
   user?: Awaited<ReturnType<typeof fetchUserProfile>> | null
@@ -31,17 +31,10 @@ export function useProfileImage({ user }: ProfileInfoProps) {
         .update({ profile_image: imageUrl })
         .eq('id', user.id)
 
-      if (error)
-        throw new Error(
-          imageUrl ? '프로필 업데이트 실패' : '기본 이미지로 변경 실패',
-        )
+      if (error) throw new Error('프로필 업데이트 실패')
 
       setAvatarUrl(imageUrl || defaultProfile)
-      toast.success(
-        imageUrl
-          ? '프로필 사진이 업데이트되었습니다.'
-          : '기본 이미지로 변경되었습니다.',
-      )
+      toast.success('프로필 사진이 업데이트되었습니다.')
       router.refresh()
     } catch (error: unknown) {
       if (error instanceof Error) toast.error(error.message)
@@ -54,6 +47,7 @@ export function useProfileImage({ user }: ProfileInfoProps) {
 
     setIsUploading(true)
 
+    // 미리보기 기능
     const fileReader = new FileReader()
     fileReader.onload = (e) => {
       if (e.target?.result) {
@@ -63,21 +57,34 @@ export function useProfileImage({ user }: ProfileInfoProps) {
     fileReader.readAsDataURL(file)
 
     try {
-      const filePath = `${user.id}/${Date.now()}-${cleanFilename(file.name)}`
+      const options = {
+        maxSizeMB: 0.4,
+        maxWidthOrHeight: 720,
+        useWebWorker: true,
+        fileType: 'image/webp',
+      }
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const compressedFile = await imageCompression(file, options)
+
+      const filePath = `${user.id}/profile-image.webp`
+
+      await supabase.storage.from('user_images').remove([filePath])
+
+      const { error: uploadError } = await supabase.storage
         .from('user_images')
-        .upload(filePath, file)
+        .upload(filePath, compressedFile, { upsert: true })
 
       if (uploadError) throw new Error('이미지 업로드 실패')
 
       const { data: publicUrlData } = supabase.storage
         .from('user_images')
-        .getPublicUrl(uploadData.path)
+        .getPublicUrl(filePath)
 
       if (!publicUrlData?.publicUrl) throw new Error('이미지 URL 생성 실패')
 
-      await updateProfileImage(publicUrlData.publicUrl)
+      const newImageUrl = `${publicUrlData.publicUrl}?t=${Date.now()}`
+
+      await updateProfileImage(newImageUrl)
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message)
