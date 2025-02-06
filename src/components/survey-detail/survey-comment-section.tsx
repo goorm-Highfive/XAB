@@ -1,10 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '~/utils/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { SurveyComment } from '~/components/survey-detail/survey-comment'
 import { SurveyCommentInput } from '~/components/survey-detail/survey-comment-input'
 import { Comment } from '~/types/comment'
+
+const supabase = createClient()
 
 type CommentsSectionProps = {
   initialComments: Comment[]
@@ -19,16 +22,54 @@ export function CommentsSection({
 }: CommentsSectionProps) {
   const [comments, setComments] = useState<Comment[]>(initialComments)
 
-  // 댓글 좋아요 토글
+  useEffect(() => {
+    const subscription = supabase
+      .channel(`comments_${postId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'comments',
+          filter: `post_id=eq.${postId}`,
+        },
+        (payload) => {
+          switch (payload.eventType) {
+            case 'INSERT':
+              setComments((prev) => [...prev, payload.new as Comment])
+              break
+            case 'UPDATE':
+              setComments((prev) =>
+                prev.map((c) =>
+                  c.id === (payload.new as Comment).id
+                    ? (payload.new as Comment)
+                    : c,
+                ),
+              )
+              break
+            case 'DELETE':
+              setComments((prev) =>
+                prev.filter((c) => c.id !== (payload.old as Comment).id),
+              )
+              break
+          }
+        },
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(subscription)
+    }
+  }, [postId])
+
+  // 댓글 좋아요 토글 함수 추가
   const handleCommentLikeToggle = async (commentId: number) => {
     try {
       const res = await fetch('/api/comment-like', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ commentId }),
-        credentials: 'include', // 쿠키 포함
+        credentials: 'include',
       })
 
       if (!res.ok) {
@@ -53,7 +94,7 @@ export function CommentsSection({
             : comment,
         ),
       )
-    } catch (err: unknown) {
+    } catch (err) {
       console.error('Comment like toggle error:', err)
     }
   }
@@ -61,7 +102,7 @@ export function CommentsSection({
   return (
     <Card className="mt-6">
       <CardHeader>
-        <CardTitle>Comments ({comments?.length})</CardTitle>
+        <CardTitle>Comments ({comments.length})</CardTitle>
       </CardHeader>
       <CardContent>
         {comments.length > 0 ? (
@@ -70,8 +111,7 @@ export function CommentsSection({
               key={comment.id}
               comment={comment}
               currentUserId={currentUserId}
-              postId={postId}
-              handleCommentLikeToggle={handleCommentLikeToggle}
+              handleCommentLikeToggle={handleCommentLikeToggle} // 🔹 여기에서 props 추가
             />
           ))
         ) : (
