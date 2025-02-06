@@ -48,13 +48,15 @@ export function useProfileImage({ user }: ProfileInfoProps) {
     setIsUploading(true)
 
     // 미리보기 기능
-    const fileReader = new FileReader()
-    fileReader.onload = (e) => {
-      if (e.target?.result) {
-        setAvatarUrl(e.target.result as string)
+    if (typeof window !== 'undefined') {
+      const fileReader = new FileReader()
+      fileReader.onload = (e) => {
+        if (e.target?.result) {
+          setAvatarUrl(e.target.result as string)
+        }
       }
+      fileReader.readAsDataURL(file)
     }
-    fileReader.readAsDataURL(file)
 
     try {
       const options = {
