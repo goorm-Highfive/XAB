@@ -1,8 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import Write from '#/write/page'
-
+import Write from '#/write/page' // Write 컴포넌트
 import {
   Dialog,
   DialogContent,
@@ -18,7 +17,6 @@ export default function WriteModal() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     const postIdParam = urlParams.get('postId')
-
     if (postIdParam) setPostId(postIdParam)
   }, [])
 
@@ -36,7 +34,8 @@ export default function WriteModal() {
               : 'Create Post with A/B Testing'}
           </DialogTitle>
         </DialogHeader>
-        <Write />
+        {/* onClose prop 전달 */}
+        <Write onClose={handleClose} />
       </DialogContent>
     </Dialog>
   )
