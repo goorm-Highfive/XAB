@@ -1,4 +1,4 @@
-// components/survey/ImageSurvey.tsx
+// components/write/image-write.tsx
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import {
   FormField,
@@ -47,26 +47,32 @@ export function ImageSurvey({
           <FormField
             control={form.control}
             name="imageA"
-            render={({ field: { onChange, ...field } }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    type="file"
-                    className="hover:cursor-pointer"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) {
-                        setPreviewA(URL.createObjectURL(file))
-                        onChange(file)
-                      }
-                    }}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              const { value, ...inputProps } = field
+              void value // value를 사용하지 않음을 명시적으로 처리하여 ESLint 경고 회피
+              return (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      {...inputProps}
+                      type="file"
+                      className="hover:cursor-pointer"
+                      accept="image/*"
+                      // file input은 value를 제어할 수 없으므로 명시적으로 undefined로 지정합니다.
+                      value={undefined}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          setPreviewA(URL.createObjectURL(file))
+                          field.onChange(file)
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )
+            }}
           />
         </CardContent>
       </Card>
@@ -88,26 +94,31 @@ export function ImageSurvey({
           <FormField
             control={form.control}
             name="imageB"
-            render={({ field: { onChange, ...field } }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    type="file"
-                    className="hover:cursor-pointer"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) {
-                        setPreviewB(URL.createObjectURL(file))
-                        onChange(file)
-                      }
-                    }}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              const { value, ...inputProps } = field
+              void value // value를 무시
+              return (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      {...inputProps}
+                      type="file"
+                      className="hover:cursor-pointer"
+                      accept="image/*"
+                      value={undefined}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          setPreviewB(URL.createObjectURL(file))
+                          field.onChange(file)
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )
+            }}
           />
         </CardContent>
       </Card>
