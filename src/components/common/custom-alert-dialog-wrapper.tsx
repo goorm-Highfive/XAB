@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { CustomAlertDialog } from '~/components/common/custom-alert-dialog'
 
 function CustomAlertDialogWrapper() {
@@ -18,13 +19,15 @@ function CustomAlertDialogWrapper() {
       }
 
       // 성공적인 응답 처리
-      const responseData = await response.json()
-      alert('Account deleted successfully: ' + responseData.message)
+      alert('Account deleted successfully')
+      router.push('/account/login')
     } catch (error) {
       console.error('Unexpected error:', error)
       alert('Unexpected error occurred.')
     }
   }
+
+  const router = useRouter()
 
   return (
     <CustomAlertDialog
