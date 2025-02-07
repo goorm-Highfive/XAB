@@ -80,6 +80,8 @@ export async function GET(
         'id, content, created_at, user_id, parent_id, dept, post_id, is_delete, users(username)',
       )
       .eq('post_id', postId)
+      .order('parent_id', { ascending: true }) // 부모 댓글이 먼저 정렬되도록 추가
+      .order('created_at', { ascending: true }) // 같은 부모 내에서 시간순 정렬
     if (commentsError) throw new Error(commentsError.message)
 
     const commentsCount = commentData ? commentData.length : 0
@@ -114,6 +116,7 @@ export async function GET(
     )
 
     // 5) 댓글 데이터를 트리 구조로 변환
+    // 댓글을 트리 구조로 변환
     type Comment = Tables<'comments'> & {
       username: string
       likeCount: number
@@ -123,16 +126,19 @@ export async function GET(
     const commentMap: Record<number, Comment> = {}
     const roots: Comment[] = []
 
+    // 먼저 모든 댓글을 commentMap에 등록
+
     comments.forEach((comment) => {
-      const mappedComment: Comment = {
+      commentMap[comment.id] = {
         ...comment,
         likeCount: likeCounts[comment.id] || 0,
         userLiked: userLikes.has(comment.id),
         replies: [],
       }
+    })
 
-      commentMap[comment.id] = mappedComment
-
+    // 부모 → 자식 순서로 정렬된 후이므로, 대댓글을 올바른 부모에 추가 가능
+    comments.forEach((comment) => {
       if (comment.parent_id === null) {
         roots.push(commentMap[comment.id])
       } else {
