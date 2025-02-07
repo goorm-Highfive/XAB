@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import Write from '#/write/page' // Write 컴포넌트
+import { WriteForm } from '~/components/write/write-form'
 import {
   Dialog,
   DialogContent,
@@ -21,7 +21,7 @@ export default function WriteModal() {
   }, [])
 
   const handleClose = () => {
-    router.back()
+    router.back() // 인터셉트 라우팅을 통해 모달 닫기
   }
 
   return (
@@ -34,8 +34,7 @@ export default function WriteModal() {
               : 'Create Post with A/B Testing'}
           </DialogTitle>
         </DialogHeader>
-        {/* onClose prop 전달 */}
-        <Write onClose={handleClose} />
+        <WriteForm onClose={handleClose} />
       </DialogContent>
     </Dialog>
   )
