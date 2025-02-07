@@ -1,8 +1,10 @@
+// components/survey-detail/survey-comment.tsx
+'use client'
+
 import { useState } from 'react'
 import { Heart, Ellipsis } from 'lucide-react'
 import { toast } from 'sonner'
 import Image from 'next/image'
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +24,7 @@ type SurveyCommentProps = {
   handleCommentLikeToggle: (id: number) => void
 }
 
-function SurveyComment({
+export function SurveyComment({
   comment,
   currentUserId,
   handleCommentLikeToggle,
@@ -47,7 +49,7 @@ function SurveyComment({
   const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false)
   const [isOpen, setIsOpen] = useState<boolean>(false)
 
-  // 댓글을 단 유저랑 현재 로그인 한 유저가 같은가? 다르면 수정 및 삭제 불가
+  // 현재 댓글 작성자와 로그인한 사용자가 동일한지 확인
   const isAuthorized = () => {
     if (currentUserId !== user_id) {
       toast.error(
@@ -58,21 +60,16 @@ function SurveyComment({
     return true
   }
 
-  // 수정 모드
   const handleEdit = () => {
     if (!isAuthorized()) return
-
     setIsEditing(true)
-    console.log(id)
   }
 
-  // 수정 취소
   const handleCancel = () => {
     setIsEditing(false)
     setEditContent(content)
   }
 
-  // 수정한 데이터 DB에 전송
   const handleEditSubmit = async () => {
     const response = await fetch('/api/comments/edit', {
       method: 'POST',
@@ -90,18 +87,16 @@ function SurveyComment({
     toast.success('The comment has been successfully updated')
   }
 
-  // 삭제: 댓글을 단 유저랑 현재 로그인 한 유저가 다른지 확인 후 다르면 알림창 대신 toast 뜸
   const handleMenuItemClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isAuthorized()) {
       setIsAlertOpen(false)
     } else {
-      e.preventDefault() //DropdownMenu는 메뉴 선택 시 닫힘 -> Alert도 같이 닫혀서 사용해줌
+      e.preventDefault() // DropdownMenu와 Alert가 동시에 닫히는 문제 예방
       setIsAlertOpen(true)
       setIsOpen(false)
     }
   }
 
-  // 댓글 삭제
   const handleDelete = async () => {
     if (!isAuthorized()) return
 
@@ -109,9 +104,7 @@ function SurveyComment({
       const response = await fetch('/api/comments/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: id,
-        }),
+        body: JSON.stringify({ id }),
       })
       const result = await response.json()
       if (!result.success) throw new Error(result.error)
@@ -124,8 +117,7 @@ function SurveyComment({
   return (
     <div className="mb-4 mt-2 flex">
       <div className="mr-3 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
-        {/*프로필 이미지 기능 구현 시 변경*/}
-        <Image src={defaultProfile} alt="" />{' '}
+        <Image src={defaultProfile} alt="" />
       </div>
       <div className="flex-auto">
         <div className="flex justify-between rounded-lg bg-primary-foreground px-5 py-3">
@@ -133,10 +125,7 @@ function SurveyComment({
             <div className="mb-1 flex justify-between">
               {!is_delete ? <b>{username}</b> : <b>Unknown User</b>}
               {!is_delete && (
-                <DropdownMenu
-                  open={isOpen}
-                  onOpenChange={(open) => setIsOpen(open)}
-                >
+                <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
                   <DropdownMenuTrigger className="rounded p-1 hover:bg-gray-100">
                     <Ellipsis className="text-gray-500" size={16} />
                   </DropdownMenuTrigger>
@@ -226,17 +215,17 @@ function SurveyComment({
           </div>
         ))}
 
+        {/* ReplyInput 컴포넌트에 onReplySubmit 콜백을 전달하여, 답글 작성 후 reply 창을 닫도록 처리 */}
         {reply && (
           <ReplyInput
             username={username}
             postId={post_id}
             replyId={id}
             dept={dept}
+            onReplySubmit={() => setReply(false)}
           />
         )}
       </div>
     </div>
   )
 }
-
-export { SurveyComment }

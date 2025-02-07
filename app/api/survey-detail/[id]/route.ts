@@ -28,6 +28,14 @@ export async function GET(
     }
 
     const userId = user.id
+    // UserName 데이터 -> 현재 접속중인 사용자의 이름을 반환
+    const { data: currentUserName, error: currentUserNameError } =
+      await supabase
+        .from('users')
+        .select('username')
+        .eq('id', userId || 'undefined')
+        .single()
+    if (currentUserNameError) throw new Error(currentUserNameError.message)
 
     // 2) 게시글 데이터 가져오기
     const { data: post, error: postError } = await supabase
@@ -184,6 +192,7 @@ export async function GET(
       comments_count: commentsCount,
       likes_count: post.likes ? post.likes.length : 0,
       userLikedPostIds,
+      currentUserName: currentUserName.username,
       userVote,
       votesA,
       votesB,

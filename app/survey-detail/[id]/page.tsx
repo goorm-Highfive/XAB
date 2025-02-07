@@ -1,3 +1,4 @@
+//survey-detail/[id]/page
 import { SurveyCard } from '~/components/common/survey-card/survey-card'
 import { CommentsSection } from '~/components/survey-detail/survey-comment-section'
 import { headers } from 'next/headers'
@@ -38,7 +39,6 @@ export default async function SurveyDetailPage({
     }
 
     const { data } = await response.json()
-    console.log(data)
 
     return (
       <div className="min-h-screen bg-gray-100">
@@ -51,6 +51,7 @@ export default async function SurveyDetailPage({
             <CommentsSection
               initialComments={data.comments}
               currentUserId={user.id}
+              currentUserName={data.currentUserName}
               postId={data.post_id}
             />
           </div>
